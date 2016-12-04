@@ -1,4 +1,4 @@
-Deck Chores
+deck-chores
 ===========
 
 .. image:: https://img.shields.io/pypi/v/deck_chores.svg
@@ -13,7 +13,7 @@ Job scheduler for Docker containers, configured via container labels.
 
 
 * Free software: ISC license
-* Documentation: https://deck-chores.readthedocs.io.
+* Documentation: http://deck-chores.rtfd.io
 
 
 Features
@@ -27,13 +27,39 @@ Features
 Example
 -------
 
-* TODO
+Let's say you want to dump the database of a Wordpress once a day. Here's a ``docker-compose.yml``
+that defines a job that will be handled by *deck-chores*:
+
+.. code-block:: yaml
+
+    version: '2'
+
+    services:
+      wordpress:
+        image: wordpress
+      mysql:
+        image: mariadb
+        volumes:
+          - ./database_dumps:/dumps
+        labels:
+          deck-chores.dump.command: sh -c "mysqldump --all-databases > /dumps/dump-$$(date -Idate)"
+          deck-chores.dump.interval: daily
+
+It is however recommended use scripts with a proper shebang for such actions. Their outputs to
+``stdout`` and ``stderr`` as well as their exit code will be logged by *deck-chores*.
 
 
 Acknowledgements
 ----------------
 
-* TODO
+It wouldn't be as charming to write this piece of software without these projects:
+
+* `APScheduler <https://apscheduler.readthedocs.io>`_ for managing jobs
+* `cerberus <http://python-cerberus.org>`_ for processing metadata
+* `docker-py <https://docker-py.readthedocs.io>`_ for Docker interaction
+* `flake8 <http://flake8.pycqa.org/>`_, `mypy <http://mypy-lang.org>`_,
+  `pytest <http://pytest.org>`_ and `tox <https://tox.readthedocs.io>`_ for testing
+* `Python <https://python.org>`_
 
 
 Roadmap
