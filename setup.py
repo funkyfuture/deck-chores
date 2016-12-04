@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from os import chdir, getcwd
+from pathlib import Path
 from setuptools import setup
+
+
+PROJECT_DIR = Path(__file__).parent
+
+_old_cwd = getcwd()
+chdir(str(PROJECT_DIR))
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -12,7 +20,7 @@ with open('HISTORY.rst') as history_file:
 
 setup(
     name='deck_chores',
-    version='0.1.0',
+    version='0.1.beta1',
     description="Job scheduler for Docker containers, configured via container labels.",
     long_description=readme + '\n\n' + history,
     author="Frank Sachsenheim",
@@ -30,7 +38,7 @@ setup(
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: ISC License (ISCL)',
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython'
     ],
     entry_points="""
@@ -38,3 +46,5 @@ setup(
     deck-chores=deck_chores.main:main
     """
 )
+
+chdir(_old_cwd)

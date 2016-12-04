@@ -1,11 +1,8 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help build build-dev tag_latest run-dev
+.PHONY: clean clean-test clean-pyc clean-build docs help build build-dev run-dev
 .DEFAULT_GOAL := build-dev
 
 NAME = funkyfuture/deck-chores
-VERSION = 0.1
-BUILD_DATE = $(shell date --rfc-3339=seconds)
-COMMIT = 'None'
-# FIXME COMMIT = $(shell git rev-parse HEAD)
+VERSION = $(shell grep __version__ deck_chores/__init__.py | cut -f3 -d" ")
 
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -18,15 +15,13 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
-BUILD_ARGS = --build-arg BUILD_DATE="$(BUILD_DATE)" --build-arg COMMIT=$(COMMIT) --build-arg VERSION=$(VERSION)
-
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 all: build
 
 build:
-	docker build -t $(NAME):$(VERSION) $(BUILD_ARGS) --rm .
+	docker build -t $(NAME):$(VERSION) --rm .
 
 run:
 	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(NAME):$(VERSION)
@@ -61,21 +56,17 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 deck_chores tests
 
-test: ## run tests
-	TODO
+test:
+	tox
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	xdg-open docs/_build/html/index.html
 
-tag_latest:
-	docker tag -f $(NAME):$(VERSION) $(NAME):latest
-
-release: clean build tag_latest
+release: clean build
 	python setup.py sdist upload
 	python setup.py bdist_wheel upload
-	docker push $(NAME)
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist

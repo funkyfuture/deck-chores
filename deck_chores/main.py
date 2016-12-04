@@ -9,17 +9,12 @@ from signal import signal, SIGINT, SIGTERM
 from apscheduler.schedulers import SchedulerNotRunningError  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore
 
+from deck_chores import __version__
 from deck_chores.config import cfg, generate_config
 from deck_chores.exceptions import ConfigurationError
 from deck_chores import jobs
 import deck_chores.parsers as parse
 from deck_chores.utils import from_json, trueish
-
-
-####
-
-
-VERSION = '0.1-pre'
 
 
 ####
@@ -133,7 +128,7 @@ def shutdown() -> None:
 
 
 def main() -> None:
-    log.info('Deck Chores %s started.' % VERSION)
+    log.info('Deck Chores %s started.' % __version__)
     try:
         generate_config()
         log.debug('Config: %s' % cfg.__dict__)
