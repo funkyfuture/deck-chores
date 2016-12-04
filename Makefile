@@ -65,8 +65,9 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	xdg-open docs/_build/html/index.html
 
 release: clean build
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+	git tag -f latest
+	git push --tags
+	python setup.py sdist bdist_wheel upload
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist

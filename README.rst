@@ -1,25 +1,16 @@
 deck-chores
 ===========
 
-.. image:: https://img.shields.io/pypi/v/deck_chores.svg
-        :target: https://pypi.python.org/pypi/deck_chores
+** A job scheduler for Docker containers, configured via container labels.**
 
-.. image:: https://readthedocs.org/projects/deck-chores/badge/?version=latest
-        :target: https://deck-chores.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-Job scheduler for Docker containers, configured via container labels.
-
-
-* Free software: ISC license
 * Documentation: http://deck-chores.rtfd.io
+* Free software: ISC license
 
 
 Features
 --------
 
-- define regular jobs by defining container labels
+- define regular jobs to run within a container context with container labels
 - use date, interval and cron-like triggers
 - set a maximum of simultaneously running instances per job
 
@@ -68,7 +59,6 @@ Roadmap
 0.1
 ...
 
-- configurable logformat
 - take compose projects into account
 - also parse image's labels
   - omit when magic label is set

@@ -4,7 +4,7 @@ from apscheduler.triggers.base import BaseTrigger  # type: ignore
 from pytz import utc
 
 from deck_chores import config
-from deck_chores import parsers as parse
+from deck_chores.parsers import _parse_labels as parse_labels
 from deck_chores.parsers import CronTrigger, DateTrigger, IntervalTrigger, JobConfigValidator
 
 from tests.utils import equal_triggers

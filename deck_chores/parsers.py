@@ -9,6 +9,7 @@ import cerberus  # type: ignore
 from pytz import all_timezones
 
 from deck_chores.config import cfg
+from deck_chores.exceptions import ParsingError
 
 
 ####
@@ -52,14 +53,11 @@ class JobConfigValidator(cerberus.Validator):
             return cls(*args, timezone=self.document.get('timezone', cfg.timezone))
         except Exception as e:
             message = "Error while instantiating a {trigger} with '{value}'.".format(
-                trigger=cls.__name__, value=value
-            )
+                trigger=cls.__name__, value=value)
             if cfg.debug:
-                log.debug(message)
-                log.debug("parsed arguments: %s" % args)
-                log.exception(e)  # type: ignore
-
-            raise Exception(message)
+                message += " Parsed arguments: %s" % args
+                message += "\n%s" % e
+            raise ParsingError(message)
 
     def _normalize_coerce_cron(self, value: str) -> CronTrigger:
         args = self._fill_args(value, len(CronTrigger.FIELD_NAMES), '*')
@@ -71,7 +69,7 @@ class JobConfigValidator(cerberus.Validator):
     def _normalize_coerce_interval(self, value: str) -> IntervalTrigger:
         args = NAME_INTERVAL_MAP.get(value)
         if args is None:
-            for c in ('.:/'):
+            for c in '.:/':
                 value = value.replace(c, ' ')
             args = self._fill_args(value, 5, '0')  # type: ignore
             args = tuple(int(x) for x in args)  # type: ignore
@@ -108,7 +106,28 @@ job_def_validator = JobConfigValidator({
 ####
 
 
-def labels(_labels: dict) -> dict:
+def labels(*args, **kwargs) -> Tuple[str, str, dict]:
+    # don't call this from unittests
+    try:
+        return _parse_labels(*args, **kwargs)
+    except ParsingError as e:
+        if isinstance(e.args[0], str):
+            lines = e.args[0].splitlines()
+        elif isinstance(e.args[0], list):
+            lines = e.args[0]
+        else:
+            raise RuntimeError
+        for line in lines:
+            if isinstance(line, str):
+                log.error(line)
+            elif isinstance(line, Exception):
+                log.exception(line)
+        return '', '', {}
+    except Exception as e:
+        raise e
+
+
+def _parse_labels(_labels: dict) -> Tuple[str, str, dict]:
     log.debug('Parsing labels: %s' % _labels)
     filtered_labels = {k: v for k, v in _labels.items()
                        if k.startswith(cfg.label_ns)}

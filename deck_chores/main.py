@@ -39,7 +39,6 @@ signal(SIGTERM, sigterm_handler)
 
 log = logging.getLogger('deck_chores')
 log_handler = logging.StreamHandler(sys.stdout)
-log_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
 log.addHandler(log_handler)
 log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INFO)
 
@@ -131,6 +130,7 @@ def main() -> None:
     log.info('Deck Chores %s started.' % __version__)
     try:
         generate_config()
+        log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
         log.debug('Config: %s' % cfg.__dict__)
         jobs.start_scheduler()
         inspection_time = inspect_running_containers()

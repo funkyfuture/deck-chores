@@ -152,6 +152,12 @@ default: ``deck-chores``
 
 The label namespace to look for job definitions.
 
+.. envvar:: LOG_FORMAT
+
+default: ``{asctime}|{levelname:8}|{message}``
+
+Pattern that formats `log record attributes`_.
+
 .. envvar:: TIMEZONE
 
 default: ``UTC``
@@ -181,4 +187,5 @@ Authentication related files are expected to be available at ``/config/ca.pem``,
 
 .. _cron-trigger: https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#introduction
 .. _docker-compose: https://docs.docker.com/compose/
+.. _log record attributes: https://docs.python.org/library/logging.html#logrecord-attributes
 .. _ssl: https://docs.python.org/library/ssl.html#ssl.PROTOCOL_TLS

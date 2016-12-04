@@ -61,6 +61,7 @@ def generate_config() -> None:
     cfg.default_max = int(getenv('DEFAULT_MAX', '1'))
     cfg.default_user = getenv('DEFAULT_USER', 'root')
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
+    cfg.logformat = getenv('LOG_FORMAT', '{asctime}|{levelname:8}|{message}')
     cfg.ssl_version = _resolve_tls_version(getenv('SSL_VERSION', 'TLS'))
     cfg.timezone = getenv('TIMEZONE', 'UTC').replace(' ', '_')
 
