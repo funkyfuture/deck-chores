@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  beep:
+    build:
+      context: ./build
+    volumes:
+      - ${OUTFILE}:/receiver.txt
+    environment:
+      COUNT: "3"
+      DELAY: "1"
+    labels:
+      deck-chores.beep.command: /beep.sh
+      deck-chores.beep.interval: "15"

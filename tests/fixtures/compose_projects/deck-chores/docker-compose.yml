@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  officer:
+    image: funkyfuture/deck-chores:dev
+    environment:
+      DEBUG: 'no'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
