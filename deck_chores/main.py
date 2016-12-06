@@ -47,7 +47,7 @@ log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INF
 ####
 
 
-def process_container_labels(container_id: str, labels: dict) -> None:
+def process_running_container_labels(container_id: str, labels: dict) -> None:
     service_id, options, definitions = parse.labels(labels)
     if not definitions:
         return
@@ -60,14 +60,6 @@ def process_container_labels(container_id: str, labels: dict) -> None:
     jobs.add(container_id, definitions)
 
 
-def exec_inspection(containers: dict) -> None:
-    log.info('Inspecting running containers.')
-    for container in containers:
-        container_id = container['Id']
-        labels = container.get('Labels', {})
-        process_container_labels(container_id, labels)
-
-
 def inspect_running_containers() -> datetime:
     log.debug('Fetching running containers')
     containers = cfg.client.containers(filters={'status': 'running'})
@@ -75,6 +67,14 @@ def inspect_running_containers() -> datetime:
     jobs.scheduler.add_job(exec_inspection, trigger=DateTrigger(), args=(containers,),
                            id='container_inspection')
     return inspection_time
+
+
+def exec_inspection(containers: dict) -> None:
+    log.info('Inspecting running containers.')
+    for container in containers:
+        container_id = container['Id']
+        labels = container.get('Labels', {})
+        process_running_container_labels(container_id, labels)
 
 
 def listen(since: datetime = datetime.utcnow()) -> None:
@@ -97,7 +97,7 @@ def handle_start(event: dict) -> None:
     log.debug('Handling start.')
     container_id = event['Actor']['ID']
     labels = event['Actor'].get('Attributes', {})
-    process_container_labels(container_id, labels)
+    process_running_container_labels(container_id, labels)
 
 
 def handle_die(event: dict) -> None:
