@@ -51,57 +51,52 @@ class JobConfigValidator(cerberus.Validator):
         tokens = value.split(' ')
         return tuple([filling] * (length - len(tokens)) + tokens)
 
-    def _instantiate_trigger(self, value: str, cls: type, args) -> Union[Trigger, None]:
-        try:
-            return cls(*args, timezone=self.document.get('timezone', cfg.timezone))
-        except Exception as e:
-            message = "Error while instantiating a {trigger} with '{value}'.".format(
-                trigger=cls.__name__, value=value)
-            if cfg.debug:
-                message += " Parsed arguments: %s" % args
-                message += "\n%s" % e
-            raise ParsingError(message)
-
-    def _normalize_coerce_cron(self, value: str) -> CronTrigger:
+    def _normalize_coerce_cron(self, value: str) -> Tuple[object, tuple]:
         args = self._fill_args(value, len(CronTrigger.FIELD_NAMES), '*')
-        return self._instantiate_trigger(value, CronTrigger, args)
+        return CronTrigger, args
 
-    def _normalize_coerce_date(self, value: str) -> DateTrigger:
-        return self._instantiate_trigger(value, DateTrigger, (value,))
+    def _normalize_coerce_date(self, value: str) -> Tuple[object, tuple]:
+        return DateTrigger, (value,)
 
-    def _normalize_coerce_interval(self, value: str) -> IntervalTrigger:
+    def _normalize_coerce_interval(self, value: str) -> Tuple[object, tuple]:
         args = NAME_INTERVAL_MAP.get(value)
         if args is None:
             for c in '.:/':
                 value = value.replace(c, ' ')
             args = self._fill_args(value, 5, '0')  # type: ignore
             args = tuple(int(x) for x in args)  # type: ignore
-        return self._instantiate_trigger(value, IntervalTrigger, args)
+        return IntervalTrigger, args
 
-    @staticmethod
-    def _validate_type_cron_trigger(value):
-        return isinstance(value, CronTrigger)
+    # TODO remove with the next release of cerberus
+    def _validate_validator_trigger(self, field, value):
+        pass
 
-    @staticmethod
-    def _validate_type_date_trigger(value):
-        return isinstance(value, DateTrigger)
-
-    @staticmethod
-    def _validate_type_interval_trigger(value):
-        return isinstance(value, IntervalTrigger)
+    def _validator_trigger(self, field, value):
+        if isinstance(value, str):  # normalization failed
+            return
+        cls, args = value[0], value[1]
+        try:
+            cls(*args, timezone=self.document.get('timezone', cfg.timezone))
+        except Exception as e:
+            message = "Error while instantiating a {trigger} with '{args}'.".format(
+                trigger=cls.__name__, args=args)
+            if cfg.debug:
+                message += "\n%s" % e
+            self._error(field, message)
 
 
 job_def_validator = JobConfigValidator({
     'command': {'required': True},
-    'cron': {'coerce': 'cron', 'type': 'cron_trigger',
+    'cron': {'coerce': 'cron', 'validator': 'trigger',
              'required': True, 'excludes': ['date', 'interval']},
-    'date': {'coerce': 'date', 'type': 'date_trigger',
+    'date': {'coerce': 'date', 'validator': 'trigger',
              'required': True, 'excludes': ['cron', 'interval']},
-    'interval': {'coerce': 'interval', 'type': 'interval_trigger',
+    'interval': {'coerce': 'interval', 'validator': 'trigger',
                  'required': True, 'excludes': ['cron', 'date']},
     'max': {'coerce': int, 'default_setter': lambda x: cfg.default_max},
     'name': {'regex': r'[a-z0-9.-]+'},
-    'timezone': {'allowed': all_timezones},
+    'timezone': {'default_setter': lambda x: cfg.timezone, 'allowed': all_timezones,
+                 'required': True},
     'user': {'default_setter': lambda x: cfg.default_user}
 })
 
@@ -130,6 +125,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
         raise e
 
 
+@lru_dict_arg_cache
 def _parse_labels(_labels: dict) -> Tuple[str, str, dict]:
     log.debug('Parsing labels: %s' % _labels)
     options = _parse_options(_labels)
@@ -191,10 +187,11 @@ def _parse_job_defintion(_labels: dict) -> dict:
             log.error('Errors: %s' % job_def_validator.errors)
         else:
             job = job_def_validator.document
-            trigger = None
             for trigger_name in ('cron', 'date', 'interval'):
-                trigger = trigger or job.pop(trigger_name, None)
-            job['trigger'] = trigger
+                trigger = job.pop(trigger_name, None)
+                if trigger is None:
+                    continue
+                job['trigger'] = trigger
             log.debug('Normalized definition: %s' % job)
             result[name] = job
 

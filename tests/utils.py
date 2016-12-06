@@ -2,25 +2,10 @@ from os import chdir, environ
 from pathlib import Path
 from subprocess import check_output
 
-from deck_chores.parsers import CronTrigger, DateTrigger, IntervalTrigger
-
 
 TEST_DIR = Path(__file__).parent
 PROJECT_DIR = TEST_DIR / '..'
 COMPOSE_PROJECTS_DIR = TEST_DIR / 'fixtures' / 'compose_projects'
-
-
-def equal_triggers(a, b):
-    if not isinstance(b, (type(a))):
-        raise AssertionError('%s != %s ' % (a.__class__, b.__class__))
-    if isinstance(a, CronTrigger):
-        for i, field in enumerate(a.fields):
-            assert field == b.fields[i]
-    elif isinstance(a, DateTrigger):
-        assert a.run_date == b.run_date
-    elif isinstance(a, IntervalTrigger):
-        assert a.interval_length == b.interval_length
-    return True
 
 
 def on_travis():

@@ -119,16 +119,17 @@ def add(container_id: str, definitions: dict) -> None:
     log.debug('Adding jobs for %s.' % container_name)
     for job_name, definition in definitions.items():
         job_id = generate_id(container_id, job_name)
-        trigger = definition.pop('trigger')
-        max_instances = definition.pop('max')
+        trigger = definition['trigger']
         definition.update({
             'job_name': job_name, 'job_id': job_id,
             'container_id': container_id, 'container_name': container_name}
         )
-        scheduler.add_job(func=exec_job, trigger=trigger,
+        scheduler.add_job(func=exec_job,
+                          trigger=trigger[0](*trigger[1],
+                                             timezone=definition['timezone']),
                           kwargs=definition,
                           id=job_id,
-                          max_instances=max_instances,
+                          max_instances=definition['max'],
                           replace_existing=True)
         log.info("Added '%s' for %s" % (job_name, container_name))
 
