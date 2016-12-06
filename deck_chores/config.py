@@ -4,6 +4,7 @@ import ssl
 from types import SimpleNamespace
 
 from docker import Client  # type: ignore
+from docker.constants import DEFAULT_TIMEOUT_SECONDS  # type: ignore
 from docker.tls import TLSConfig  # type: ignore
 
 from deck_chores.exceptions import ConfigurationError
@@ -55,7 +56,7 @@ def _test_daemon_socket(url: str) -> str:
 def generate_config() -> None:
     cfg.assert_fingerprint = trueish(getenv('ASSERT_FINGERPRINT', 'no'))
     cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
-    cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', '120'))
+    cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
     cfg.daemon_url = _test_daemon_socket(getenv('DOCKER_DAEMON', 'unix://var/run/docker.sock'))
     cfg.debug = trueish(getenv('DEBUG', 'no'))
     cfg.default_max = int(getenv('DEFAULT_MAX', '1'))

@@ -110,6 +110,24 @@ Examples
 There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``every minute`` and
 ``every second``.
 
+.. _options:
+
+Container options
+-----------------
+
+Option flags control *deck-chores*'s behaviour. The schema for an option label name is::
+
+    $LABEL_NAMESPACE.options
+
+Options are set as comma-separated list of flags. An option set by :envvar:`DEFAULT_OPTIONS` can
+be unset by prefixing with ``no``.
+
+.. option:: service
+
+    Registers no further jobs for containers that are identified with the same service.
+
+    See :envvar:`SERVICE_ID_LABELS` regarding service identity.
+
 
 Environment variables
 ---------------------
@@ -118,68 +136,68 @@ deck-chore's behaviour is defined by these environment variables:
 
 .. envvar:: CLIENT_TIMEOUT
 
-default: ``120``
-
-The timeout for responses from the Docker daemon.
+    The timeout for responses from the Docker daemon. The default is imported from *docker-py*.
 
 .. envvar:: DOCKER_DAEMON
 
-default: ``unix://var/run/docker.sock``
+    default: ``unix://var/run/docker.sock``
 
-The URL of the Docker daemon to connect to.
+    The URL of the Docker daemon to connect to.
 
 .. envvar:: DEBUG
 
-default: ``no``
+    default: ``no``
 
-Log debugging messages.
+    Log debugging messages.
 
 .. envvar:: DEFAULT_MAX
 
-default: ``1``
+    default: ``1``
 
-The default for a job's ``max`` attribute.
+    The default for a job's ``max`` attribute.
+
 
 .. envvar:: DEFAULT_USER
 
-default: ``root``
+    default: ``root``
 
-The default for a job's ``user`` attribute.
+    The default for a job's ``user`` attribute.
 
 .. envvar:: LABEL_NAMESPACE
 
-default: ``deck-chores``
+    default: ``deck-chores``
 
-The label namespace to look for job definitions.
+    The label namespace to look for job definitions.
 
 .. envvar:: LOG_FORMAT
 
-default: ``{asctime}|{levelname:8}|{message}``
+    default: ``{asctime}|{levelname:8}|{message}``
 
-Pattern that formats `log record attributes`_.
+    Pattern that formats `log record attributes`_.
+
 
 .. envvar:: TIMEZONE
 
 default: ``UTC``
 
-The job scheduler's timezone and the default for a job's ``timezone`` attribute.
+    The job scheduler's timezone and the default for a job's ``timezone`` attribute.
 
 TLS options
 ~~~~~~~~~~~
 
 .. envvar:: ASSERT_FINGERPRINT
 
-default: ``no``
+    default: ``no``
 
 .. envvar:: ASSERT_HOSTNAME
 
-default: ``no``
+    default: ``no``
 
 .. envvar:: SSL_VERSION
 
-default: ``TLS`` (selects the highest version supported by the client and the daemon)
+    default: ``TLS`` (selects the highest version supported by the client and the daemon)
 
-For other options see the names provided by Python's ssl_ library prefixed with ``PROTOCOL_``.
+    For other options see the names provided by Python's ssl_ library prefixed with ``PROTOCOL_``.
 
 Authentication related files are expected to be available at ``/config/ca.pem``,
 ``/config/cert.pem`` respectively ``/config/key.pem``.
