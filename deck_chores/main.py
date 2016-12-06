@@ -8,6 +8,8 @@ from signal import signal, SIGINT, SIGTERM
 
 from apscheduler.schedulers import SchedulerNotRunningError  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore
+from docker import Client  # type: ignore
+from fasteners import InterProcessLock  # type: ignore
 
 from deck_chores import __version__
 from deck_chores.config import cfg, generate_config
@@ -16,6 +18,27 @@ from deck_chores.indexes import locking_container_to_services_map
 from deck_chores import jobs
 import deck_chores.parsers as parse
 from deck_chores.utils import from_json, generate_id, trueish
+
+
+####
+
+
+lock = InterProcessLock('/tmp/deck-chores.lock')
+
+
+def there_is_another_deck_chores_container(client: Client) -> bool:
+    matched_containers = 0
+    for container in client.containers():
+        if container['State'] in 'created,exited':
+            continue
+        image_id = container['ImageID'].split(':')[1]
+        labels = client.inspect_image(image_id)['Config']['Labels']
+        if labels.get('org.label-schema.name', '') == 'deck-chores':
+            matched_containers += 1
+        if matched_containers > 1:
+            return True
+    assert matched_containers == 1
+    return False
 
 
 ####
@@ -148,11 +171,17 @@ def shutdown() -> None:
 
 
 def main() -> None:
+    if not lock.acquire(blocking=False):
+        print("Couldn't acquire lock file at %s, exiting." % lock.path)
+        sys.exit(1)
     log.info('Deck Chores %s started.' % __version__)
     try:
         generate_config()
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
         log.debug('Config: %s' % cfg.__dict__)
+        if there_is_another_deck_chores_container(cfg.client):
+            log.error("There's another container running deck-chores, maybe paused or restarting.")
+            raise SystemExit(1)
         jobs.start_scheduler()
         inspection_time = inspect_running_containers()
         listen(since=inspection_time)
@@ -169,6 +198,7 @@ def main() -> None:
         exit_code = 0
     finally:
         shutdown()
+        lock.release()
         sys.exit(exit_code)
 
 

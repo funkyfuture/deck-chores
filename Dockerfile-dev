@@ -2,12 +2,14 @@ FROM python:3.6.0b4-alpine
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["deck-chores"]
+LABEL org.label-schema.name="deck-chores"
 ENV DEBUG=true
 
 RUN apk add --no-cache --virtual .build-deps build-base \
  && apk add --no-cache ca-certificates \
- && pip install  cerberus dumb-init docker-py APScheduler \
+ && pip install  cerberus dumb-init docker-py fasteners APScheduler \
  && apk del .build-deps
+
 
 COPY . /src
 

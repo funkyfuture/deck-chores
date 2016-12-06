@@ -61,7 +61,6 @@ Roadmap
 
 - also parse image's labels
   - omit when magic label is set
-- detect other running deck-chores containers and exit if positive
 
 
 0.2
