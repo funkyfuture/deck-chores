@@ -6,7 +6,8 @@ import pytest
 from tests.utils import ComposeProject
 
 
-pytestmark = pytest.mark.skipif("os.getenv('TRAVIS') == 'true'", reason='No Docker client available.')
+pytestmark = pytest.mark.skipif("os.getenv('TRAVIS') == 'true'",
+                                reason='No Docker client available.')
 
 
 def test_sojus(deck_chores, tmpdir):
