@@ -124,9 +124,11 @@ Option flags control *deck-chores*'s behaviour. The schema for an option label n
 Options are set as comma-separated list of flags. An option set by :envvar:`DEFAULT_OPTIONS` can
 be unset by prefixing with ``no``.
 
+These options are available:
+
 .. option:: service
 
-    Registers no further jobs for containers that are identified with the same service.
+    Restricts jobs to one container of those that are identified with the same service.
 
     See :envvar:`SERVICE_ID_LABELS` regarding service identity.
 
@@ -187,7 +189,7 @@ deck-chore's behaviour is defined by these environment variables:
     default: ``com.docker.compose.project,com.docker.compose.service``
 
     A comma-separated list of container labels that identify a unique service with possibly multiple
-    container instances. See :option:`service`.
+    container instances. This has an impact on how the :option:`service` option behaves.
 
 .. envvar:: TIMEZONE
 
