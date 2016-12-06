@@ -6,7 +6,7 @@ from apscheduler.job import Job  # type: ignore
 from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 
 from deck_chores.config import cfg
-from deck_chores.utils import generate_job_id
+from deck_chores.utils import generate_id
 
 
 ####
@@ -117,7 +117,7 @@ def add(container_id: str, definitions: dict) -> None:
     container_name = cfg.client.inspect_container(container_id)['Name']
     log.debug('Adding jobs for %s.' % container_name)
     for job_name, definition in definitions.items():
-        job_id = generate_job_id(container_id, job_name)
+        job_id = generate_id(container_id, job_name)
         trigger = definition.pop('trigger')
         max_instances = definition.pop('max')
         definition.update({

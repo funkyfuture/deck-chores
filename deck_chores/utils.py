@@ -13,5 +13,5 @@ def trueish(value: str) -> bool:
     return value.strip().lower() in ('1', 'on', 'true', 'yes')
 
 
-def generate_job_id(container_id: str, job_name: str) -> str:
-    return str(uuid5(NAMESPACE_OID, container_id + job_name))
+def generate_id(*args) -> str:
+    return str(uuid5(NAMESPACE_OID, ''.join(args)))
