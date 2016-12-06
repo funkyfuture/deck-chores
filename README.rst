@@ -59,7 +59,6 @@ Roadmap
 0.1
 ...
 
-- take compose projects into account
 - also parse image's labels
   - omit when magic label is set
 - detect other running deck-chores containers and exit if positive

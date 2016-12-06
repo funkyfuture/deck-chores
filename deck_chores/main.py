@@ -12,6 +12,7 @@ from apscheduler.triggers.date import DateTrigger  # type: ignore
 from deck_chores import __version__
 from deck_chores.config import cfg, generate_config
 from deck_chores.exceptions import ConfigurationError
+from deck_chores.indexes import locking_container_to_services_map
 from deck_chores import jobs
 import deck_chores.parsers as parse
 from deck_chores.utils import from_json, generate_id, trueish
@@ -48,6 +49,14 @@ log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INF
 
 def process_container_labels(container_id: str, labels: dict) -> None:
     service_id, options, definitions = parse.labels(labels)
+    if not definitions:
+        return
+    if service_id and 'service' in options:
+        if locking_container_to_services_map.values():
+            log.debug('Service id has a registered job: %s' % service_id)
+            return
+        log.info('Locking service id: %s' % service_id)
+        locking_container_to_services_map[container_id] = service_id
     jobs.add(container_id, definitions)
 
 
@@ -99,6 +108,13 @@ def handle_die(event: dict) -> None:
         return
 
     container_id = event['Actor']['ID']
+    if service_id and 'service' in options:
+        if container_id in locking_container_to_services_map:
+            log.info('Unlocking service id: %s' % service_id)
+            del locking_container_to_services_map[container_id]
+        else:
+            return
+
     container_name = cfg.client.inspect_container(container_id)['Name']
     for job_name in definitions:
         log.info("Removing job '%s' for %s" % (job_name, container_name))
