@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from apscheduler.triggers.base import BaseTrigger  # type: ignore
+from pytest import mark
 from pytz import utc
 
 from deck_chores import config
@@ -49,10 +50,20 @@ def test_parse_labels():
          'gen-thumbs': {'trigger': CronTrigger('*', '*', '*', '*/10', '*', '*', '*', '*'),
                         'name': 'gen-thumbs', 'command': 'python /scripts/gen_thumbs.py',
                         'user': 'root', 'max': 3}}
-    assert_expected_job_result(labels, expected_jobs, 3)
+    assert_expected_job_result(labels, expected_jobs)
 
 
 def test_interval_trigger():
     validator = JobConfigValidator({'trigger': {'coerce': 'interval'}})
-    validator({'trigger': '15'})
+    assert validator({'trigger': '15'})
     assert equal_triggers(validator.document['trigger'], IntervalTrigger(seconds=15))
+
+
+@mark.parametrize('default,value,result',
+                  ((('image', 'service'), '', 'image,service'),
+                   (('image', 'service'), 'noservice', 'image'),
+                   (('service',), 'image', 'image,service')))
+def test_options(default, value, result):
+    config.cfg.default_options = default
+    labels = {'deck-chores.options': value}
+    assert parse_labels(labels) == ('', result, {})

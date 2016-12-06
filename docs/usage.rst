@@ -38,6 +38,8 @@ has an own namespace that holds all its attributes. Thus an attribute's key has 
 
     $LABEL_NAMESPACE.<job name>.<job attribute>
 
+The *job name* ``options`` cannot be used as it is reserved for setting :ref:`options`.
+
 The following attributes are available:
 
 =========  ==========================================================
@@ -156,6 +158,11 @@ deck-chore's behaviour is defined by these environment variables:
 
     The default for a job's ``max`` attribute.
 
+.. envvar:: DEFAULT_OPTIONS
+
+    default: ``image,service``
+
+    The default for a job's ``options`` attribute.
 
 .. envvar:: DEFAULT_USER
 

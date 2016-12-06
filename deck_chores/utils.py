@@ -1,6 +1,19 @@
 import json
-from typing import Union
+from typing import Tuple, Union
 from uuid import NAMESPACE_OID, uuid5
+
+
+def split_string(value: str, delimiter: str = ',', strip: bool = True,
+                 sort: bool = False) -> Tuple[str, ...]:
+    result = []
+    for part in value.split(delimiter):
+        if strip:
+            result.append(part.strip())
+        else:
+            result.append(part)
+    if sort:
+        result.sort()
+    return tuple(result)
 
 
 def from_json(s: Union[bytes, str]) -> dict:

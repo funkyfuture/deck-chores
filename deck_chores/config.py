@@ -8,7 +8,7 @@ from docker.constants import DEFAULT_TIMEOUT_SECONDS  # type: ignore
 from docker.tls import TLSConfig  # type: ignore
 
 from deck_chores.exceptions import ConfigurationError
-from deck_chores.utils import trueish
+from deck_chores.utils import split_string, trueish
 
 
 ####
@@ -60,6 +60,7 @@ def generate_config() -> None:
     cfg.daemon_url = _test_daemon_socket(getenv('DOCKER_DAEMON', 'unix://var/run/docker.sock'))
     cfg.debug = trueish(getenv('DEBUG', 'no'))
     cfg.default_max = int(getenv('DEFAULT_MAX', '1'))
+    cfg.default_options = split_string(getenv('DEFAULT_OPTIONS', 'image,service'), sort=True)
     cfg.default_user = getenv('DEFAULT_USER', 'root')
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
     cfg.logformat = getenv('LOG_FORMAT', '{asctime}|{levelname:8}|{message}')
