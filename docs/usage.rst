@@ -182,6 +182,12 @@ deck-chore's behaviour is defined by these environment variables:
 
     Pattern that formats `log record attributes`_.
 
+.. envvar:: SERVICE_ID_LABELS
+
+    default: ``com.docker.compose.project,com.docker.compose.service``
+
+    A comma-separated list of container labels that identify a unique service with possibly multiple
+    container instances. See :option:`service`.
 
 .. envvar:: TIMEZONE
 

@@ -14,7 +14,7 @@ from deck_chores.config import cfg, generate_config
 from deck_chores.exceptions import ConfigurationError
 from deck_chores import jobs
 import deck_chores.parsers as parse
-from deck_chores.utils import from_json, trueish
+from deck_chores.utils import from_json, generate_id, trueish
 
 
 ####
@@ -47,9 +47,8 @@ log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INF
 
 
 def process_container_labels(container_id: str, labels: dict) -> None:
-    definitions = parse.labels(labels)
-    if definitions:
-        jobs.add(container_id, definitions)
+    service_id, options, definitions = parse.labels(labels)
+    jobs.add(container_id, definitions)
 
 
 def exec_inspection(containers: dict) -> None:
@@ -94,10 +93,16 @@ def handle_start(event: dict) -> None:
 
 def handle_die(event: dict) -> None:
     log.debug('Handling die.')
+    labels = event['Actor'].get('Attributes', {})
+    service_id, options, definitions = parse.labels(labels)
+    if not definitions:
+        return
+
     container_id = event['Actor']['ID']
-    for job in jobs.get_jobs_for_container(container_id):
-        log.info("Removing job '%s' for %s" % (job.kwargs['job_name'], job.kwargs['container_name']))  # noqa: E501
-        job.remove()
+    container_name = cfg.client.inspect_container(container_id)['Name']
+    for job_name in definitions:
+        log.info("Removing job '%s' for %s" % (job_name, container_name))
+        jobs.remove(generate_id(container_id, job_name))
 
 
 def handle_pause(event: dict) -> None:

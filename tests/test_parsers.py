@@ -14,12 +14,13 @@ from tests.utils import equal_triggers
 config.generate_config()
 
 
-def assert_expected_job_result(labels, expected_jobs, jobs_count):
-    result = parse.labels(labels)
+def assert_expected_job_result(labels, expected_jobs):
+    _, _, result = parse_labels(labels)
 
-    assert len(result) == jobs_count
+    assert len(result) == len(expected_jobs)
 
     for name, definition in result.items():
+        definition.pop('service_id')
         assert len(definition) == 5
         expected_job = expected_jobs[name]
         for attr in definition:
@@ -33,6 +34,7 @@ def assert_expected_job_result(labels, expected_jobs, jobs_count):
 def test_parse_labels():
     labels = {
         'com.docker.compose.project': 'test_project',
+        'com.docker.compose.service': 'ham_machine',
         'deck-chores.backup.interval': 'daily',
         'deck-chores.backup.command': '/usr/local/bin/backup.sh',
         'deck-chores.backup.user': 'www-data',

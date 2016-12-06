@@ -10,6 +10,7 @@ from pytz import all_timezones
 
 from deck_chores.config import cfg
 from deck_chores.exceptions import ParsingError
+from deck_chores.utils import generate_id, split_string
 
 
 ####
@@ -129,9 +130,48 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 
 def _parse_labels(_labels: dict) -> Tuple[str, str, dict]:
     log.debug('Parsing labels: %s' % _labels)
+    options = _parse_options(_labels)
+    service_id = parse_service_id(_labels)
+    job_definitions = _parse_job_defintion(_labels)
+    if service_id:
+        log.debug('Assigning service id: %s' % service_id)
+        for definition in job_definitions.values():
+            # this is informative, not functional
+            definition['service_id'] = service_id
+    return service_id, options, job_definitions
+
+
+def _parse_options(_labels: dict) -> str:
+    options = _labels.pop(cfg.label_ns + 'options', None)
+    result = set(cfg.default_options)
+    if options is not None:
+        for option in split_string(options):
+            if option.startswith('no'):
+                result.remove(option[2:])
+            else:
+                result.add(option)
+    result_string = ','.join(sorted(x for x in result if x))
+    log.debug('Parsed options: %s' % result_string)
+    return result_string
+
+
+def parse_service_id(_labels: dict) -> str:
+    filtered_labels = {k: v for k, v in _labels.items() if k in cfg.service_identifiers}
+    log.debug('Considering labels for service id: %s' % filtered_labels)
+    if not filtered_labels:
+        return ''
+    if len(filtered_labels) != len(cfg.service_identifiers):
+        log.critical('Missing service identity labels: {}'
+                     .format(', '.join(set(cfg.service_identifiers) - set(filtered_labels))))
+        return ''
+    identifiers = tuple(filtered_labels[x] for x in cfg.service_identifiers)
+    return generate_id(*identifiers)
+
+
+def _parse_job_defintion(_labels: dict) -> dict:
     filtered_labels = {k: v for k, v in _labels.items()
                        if k.startswith(cfg.label_ns)}
-    log.debug('Considering labels: %s' % filtered_labels)
+    log.debug('Considering labels for job definitions: %s' % filtered_labels)
 
     name_grouped_definitions = defaultdict(dict)  # type: ignore
     for key, value in filtered_labels.items():
@@ -153,7 +193,7 @@ def _parse_labels(_labels: dict) -> Tuple[str, str, dict]:
             for trigger_name in ('cron', 'date', 'interval'):
                 trigger = trigger or job.pop(trigger_name, None)
             job['trigger'] = trigger
-            log.debug('Normalized defintion: %s' % job)
+            log.debug('Normalized definition: %s' % job)
             result[name] = job
 
     return result

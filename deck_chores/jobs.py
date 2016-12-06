@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 from apscheduler import events  # type: ignore
 from apscheduler.job import Job  # type: ignore
+from apscheduler.jobstores.base import JobLookupError  # type: ignore
 from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 
 from deck_chores.config import cfg
@@ -130,6 +131,13 @@ def add(container_id: str, definitions: dict) -> None:
                           max_instances=max_instances,
                           replace_existing=True)
         log.info("Added '%s' for %s" % (job_name, container_name))
+
+
+def remove(job_id: str) -> None:
+    try:
+        scheduler.remove_job(job_id)
+    except JobLookupError as e:
+        log.critical(str(e))
 
 
 ####

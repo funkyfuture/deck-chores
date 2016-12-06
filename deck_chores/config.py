@@ -64,6 +64,8 @@ def generate_config() -> None:
     cfg.default_user = getenv('DEFAULT_USER', 'root')
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
     cfg.logformat = getenv('LOG_FORMAT', '{asctime}|{levelname:8}|{message}')
+    cfg.service_identifiers = split_string(
+        getenv('SERVICE_ID_LABELS', 'com.docker.compose.project,com.docker.compose.service'))
     cfg.ssl_version = _resolve_tls_version(getenv('SSL_VERSION', 'TLS'))
     cfg.timezone = getenv('TIMEZONE', 'UTC').replace(' ', '_')
 
