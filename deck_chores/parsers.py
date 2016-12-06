@@ -1,3 +1,4 @@
+from functools import lru_cache
 from collections import defaultdict
 import logging
 from typing import Tuple, Union
@@ -10,7 +11,7 @@ from pytz import all_timezones
 
 from deck_chores.config import cfg
 from deck_chores.exceptions import ParsingError
-from deck_chores.utils import generate_id, split_string
+from deck_chores.utils import generate_id, lru_dict_arg_cache, split_string
 
 
 ####
@@ -42,6 +43,7 @@ log = logging.getLogger('deck_chores')
 
 class JobConfigValidator(cerberus.Validator):
     @staticmethod
+    @lru_cache(128)
     def _fill_args(value: str, length: int, filling: str) -> Tuple[str, ...]:
         value = value.strip()
         while '  ' in value:
@@ -131,7 +133,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 def _parse_labels(_labels: dict) -> Tuple[str, str, dict]:
     log.debug('Parsing labels: %s' % _labels)
     options = _parse_options(_labels)
-    service_id = parse_service_id(_labels)
+    service_id = _parse_service_id(_labels)
     job_definitions = _parse_job_defintion(_labels)
     if service_id:
         log.debug('Assigning service id: %s' % service_id)
@@ -155,7 +157,7 @@ def _parse_options(_labels: dict) -> str:
     return result_string
 
 
-def parse_service_id(_labels: dict) -> str:
+def _parse_service_id(_labels: dict) -> str:
     filtered_labels = {k: v for k, v in _labels.items() if k in cfg.service_identifiers}
     log.debug('Considering labels for service id: %s' % filtered_labels)
     if not filtered_labels:
