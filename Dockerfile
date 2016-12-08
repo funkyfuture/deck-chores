@@ -1,4 +1,4 @@
-FROM python:3.6.0b4-alpine
+FROM python:3.6.0rc1-alpine
 
 LABEL org.label-schema.schema-version="1.0" \
       org.label-schema.description="Job scheduler for Docker containers, configured via container labels." \
