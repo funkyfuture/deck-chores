@@ -9,9 +9,10 @@ from apscheduler.triggers.interval import IntervalTrigger  # type: ignore
 import cerberus  # type: ignore
 from pytz import all_timezones
 
+from deck_chores.caches import get_filtered_image_labels_for_container
 from deck_chores.config import cfg
 from deck_chores.exceptions import ParsingError
-from deck_chores.utils import generate_id, lru_dict_arg_cache, split_string
+from deck_chores.utils import generate_id, split_string
 
 
 ####
@@ -119,18 +120,22 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
             if isinstance(line, str):
                 log.error(line)
             elif isinstance(line, Exception):
-                log.exception(line)
+                log.exception(line)  # type: ignore
         return '', '', {}
     except Exception as e:
         raise e
 
 
-@lru_dict_arg_cache
-def _parse_labels(_labels: dict) -> Tuple[str, str, dict]:
+@lru_cache()
+def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
+    _labels = cfg.client.inspect_container(container_id)['Config'].get('Labels', {})
     log.debug('Parsing labels: %s' % _labels)
-    options = _parse_options(_labels)
+    filtered_labels = {k: v for k, v in _labels.items()
+                       if k.startswith(cfg.label_ns)}
+    options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
     service_id = _parse_service_id(_labels)
     job_definitions = _parse_job_defintion(_labels)
+
     if service_id:
         log.debug('Assigning service id: %s' % service_id)
         for definition in job_definitions.values():
@@ -139,8 +144,8 @@ def _parse_labels(_labels: dict) -> Tuple[str, str, dict]:
     return service_id, options, job_definitions
 
 
-def _parse_options(_labels: dict) -> str:
-    options = _labels.pop(cfg.label_ns + 'options', None)
+@lru_cache(4)
+def _parse_options(options: str) -> str:
     result = set(cfg.default_options)
     if options is not None:
         for option in split_string(options):
@@ -167,12 +172,11 @@ def _parse_service_id(_labels: dict) -> str:
 
 
 def _parse_job_defintion(_labels: dict) -> dict:
-    filtered_labels = {k: v for k, v in _labels.items()
-                       if k.startswith(cfg.label_ns)}
-    log.debug('Considering labels for job definitions: %s' % filtered_labels)
-
+    log.debug('Considering labels for job definitions: %s' % _labels)
     name_grouped_definitions = defaultdict(dict)  # type: ignore
-    for key, value in filtered_labels.items():
+    for key, value in _labels.items():
+        if key == cfg.label_ns + 'options':
+            continue
         name, attribute = key[len(cfg.label_ns):].rsplit('.', 1)
         name_grouped_definitions[name][attribute] = value
 

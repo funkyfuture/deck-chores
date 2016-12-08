@@ -8,17 +8,7 @@ from deck_chores.parsers import CronTrigger, DateTrigger, IntervalTrigger, JobCo
 config.generate_config()
 
 
-def assert_expected_job_result(labels, expected_jobs):
-    _, _, result = parse_labels(labels)
-    assert len(result) == len(expected_jobs)
-    for name, definition in result.items():
-        definition.pop('service_id')
-        assert definition.pop('timezone') == 'UTC'
-        assert len(definition) == 5
-        assert definition == expected_jobs[name]
-
-
-def test_parse_labels():
+def test_parse_labels(mocker):
     labels = {
         'com.docker.compose.project': 'test_project',
         'com.docker.compose.service': 'ham_machine',
@@ -31,6 +21,10 @@ def test_parse_labels():
         'deck-chores.gen-thumbs.command': 'python /scripts/gen_thumbs.py',
         'deck-chores.gen-thumbs.max': '3'
     }
+    inspect_container = lambda x, y: {'Image': '', 'Config': {'Labels': labels}}  # noqa: E731
+    mocker.patch('docker.Client.inspect_container', inspect_container)
+    mocker.patch('docker.Client.inspect_image', lambda x, y: {'Config': {'Labels': {}}})
+
     expected_jobs = \
         {'backup': {'trigger': (IntervalTrigger, (0, 1, 0, 0, 0)), 'name': 'backup',
                     'command': '/usr/local/bin/backup.sh', 'user': 'www-data', 'max': 1},
@@ -39,7 +33,13 @@ def test_parse_labels():
          'gen-thumbs': {'trigger': (CronTrigger, ('*', '*', '*', '*/10', '*', '*', '*', '*')),
                         'name': 'gen-thumbs', 'command': 'python /scripts/gen_thumbs.py',
                         'user': 'root', 'max': 3}}
-    assert_expected_job_result(labels, expected_jobs)
+    _, _, result = parse_labels('')
+    assert len(result) == len(expected_jobs)
+    for name, definition in result.items():
+        definition.pop('service_id')
+        assert definition.pop('timezone') == 'UTC'
+        assert len(definition) == 5
+        assert definition == expected_jobs[name]
 
 
 def test_interval_trigger():
@@ -52,7 +52,9 @@ def test_interval_trigger():
                   ((('image', 'service'), '', 'image,service'),
                    (('image', 'service'), 'noservice', 'image'),
                    (('service',), 'image', 'image,service')))
-def test_options(default, value, result):
-    config.cfg.default_options = default
+def test_options(default, value, result, mocker):
     labels = {'deck-chores.options': value}
-    assert parse_labels(labels) == ('', result, {})
+    inspect_container = lambda x, y: {'Image': '', 'Config': {'Labels': labels}}  # noqa: E731
+    mocker.patch('docker.Client.inspect_container', inspect_container)
+    config.cfg.default_options = default
+    assert parse_labels(str(default)+value)[1] == result

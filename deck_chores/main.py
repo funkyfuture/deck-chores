@@ -69,8 +69,8 @@ log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INF
 ####
 
 
-def process_running_container_labels(container_id: str, labels: dict) -> None:
-    service_id, options, definitions = parse.labels(labels)
+def process_running_container_labels(container_id: str) -> None:
+    service_id, options, definitions = parse.labels(container_id)
     if not definitions:
         return
     if service_id and 'service' in options:
@@ -94,14 +94,13 @@ def inspect_running_containers() -> datetime:
 def exec_inspection(containers: dict) -> None:
     log.info('Inspecting running containers.')
     for container in containers:
-        container_id = container['Id']
-        labels = container.get('Labels', {})
-        process_running_container_labels(container_id, labels)
+        process_running_container_labels(container['Id'])
 
 
 def listen(since: datetime = datetime.utcnow()) -> None:
     log.info('Listening to events.')
     for event in (from_json(x) for x in cfg.client.events(since=since)):
+        # TODO check for keywords in json before parsing it
         log.debug('Daemon event: %s' % event)
         if event['Type'] != 'container':
             continue
@@ -118,18 +117,16 @@ def listen(since: datetime = datetime.utcnow()) -> None:
 def handle_start(event: dict) -> None:
     log.debug('Handling start.')
     container_id = event['Actor']['ID']
-    labels = event['Actor'].get('Attributes', {})
-    process_running_container_labels(container_id, labels)
+    process_running_container_labels(container_id)
 
 
 def handle_die(event: dict) -> None:
     log.debug('Handling die.')
-    labels = event['Actor'].get('Attributes', {})
-    service_id, options, definitions = parse.labels(labels)
+    container_id = event['Actor']['ID']
+    service_id, options, definitions = parse.labels(container_id)
     if not definitions:
         return
 
-    container_id = event['Actor']['ID']
     if service_id and 'service' in options:
         if container_id in locking_container_to_services_map:
             log.info('Unlocking service id: %s' % service_id)
