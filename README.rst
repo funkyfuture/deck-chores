@@ -58,13 +58,6 @@ It wouldn't be as charming to write this piece of software without these project
 Roadmap
 -------
 
-0.1
-...
-
-- also parse image's labels
-  - omit when magic label is set
-
-
 0.2
 ...
 
