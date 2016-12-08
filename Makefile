@@ -64,8 +64,9 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	xdg-open docs/_build/html/index.html
 
-release: clean build
+release: test clean build
 	git tag -f latest
+	git push
 	git push --tags
 	python setup.py sdist bdist_wheel upload
 
