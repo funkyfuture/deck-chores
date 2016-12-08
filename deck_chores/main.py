@@ -12,6 +12,7 @@ from docker import Client  # type: ignore
 from fasteners import InterProcessLock  # type: ignore
 
 from deck_chores import __version__
+from deck_chores.caches import get_image_labels_for_container
 from deck_chores.config import cfg, generate_config
 from deck_chores.exceptions import ConfigurationError
 from deck_chores.indexes import locking_container_to_services_map
@@ -31,13 +32,11 @@ def there_is_another_deck_chores_container(client: Client) -> bool:
     for container in client.containers():
         if container['State'] in 'created,exited':
             continue
-        image_id = container['ImageID'].split(':')[1]
-        labels = client.inspect_image(image_id)['Config']['Labels']
+        labels = get_image_labels_for_container(container['Id'])
         if labels.get('org.label-schema.name', '') == 'deck-chores':
             matched_containers += 1
         if matched_containers > 1:
             return True
-    assert matched_containers == 1
     return False
 
 
