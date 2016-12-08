@@ -10,7 +10,8 @@ deck-chores
 Features
 --------
 
-- define regular jobs to run within a container context with container labels
+- define regular jobs to run within a container context with container and optionally with image
+  labels
 - use date, interval and cron-like triggers
 - set a maximum of simultaneously running instances per job
 - restrict job scheduling to one container per service

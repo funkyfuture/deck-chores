@@ -134,6 +134,12 @@ def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
                        if k.startswith(cfg.label_ns)}
     options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
     service_id = _parse_service_id(_labels)
+    if 'image' in options:
+        _labels = get_filtered_image_labels_for_container(container_id).copy()
+        _labels.update(filtered_labels)
+    else:
+        _labels = filtered_labels
+
     job_definitions = _parse_job_defintion(_labels)
 
     if service_id:

@@ -126,6 +126,10 @@ be unset by prefixing with ``no``.
 
 These options are available:
 
+.. option:: image
+
+    Job definitions in image labels are also parsed while container label keys override these.
+
 .. option:: service
 
     Restricts jobs to one container of those that are identified with the same service.
