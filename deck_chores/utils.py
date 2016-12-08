@@ -5,6 +5,18 @@ from typing import Any, Callable, Dict, Hashable, Tuple, Union
 from uuid import NAMESPACE_OID, uuid5
 
 
+def from_json(s: Union[bytes, str]) -> dict:
+    if isinstance(s, bytes):
+        s = s.decode()
+    return json.loads(s)
+
+
+@lru_cache(128)
+def generate_id(*args) -> str:
+    return str(uuid5(NAMESPACE_OID, ''.join(args)))
+
+
+# dead code
 def lru_dict_arg_cache(func: Callable) -> Callable:
     # TODO? wrapper that allows maxsize
     def unpacking_func(func: Callable, arg: frozenset) -> Any:
@@ -34,19 +46,8 @@ def split_string(value: str, delimiter: str = ',', strip: bool = True,
     return tuple(result)
 
 
-def from_json(s: Union[bytes, str]) -> dict:
-    if isinstance(s, bytes):
-        s = s.decode()
-    return json.loads(s)
-
-
 def trueish(value: str) -> bool:
     return value.strip().lower() in ('1', 'on', 'true', 'yes')
-
-
-@lru_cache(128)
-def generate_id(*args) -> str:
-    return str(uuid5(NAMESPACE_OID, ''.join(args)))
 
 
 __all__ = [from_json.__name__,
