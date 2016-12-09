@@ -1,0 +1,11 @@
+sudo: false
+language: python
+cache: pip
+python: 3.6-dev
+env:
+  - TOX_ENV=py36
+  - TOX_ENV=mypy
+  - TOX_ENV=flake8
+install: travis_retry pip install tox
+script:
+  - tox -e $TOX_ENV

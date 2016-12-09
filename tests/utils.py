@@ -8,10 +8,6 @@ PROJECT_DIR = TEST_DIR / '..'
 COMPOSE_PROJECTS_DIR = TEST_DIR / 'fixtures' / 'compose_projects'
 
 
-def on_travis():
-    return
-
-
 class ComposeProject:
     def __init__(self, project_name: str, env: dict = {}) -> None:
         self.project_path = str(COMPOSE_PROJECTS_DIR / project_name)
