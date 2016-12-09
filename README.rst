@@ -1,9 +1,12 @@
 deck-chores
 ===========
 
-** A job scheduler for Docker containers, configured via container labels.**
+**A job scheduler for Docker containers, configured via container labels.**
 
 * Documentation: http://deck-chores.rtfd.io
+* Image repository: https://hub.docker.com/r/funkyfuture/deck-chores
+* Code repository: https://github.com/funkyfuture/deck-chores
+* Issue tracker: https://github.com/funkyfuture/deck-chores/issues
 * Free software: ISC license
 
 
@@ -63,7 +66,9 @@ Roadmap
 
 - parse time units for interval triggers
 - handle a global limit on concurrent jobs
-- print jobs when receiving SIGHUP
+- print jobs when receiving SIGUSR1
+- maybe drop all jobs and reinspect containers on SIGUSR2
+  - simpler: shutdown and fork self
 - randomization of interval triggered events
 - maybe add a randomize expression for cron triggers
 

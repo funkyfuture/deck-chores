@@ -17,13 +17,15 @@ Likewise, docker-compose_ can be used with such configuration:
     services:
       officer:
         image: funkyfuture/deck-chores
+        restart: unless-stopped
         environment:
           TIMEZONE: Asia/Tel Aviv
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
 
 
-You could also install `deck-chores` from the Python Package Index with ``pip`` or ``pipsi`` and run it::
+You could also install `deck-chores` from the Python Package Index with ``pip`` or ``pipsi``
+(recommended) and run it::
 
     $ pipsi install deck-chores
     $ deck-chores
