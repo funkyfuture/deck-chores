@@ -41,7 +41,7 @@ that defines a job that will be handled by *deck-chores*:
           deck-chores.dump.command: sh -c "mysqldump --all-databases > /dumps/dump-$$(date -Idate)"
           deck-chores.dump.interval: daily
 
-It is however recommended use scripts with a proper shebang for such actions. Their outputs to
+It is however recommended to use scripts with a proper shebang for such actions. Their outputs to
 ``stdout`` and ``stderr`` as well as their exit code will be logged by *deck-chores*.
 
 
