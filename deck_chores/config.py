@@ -2,6 +2,7 @@ from os import getenv
 from os.path import exists, isfile
 import ssl
 from types import SimpleNamespace
+from typing import Union
 
 from docker import Client  # type: ignore
 from docker.constants import DEFAULT_TIMEOUT_SECONDS  # type: ignore
@@ -31,17 +32,15 @@ def _resolve_tls_version(version: str) -> int:
     return getattr(ssl, 'PROTOCOL_' + version.replace('.', '_'))
 
 
-def _setup_tls_config() -> None:
+def _setup_tls_config() -> Union[TLSConfig, None]:
     # https://docker-py.readthedocs.io/en/stable/tls/#TLSConfig
     if cfg.client_cert is not None or cfg.ca_cert is not None:
-        cfg.tls_config = TLSConfig(client_cert=(cfg.client_cert, cfg.client_key),
-                                   ca_cert=cfg.ca_cert,
-                                   verify=True if cfg.ca_cert else False,
-                                   ssl_version=cfg.ssl_version,
-                                   assert_hostname=cfg.assert_hostname,
-                                   assert_fingerprint=cfg.assert_fingerprint)
-    else:
-        cfg.tls_config = None
+        return TLSConfig(client_cert=(cfg.client_cert, cfg.client_key),
+                         ca_cert=cfg.ca_cert,
+                         verify=True if cfg.ca_cert else False,
+                         ssl_version=cfg.ssl_version,
+                         assert_hostname=cfg.assert_hostname,
+                         assert_fingerprint=cfg.assert_fingerprint)
 
 
 def _test_daemon_socket(url: str) -> str:
@@ -70,7 +69,7 @@ def generate_config() -> None:
     cfg.timezone = getenv('TIMEZONE', 'UTC').replace(' ', '_')
 
     _register_exsiting_files()
-    _setup_tls_config()
+    cfg.tls_config = _setup_tls_config()
     cfg.client = Client(base_url=cfg.daemon_url,
                         version='auto',
                         timeout=cfg.client_timeout,

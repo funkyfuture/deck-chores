@@ -1,11 +1,7 @@
 from pytest import mark
 
-from deck_chores import config
 from deck_chores.parsers import _parse_labels as parse_labels
 from deck_chores.parsers import CronTrigger, DateTrigger, IntervalTrigger, JobConfigValidator
-
-
-config.generate_config()
 
 
 def test_parse_labels(mocker):
@@ -56,5 +52,5 @@ def test_options(default, value, result, mocker):
     labels = {'deck-chores.options': value}
     inspect_container = lambda x, y: {'Image': '', 'Config': {'Labels': labels}}  # noqa: E731
     mocker.patch('docker.Client.inspect_container', inspect_container)
-    config.cfg.default_options = default
+    mocker.patch('deck_chores.config.cfg.default_options', default)
     assert parse_labels(str(default)+value)[1] == result
