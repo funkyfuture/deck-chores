@@ -1,8 +1,8 @@
 History
 =======
 
-unreleased
-----------
+0.1.beta2 (2016-12-08)
+----------------------
 
 * *new:* set log format per :envvar:LOG_FORMAT
 * *new:* an options label to set behavioural flags
