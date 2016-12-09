@@ -1,9 +1,7 @@
 docker-compose
 flake8
 mock
-mypy
+mypy-lang
 pytest
 pytest-mock
-Sphinx
-sphinx_rtd_theme
 tox
