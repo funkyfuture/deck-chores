@@ -66,7 +66,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 
 release: test clean build
 	git tag -f latest
-	git push
+	git push origin master
 	python setup.py sdist bdist_wheel upload
 
 dist: clean ## builds source and wheel package
