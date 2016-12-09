@@ -32,7 +32,7 @@ setup(
     install_requires=['APScheduler', 'cerberus', 'docker-py', 'fasteners'],
     license="ISC license",
     zip_safe=False,
-    keywords=['docker', 'cron', 'scheduler', 'jobs'],
+    keywords=['docker', 'cron', 'scheduler', 'jobs', 'labels', 'metadata'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: System Administrators',
