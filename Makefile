@@ -2,7 +2,11 @@
 .DEFAULT_GOAL := build-dev
 
 NAME = funkyfuture/deck-chores
-VERSION = $(shell grep __version__ deck_chores/__init__.py | cut -f3 -d" ")
+VERSION = $(shell grep __version__ deck_chores/__init__.py | cut -f3 -d" " | tr -d "'")
+IMAGE_NAME = $(NAME):$(VERSION)
+SOURCE_COMMIT = $(shell git rev-parse HEAD)
+BUILD_DATE = "$(shell date --rfc-3339 seconds)"
+BUILD_ARGS = --build-arg BUILD_DATE=$(BUILD_DATE) --build-arg SOURCE_COMMIT=$(SOURCE_COMMIT) --build-arg VERSION=$(VERSION)
 
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -21,7 +25,7 @@ help:
 all: build
 
 build:
-	docker build -t $(NAME):$(VERSION) --rm .
+	docker build $(BUILD_ARGS) -t $(IMAGE_NAME) .
 
 run:
 	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(NAME):$(VERSION)
