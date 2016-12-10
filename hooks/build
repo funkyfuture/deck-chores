@@ -5,6 +5,6 @@ echo "------ HOOK START - BUILD -------"
 BUILD_DATE="$(date --rfc-3339 seconds)"
 VERSION=$(grep __version__ deck_chores/__init__.py | cut -f3 -d" " | tr -d "'")
 printenv
-docker build --build-arg BUILD_DATE=$BUILD_DATE --build-arg SOURCE_COMMIT="${GIT_SHA1}" --build-arg VERSION=$VERSION -t $IMAGE_NAME .
+docker build --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg SOURCE_COMMIT="${GIT_SHA1}" --build-arg VERSION=$VERSION -t $IMAGE_NAME .
 
 echo "------ HOOK END - BUILD -------"
