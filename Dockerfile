@@ -7,7 +7,7 @@ ARG SOURCE_COMMIT
 ARG BUILD_DATE
 
 LABEL org.label-schema.schema-version="1.0" \
-      org.label-schema.description="Job scheduler for Docker containers, configured via container labels." \
+      org.label-schema.description="Job scheduler for Docker containers, configured via labels." \
       org.label-schema.name="deck-chores" \
       org.label-schema.version=$VERSION \
       org.label-schema.usage="/src/docs/usage.rst" \

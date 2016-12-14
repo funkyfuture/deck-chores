@@ -1,6 +1,12 @@
 deck-chores
 ===========
 
+.. image:: https://images.microbadger.com/badges/image/funkyfuture/deck-chores.svg
+        :target: https://microbadger.com/images/funkyfuture/deck-chores
+
+.. image:: https://img.shields.io/pypi/v/deck-chores.svg
+        :target: https://pypi.python.org/pypi/deck-chores
+
 **A job scheduler for Docker containers, configured via container labels.**
 
 * Documentation: http://deck-chores.rtfd.io
