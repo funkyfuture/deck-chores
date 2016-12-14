@@ -8,7 +8,6 @@ from signal import signal, SIGINT, SIGTERM
 
 from apscheduler.schedulers import SchedulerNotRunningError  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore
-from docker import Client  # type: ignore
 from fasteners import InterProcessLock  # type: ignore
 
 from deck_chores import __version__
@@ -27,9 +26,9 @@ from deck_chores.utils import from_json, generate_id, trueish
 lock = InterProcessLock('/tmp/deck-chores.lock')
 
 
-def there_is_another_deck_chores_container(client: Client) -> bool:
+def there_is_another_deck_chores_container() -> bool:
     matched_containers = 0
-    for container in client.containers():
+    for container in cfg.client.containers():
         if container['State'] in 'created,exited':
             continue
         labels = get_image_labels_for_container(container['Id'])
@@ -175,7 +174,7 @@ def main() -> None:
         generate_config()
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
         log.debug('Config: %s' % cfg.__dict__)
-        if there_is_another_deck_chores_container(cfg.client):
+        if there_is_another_deck_chores_container():
             log.error("There's another container running deck-chores, maybe paused or restarting.")
             raise SystemExit(1)
         jobs.start_scheduler()
