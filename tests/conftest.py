@@ -12,7 +12,7 @@ def nada(*args, **kwargs):
 
 @pytest.fixture(autouse=True)
 def config(mocker):
-    mocker.patch('docker.Client.__init__', nada)
+    mocker.patch('deck_chores.config.Client.__init__', nada)
     mocker.patch('deck_chores.config._setup_tls_config', lambda: None)
     mocker.patch('deck_chores.config._test_daemon_socket', lambda x: x)
     from deck_chores.config import generate_config

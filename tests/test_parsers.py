@@ -17,9 +17,10 @@ def test_parse_labels(mocker):
         'deck-chores.gen-thumbs.command': 'python /scripts/gen_thumbs.py',
         'deck-chores.gen-thumbs.max': '3'
     }
-    inspect_container = lambda x, y: {'Image': '', 'Config': {'Labels': labels}}  # noqa: E731
-    mocker.patch('docker.Client.inspect_container', inspect_container)
-    mocker.patch('docker.Client.inspect_image', lambda x, y: {'Config': {'Labels': {}}})
+    mocker.patch('deck_chores.config.Client.inspect_container',
+                 return_value={'Image': '', 'Config': {'Labels': labels}})
+    mocker.patch('deck_chores.config.Client.inspect_image',
+                 return_value={'Config': {'Labels': {}}})
 
     expected_jobs = \
         {'backup': {'trigger': (IntervalTrigger, (0, 1, 0, 0, 0)), 'name': 'backup',
@@ -50,7 +51,7 @@ def test_interval_trigger():
                    (('service',), 'image', 'image,service')))
 def test_options(default, value, result, mocker):
     labels = {'deck-chores.options': value}
-    inspect_container = lambda x, y: {'Image': '', 'Config': {'Labels': labels}}  # noqa: E731
-    mocker.patch('docker.Client.inspect_container', inspect_container)
+    mocker.patch('deck_chores.config.Client.inspect_container',
+                 return_value={'Image': '', 'Config': {'Labels': labels}})
     mocker.patch('deck_chores.config.cfg.default_options', default)
     assert parse_labels(str(default)+value)[1] == result
