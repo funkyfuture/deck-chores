@@ -1,4 +1,4 @@
-FROM python:3.6.0rc1-alpine
+FROM python:3.6.0rc2-alpine
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["deck-chores"]
