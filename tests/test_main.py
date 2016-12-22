@@ -20,9 +20,9 @@ _events = b'''{"status":"rename","id":"a84c8e16c1b1b2339bd276f725f08425935c51a5d
 
 
 def test_event_dispatching(mocker):
-    mocker.patch('deck_chores.config.Client.events',
+    mocker.patch('deck_chores.config.DockerClient.events',
                  return_value=(x for x in _events.splitlines() if x))
-    mocker.patch('deck_chores.config.Client.inspect_container',
+    mocker.patch('deck_chores.config.DockerClient.api.inspect_container',
                  return_value={'Name': 'foo'})
     labels = mocker.patch('deck_chores.parsers.labels')
     definition = _parse_job_defintion({'deck-chores.beep.command': '/beep.sh',
@@ -49,8 +49,8 @@ def test_deck_chores_container_check(mocker, has_label_seq, exp_result):
         nonlocal has_label_seq
         return {'Id': str(has_label_seq[0]), 'Image': str(has_label_seq[0])}
 
-    mocker.patch('deck_chores.config.Client.containers',
+    mocker.patch('docker.client.APIClient.containers',
                  return_value=[{'Id': str(x), 'State': 'running'} for x in range(len(has_label_seq))])  # noqa: E501
-    mocker.patch('deck_chores.config.Client.inspect_image', inspect_image)
-    mocker.patch('deck_chores.config.Client.inspect_container', inspect_container)
+    mocker.patch('docker.client.APIClient.inspect_image', inspect_image)
+    mocker.patch('docker.client.APIClient.inspect_container', inspect_container)
     assert there_is_another_deck_chores_container() == exp_result

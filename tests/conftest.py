@@ -6,13 +6,9 @@ import pytest
 from tests.utils import PROJECT_DIR, ComposeProject
 
 
-def nada(*args, **kwargs):
-    pass
-
-
 @pytest.fixture(autouse=True)
 def config(mocker):
-    mocker.patch('deck_chores.config.Client.__init__', nada)
+    mocker.patch('deck_chores.config.DockerClient.__init__', return_value=None)
     mocker.patch('deck_chores.config._setup_tls_config', lambda: None)
     mocker.patch('deck_chores.config._test_daemon_socket', lambda x: x)
     from deck_chores.config import generate_config

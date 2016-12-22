@@ -28,10 +28,8 @@ lock = InterProcessLock('/tmp/deck-chores.lock')
 
 def there_is_another_deck_chores_container() -> bool:
     matched_containers = 0
-    for container in cfg.client.containers():
-        if container['State'] in 'created,exited':
-            continue
-        labels = get_image_labels_for_container(container['Id'])
+    for container in cfg.client.containers.list():
+        labels = get_image_labels_for_container(container.id)
         if labels.get('org.label-schema.name', '') == 'deck-chores':
             matched_containers += 1
         if matched_containers > 1:
@@ -83,20 +81,24 @@ def process_running_container_labels(container_id: str) -> None:
 
 def inspect_running_containers() -> datetime:
     log.debug('Fetching running containers')
-    containers = cfg.client.containers(filters={'status': 'running'})
-    inspection_time = datetime.utcnow()
+    containers = cfg.client.containers.list()
+    inspection_time = datetime.utcnow()  # FIXME get last eventtime
     jobs.scheduler.add_job(exec_inspection, trigger=DateTrigger(), args=(containers,),
                            id='container_inspection')
     return inspection_time
 
 
 def exec_inspection(containers: dict) -> None:
+    # TODO handle paused containers
     log.info('Inspecting running containers.')
     for container in containers:
-        process_running_container_labels(container['Id'])
+        process_running_container_labels(container.id)
+    log.debug('Finished inspection of running containers.')
 
 
-def listen(since: datetime = datetime.utcnow()) -> None:
+def listen(since: datetime = None) -> None:
+    if since is None:
+        since = datetime.utcnow()
     log.info('Listening to events.')
     for event_json in cfg.client.events(since=since):
         if b'container' not in event_json:
@@ -138,7 +140,7 @@ def handle_die(event: dict) -> None:
         else:
             return
 
-    container_name = cfg.client.inspect_container(container_id)['Name']
+    container_name = cfg.client.api.inspect_container(container_id)['Name']
     for job_name in definitions:
         log.info("Removing job '%s' for %s" % (job_name, container_name))
         jobs.remove(generate_id(container_id, job_name))

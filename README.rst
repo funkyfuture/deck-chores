@@ -67,7 +67,7 @@ It wouldn't be as charming to write this piece of software without these project
 
 * `APScheduler <https://apscheduler.readthedocs.io>`_ for managing jobs
 * `cerberus <http://python-cerberus.org>`_ for processing metadata
-* `docker-py <https://docker-py.readthedocs.io>`_ for Docker interaction
+* `docker <https://docker-py.readthedocs.io>`_ for Docker interaction
 * `flake8 <http://flake8.pycqa.org/>`_, `mypy <http://mypy-lang.org>`_,
   `pytest <http://pytest.org>`_ and `tox <https://tox.readthedocs.io>`_ for testing
 * `Python <https://python.org>`_

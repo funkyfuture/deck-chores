@@ -17,9 +17,9 @@ def test_parse_labels(mocker):
         'deck-chores.gen-thumbs.command': 'python /scripts/gen_thumbs.py',
         'deck-chores.gen-thumbs.max': '3'
     }
-    mocker.patch('deck_chores.config.Client.inspect_container',
+    mocker.patch('deck_chores.config.DockerClient.api.inspect_container',
                  return_value={'Image': '', 'Config': {'Labels': labels}})
-    mocker.patch('deck_chores.config.Client.inspect_image',
+    mocker.patch('deck_chores.config.DockerClient.api.inspect_image',
                  return_value={'Config': {'Labels': {}}})
 
     expected_jobs = \

@@ -4,7 +4,7 @@ import ssl
 from types import SimpleNamespace
 from typing import Union
 
-from docker import Client  # type: ignore
+from docker import DockerClient  # type: ignore
 from docker.constants import DEFAULT_TIMEOUT_SECONDS  # type: ignore
 from docker.tls import TLSConfig  # type: ignore
 
@@ -70,7 +70,8 @@ def generate_config() -> None:
 
     _register_exisiting_files()
     cfg.tls_config = _setup_tls_config()
-    cfg.client = Client(base_url=cfg.daemon_url,
+    # TODO use from_env
+    cfg.client = DockerClient(base_url=cfg.daemon_url,
                         version='auto',
                         timeout=cfg.client_timeout,
                         tls=cfg.tls_config)

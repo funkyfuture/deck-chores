@@ -99,16 +99,16 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
     # some sanity checks, to be removed eventually
     assert scheduler.get_job(job_id) is not None
-    if cfg.client.containers(filters={'id': container_id, 'status': 'paused'}):
+    if cfg.client.containers.list(filters={'id': container_id, 'status': 'paused'}):
         raise AssertionError('Container is paused.')
-    if not cfg.client.containers(filters={'id': container_id, 'status': 'running'}):
+    if not cfg.client.containers.list(filters={'id': container_id, 'status': 'running'}):
         scheduler.remove_job(job_id)
         assert scheduler.get_job(job_id) is None
         raise AssertionError('Container is not running.')
 
-    exec_id = cfg.client.exec_create(container_id, command, user=definition['user'])['Id']
-    response = cfg.client.exec_start(exec_id)
-    exit_code = cfg.client.exec_inspect(exec_id)['ExitCode']
+    exec_id = cfg.client.api.exec_create(container_id, command, user=definition['user'])['Id']
+    response = cfg.client.api.exec_start(exec_id)
+    exit_code = cfg.client.api.exec_inspect(exec_id)['ExitCode']
 
     return exit_code, response or b''
 
@@ -117,7 +117,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
 
 def add(container_id: str, definitions: dict) -> None:
-    container_name = cfg.client.inspect_container(container_id)['Name']
+    container_name = cfg.client.api.inspect_container(container_id)['Name']
     log.debug('Adding jobs for %s.' % container_name)
     for job_name, definition in definitions.items():
         job_id = generate_id(container_id, job_name)

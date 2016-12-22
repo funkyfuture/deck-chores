@@ -124,7 +124,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 
 @lru_cache()
 def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
-    _labels = cfg.client.inspect_container(container_id)['Config'].get('Labels', {})
+    _labels = cfg.client.api.inspect_container(container_id)['Config'].get('Labels', {})
     log.debug('Parsing labels: %s' % _labels)
     filtered_labels = {k: v for k, v in _labels.items()
                        if k.startswith(cfg.label_ns)}
