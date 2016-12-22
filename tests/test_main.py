@@ -50,7 +50,7 @@ def test_deck_chores_container_check(mocker, has_label_seq, exp_result):
         return {'Id': str(has_label_seq[0]), 'Image': str(has_label_seq[0])}
 
     mocker.patch('deck_chores.config.Client.containers',
-                 return_value=[{'Id': str(x), 'State': 'running'} for x in range(len(has_label_seq))])
+                 return_value=[{'Id': str(x), 'State': 'running'} for x in range(len(has_label_seq))])  # noqa: E501
     mocker.patch('deck_chores.config.Client.inspect_image', inspect_image)
     mocker.patch('deck_chores.config.Client.inspect_container', inspect_container)
     assert there_is_another_deck_chores_container() == exp_result
