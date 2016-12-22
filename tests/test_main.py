@@ -43,7 +43,7 @@ def test_deck_chores_container_check(mocker, has_label_seq, exp_result):
         if has_label_seq.pop(0):
             return {'Config': {'Labels': {'org.label-schema.name': 'deck-chores'}}}
         else:
-            return {'Config': {'Labels': {}}}
+            return {'Config': {}}
 
     def inspect_container(self, id):
         nonlocal has_label_seq

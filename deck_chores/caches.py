@@ -8,7 +8,7 @@ from deck_chores.config import cfg
 def get_image_labels(image_id: str) -> Dict[str, str]:
     if ':' in image_id:
         image_id = image_id.split(':')[1]
-    return cfg.client.inspect_image(image_id)['Config']['Labels']
+    return cfg.client.inspect_image(image_id)['Config'].get('Labels', {})
 
 
 @lru_cache()
