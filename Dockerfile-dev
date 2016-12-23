@@ -1,13 +1,12 @@
 FROM python:3.6.0rc2-alpine
 
-ENTRYPOINT ["dumb-init", "--"]
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["deck-chores"]
 LABEL org.label-schema.name="deck-chores"
 ENV DEBUG=true
 
-RUN apk add --no-cache --virtual .build-deps build-base \
- && apk add --no-cache ca-certificates \
- && pip install  cerberus dumb-init docker-py fasteners APScheduler \
+RUN apk add --no-cache --virtual .build-deps ca-certificates \
+ && pip install cerberus docker-py fasteners APScheduler \
  && apk del .build-deps
 
 

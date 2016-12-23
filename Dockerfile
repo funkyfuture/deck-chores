@@ -18,13 +18,13 @@ LABEL org.label-schema.schema-version="1.0" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-ref=$SOURCE_COMMIT
 
-ENTRYPOINT ["dumb-init", "--"]
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["deck-chores"]
 
 COPY . /src
 
-RUN apk add --no-cache --virtual .build-deps ca-certificates build-base \
- && pip install dumb-init \
+RUN apk add --no-cache --virtual .build-deps ca-certificates \
+ && apk add --no-cache tini \
  && /src/setup.py install \
  && rm -Rf /root/.cache \
  && apk del .build-deps
