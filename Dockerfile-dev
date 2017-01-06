@@ -6,6 +6,7 @@ LABEL org.label-schema.name="deck-chores"
 ENV DEBUG=true
 
 RUN apk add --no-cache --virtual .build-deps ca-certificates \
+ && apk add --no-cache tini \
  && pip install cerberus docker-py fasteners APScheduler \
  && apk del .build-deps
 
