@@ -98,8 +98,13 @@ def exec_inspection(containers: dict) -> None:
 
 def listen(since: datetime = datetime.utcnow()) -> None:
     log.info('Listening to events.')
-    for event in (from_json(x) for x in cfg.client.events(since=since)):
-        # TODO check for keywords in json before parsing it
+    for event_json in cfg.client.events(since=since):
+        if b'container' not in event_json:
+            continue
+        if not any((x in event_json) for x in (b'start', b'die', b'pause', b'unpause')):
+            continue
+
+        event = from_json(event_json)
         log.debug('Daemon event: %s' % event)
         if event['Type'] != 'container':
             continue
