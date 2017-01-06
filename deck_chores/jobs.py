@@ -62,10 +62,12 @@ def on_executed(event: events.JobExecutionEvent) -> None:
     )
     if response_lines:
         longest_line = max(len(x) for x in response_lines)
-        log.info('=' * longest_line)  # TODO more descriptive separator
+        b = '== BEGIN of output =='
+        e = '== END of output ===='
+        log.info(b + '=' * (longest_line - len(b)))
         for line in response_lines:
             log.info(line)
-        log.info('=' * longest_line)  # TODO more descriptive separator
+        log.info(e + '=' * (longest_line - len(e)))
 
 
 def on_error(event: events.JobExecutionEvent) -> None:
