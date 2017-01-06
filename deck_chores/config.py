@@ -21,7 +21,7 @@ cfg = SimpleNamespace()
 ####
 
 
-def _register_exsiting_files() -> None:
+def _register_exisiting_files() -> None:
     for name, filename in (('ca_cert', 'ca.pem'), ('client_cert', 'cert.pem'),
                            ('client_key', 'key.pem')):
         path = '/config/' + filename
@@ -68,7 +68,7 @@ def generate_config() -> None:
     cfg.ssl_version = _resolve_tls_version(getenv('SSL_VERSION', 'TLS'))
     cfg.timezone = getenv('TIMEZONE', 'UTC').replace(' ', '_')
 
-    _register_exsiting_files()
+    _register_exisiting_files()
     cfg.tls_config = _setup_tls_config()
     cfg.client = Client(base_url=cfg.daemon_url,
                         version='auto',
