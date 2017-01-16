@@ -51,6 +51,14 @@ It is however recommended to use scripts with a proper shebang for such actions.
 ``stdout`` and ``stderr`` as well as their exit code will be logged by *deck-chores*.
 
 
+Limitations
+-----------
+
+At the moment *deck-chores* is designed to run on a single Docker node, not
+within a cluster of these. Code and documentation contribution covering this
+are highly encouraged.
+
+
 Acknowledgements
 ----------------
 
@@ -73,8 +81,6 @@ Roadmap
 - parse time units for interval triggers
 - handle a global limit on concurrent jobs
 - print jobs when receiving SIGUSR1
-- maybe drop all jobs and reinspect containers on SIGUSR2
-  - simpler: shutdown and fork self
 - randomization of interval triggered events
 - maybe add a randomize expression for cron triggers
 
