@@ -115,8 +115,8 @@ Examples
 
 ::
 
-    42:00:00
-    100/00:00:00
+    42:00:00      # run every fourty-two hours
+    100/00:00:00  # run every one hundred days
 
 There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``every minute`` and
 ``every second``.
