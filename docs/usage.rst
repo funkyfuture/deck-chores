@@ -8,6 +8,13 @@ Usually you would run `deck-chores` in a container::
 
     $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock funkyfuture/deck-chores
 
+.. note::
+
+    There's a manifest on the Docker Hub that maps images to builds targeting ``amd64`` and ``arm``
+    architectures.
+    Thus you don't need to specify any platform indicator, the Docker client will figure out which
+    one is the proper image to pull.
+
 Likewise, docker-compose_ can be used with such configuration:
 
 .. code-block:: yaml

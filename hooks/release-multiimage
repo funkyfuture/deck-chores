@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -e
+
+IMAGE=$1
+VERSION=$2
+
+ARCHITECTURES="amd64 arm"
+MANIFEST_FILE="$(dirname $0)/multiimage.yml"
+
+
+for agnostic_tag in "$VERSION latest"; do
+
+    cat > $MANIFEST_FILE <<-EOF
+image: $IMAGE:$agnostic_tag
+manifests:
+EOF
+
+    for arch in $ARCHITECTURES ; do
+        tag=$agnostic_tag-$arch
+
+        while ! docker pull $IMAGE:$tag ; do
+            sleep 10
+        done
+
+        cat >> $MANIFEST_FILE <<-EOF
+  - image: $IMAGE:$tag
+    platform:
+      architecture: $arch
+      os: linux
+EOF
+
+    done
+
+
+    cat $MANIFEST_FILE
+    echo
+    read -p "Push multi-image? " inp
+    case $inp in
+        [Yy]*) manifest-tool push from-spec $MANIFEST_FILE ;;
+        *) ;;
+    esac
+
+done
+
+rm $MANIFEST_FILE
