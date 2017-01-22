@@ -59,4 +59,4 @@ tests/
 # Other
 *.ini
 Makefile
-requirements-dev.txt
+requirements-*.txt
