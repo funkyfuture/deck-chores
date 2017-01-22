@@ -23,8 +23,6 @@ CMD ["deck-chores"]
 
 COPY . /src
 
-RUN apk add --no-cache --virtual .build-deps ca-certificates \
- && apk add --no-cache tini \
+RUN apk add --no-cache tini \
  && /src/setup.py install \
- && rm -Rf /root/.cache \
- && apk del .build-deps
+ && rm -Rf /root/.cache

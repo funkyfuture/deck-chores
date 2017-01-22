@@ -5,13 +5,9 @@ CMD ["deck-chores"]
 LABEL org.label-schema.name="deck-chores"
 ENV DEBUG=true
 
-RUN apk add --no-cache --virtual .build-deps ca-certificates \
- && apk add --no-cache tini \
- && pip install cerberus docker-py fasteners APScheduler \
- && apk del .build-deps
-
+RUN apk add --no-cache tini \
+ && pip install cerberus docker-py fasteners APScheduler
 
 COPY . /src
 
-RUN cd src && python setup.py install \
- && cd / && rm -R /src
+RUN python /src/setup.py install
