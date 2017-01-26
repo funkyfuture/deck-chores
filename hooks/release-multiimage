@@ -9,7 +9,7 @@ ARCHITECTURES="amd64 arm"
 MANIFEST_FILE="$(dirname $0)/multiimage.yml"
 
 
-for agnostic_tag in "$VERSION latest"; do
+for agnostic_tag in $VERSION latest ; do
 
     cat > $MANIFEST_FILE <<-EOF
 image: $IMAGE:$agnostic_tag
@@ -35,7 +35,7 @@ EOF
 
     cat $MANIFEST_FILE
     echo
-    read -p "Push multi-image? " inp
+    read -p "Push multiimage? " inp
     case $inp in
         [Yy]*) manifest-tool push from-spec $MANIFEST_FILE ;;
         *) ;;
