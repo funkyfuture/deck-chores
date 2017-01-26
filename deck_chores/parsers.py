@@ -68,10 +68,6 @@ class JobConfigValidator(cerberus.Validator):
             args = tuple(int(x) for x in args)  # type: ignore
         return IntervalTrigger, args
 
-    # TODO remove with the next release of cerberus
-    def _validate_validator_trigger(self, field, value):
-        pass
-
     def _validator_trigger(self, field, value):
         if isinstance(value, str):  # normalization failed
             return
