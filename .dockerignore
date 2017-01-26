@@ -57,6 +57,7 @@ docs/_build/
 tests/
 
 # Other
+/hooks/
 *.ini
 Makefile
 requirements-*.txt
