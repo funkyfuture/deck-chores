@@ -5,7 +5,7 @@ History
 ~~~~~~~~~~~~~~~~
 
 * *fix*: docker-py returns ``None`` for labels of images that were created with
-         older Docker versions
+         older Docker versions (#7)
 
 0.1.beta3 (2017-01-22)
 ~~~~~~~~~~~~~~~~~~~~~~

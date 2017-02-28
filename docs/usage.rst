@@ -38,6 +38,19 @@ You could also install `deck-chores` from the Python Package Index with ``pip`` 
     $ deck-chores
 
 
+Caveats
+-------
+
+.. caution::
+
+    There's yet no way to distinguish container events that happen during an **image build** from
+    others (#6 and `#15211 <docker-issue-15211_>`_). Thus when an image is built, `deck-chores`
+    will register and remove jobs on all intermediate containers following labels that define jobs.
+    It would possibly trigger these jobs, which might lead to a corrupted build.
+    You can avoid this risk by building images on a host that is not observed by `deck-chores` or
+    by pausing it during image builds.
+
+
 Job definitions
 ---------------
 
@@ -51,22 +64,42 @@ The *job name* ``options`` cannot be used as it is reserved for setting :ref:`op
 
 The following attributes are available:
 
-=========  ==========================================================
+=========  ========================================================
 Attribute  Description
-=========  ==========================================================
+=========  ========================================================
 command    the command to run
 cron       a :ref:`cron` definition
 date       a :ref:`date` definition
 interval   a :ref:`interval` definition
-max        the maximimum of simultaneously running command instances,
+max        the maximum of simultaneously running command instances,
            defaults to :envvar:`DEFAULT_MAX`
 timezone   the timezone that *cron* and *date* relate to,
            defaults to :envvar:`TIMEZONE`
 user       the user to run the command,
            defaults to :envvar:`DEFAULT_USER`
-=========  ==========================================================
+=========  ========================================================
 
 The attribute ``command`` and one of ``cron``, ``date`` or ``interval`` are *required* for each job.
+
+Example snippet from a ``docker-compose.yml`` file:
+
+.. code-block:: yaml
+
+    services:
+      web:
+        # ...
+        labels:
+          deck-chores.clear-caches.command: drush cc all
+          deck-chores.clear-caches.interval: daily
+          deck-chores.clear-caches.user: www-data
+
+Or baked into an image:
+
+.. code-block:: Dockerfile
+
+    LABEL deck-chores.clear-caches.command="drush cc all" \
+          deck-chores.clear-caches.interval="daily" \
+          deck-chores.clear-caches.user="www-data"
 
 
 Job triggers
@@ -80,7 +113,7 @@ cron
 cron triggers allow definitions for repeated run times like for the well-known *cron* daemon.
 The fields are separated by spaces, missing fields are filled up with ``*`` on the left.
 
-See APScheduler's `documentation <cron-trigger>`_ for details, including versatile expressions.
+See APScheduler's `documentation <cron-trigger_>`_ for details, including versatile expressions.
 
 Examples
 ........
@@ -177,7 +210,7 @@ deck-chore's behaviour is defined by these environment variables:
 
     default: ``image,service``
 
-    The default for a job's ``options`` attribute.
+    The default for a job's :ref:`options <options>` attribute.
 
 .. envvar:: DEFAULT_USER
 
@@ -232,6 +265,7 @@ Authentication related files are expected to be available at ``/config/ca.pem``,
 
 
 .. _cron-trigger: https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#introduction
+.. _docker-issue-15211: https://github.com/docker/docker/issues/15211
 .. _docker-compose: https://docs.docker.com/compose/
 .. _log record attributes: https://docs.python.org/library/logging.html#logrecord-attributes
 .. _ssl: https://docs.python.org/library/ssl.html#ssl.PROTOCOL_TLS
