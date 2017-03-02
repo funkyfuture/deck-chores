@@ -1,7 +1,7 @@
 History
 -------
 
-0.1 (unreleased)
+0.1 (2017-03-02)
 ~~~~~~~~~~~~~~~~
 
 * *fix*: docker-py returns ``None`` for labels of images that were created with
