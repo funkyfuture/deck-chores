@@ -11,7 +11,6 @@ Contents:
    :maxdepth: 2
 
    usage
-   genindex
    contributing
    history
 
