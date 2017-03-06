@@ -1,4 +1,4 @@
-FROM python:3.6-alpine
+FROM python@sha256:142fc3f338b10569d08c3f3855c492c2a176b0c45af099f9ebe87f0fededb210
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["deck-chores"]
