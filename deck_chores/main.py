@@ -32,7 +32,7 @@ def there_is_another_deck_chores_container() -> bool:
         if container['State'] in 'created,exited':
             continue
         labels = get_image_labels_for_container(container['Id'])
-        if labels.get('org.label-schema.name', '') == 'deck-chores':
+        if (labels and labels.get('org.label-schema.name', '') == 'deck-chores'):
             matched_containers += 1
         if matched_containers > 1:
             return True
