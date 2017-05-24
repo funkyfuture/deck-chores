@@ -23,7 +23,6 @@ CMD ["deck-chores"]
 
 COPY . /src
 
-RUN apk upgrade --no-cache \
- && apk add --no-cache tini \
+RUN apk add --update --no-cache tini=0.9.0-r1 \
  && /src/setup.py install \
  && rm -Rf /root/.cache

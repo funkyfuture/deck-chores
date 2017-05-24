@@ -5,7 +5,7 @@ CMD ["deck-chores"]
 LABEL org.label-schema.name="deck-chores"
 ENV DEBUG=true
 
-RUN apk add --no-cache tini \
+RUN apk add --update --no-cache tini=0.9.0-r1 \
  && pip install cerberus~=1.1 docker-py fasteners APScheduler
 
 COPY . /src
