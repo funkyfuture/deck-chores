@@ -73,7 +73,7 @@ def process_running_container_labels(container_id: str) -> None:
     if not definitions:
         return
     if service_id and 'service' in options:
-        if locking_container_to_services_map.values():
+        if service_id in locking_container_to_services_map.values():
             log.debug('Service id has a registered job: %s' % service_id)
             return
         log.info('Locking service id: %s' % service_id)
