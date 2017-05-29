@@ -22,22 +22,19 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-all: build
-
-build:
+build: ## builds the Docker image
 	docker build $(BUILD_ARGS) -t $(IMAGE_NAME) .
 
-run:
+run: build ## runs deck-chores in a temporary container
 	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(IMAGE_NAME)
 
-build-dev:
+build-dev: ## builds the Docker image for debugging
 	docker build -t $(REPO_NAME):dev --rm -f Dockerfile-dev .
 
-run-dev:
+run-dev: ## runs deck-chores in a temporary container for debugging
 	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(REPO_NAME):dev
 
-clean: clean-build clean-pyc clean-test
-
+clean: clean-build clean-pyc clean-test ## cleans all artifacts
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -60,7 +57,7 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 deck_chores tests
 
-test:
+test: ## run all tests
 	tox
 
 docs: ## generate Sphinx HTML documentation, including API docs
@@ -68,7 +65,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	xdg-open docs/_build/html/index.html
 
-release: test clean build
+release: test clean build ## release the current version on github, the PyPI and the Docker hub
 	git tag -f $(VERSION)
 	git tag -f latest
 	git push origin master
@@ -77,10 +74,10 @@ release: test clean build
 	python setup.py sdist bdist_wheel upload
 	$(MAKE) release-multiimage
 
-release-arm:
+release-arm: ## release the arm build on the Docker hub
 	hooks/release-arm $(IMAGE_NAME) $(SOURCE_COMMIT)
 
-release-multiimage: release-arm
+release-multiimage: release-arm ## release the multi-arch manifest on the Docker hub
 	hooks/release-multiimage $(REPO_NAME) $(VERSION)
 
 dist: clean ## builds source and wheel package
