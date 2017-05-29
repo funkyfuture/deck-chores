@@ -32,11 +32,13 @@ Likewise, docker-compose_ can be used with such configuration:
 
 
 You could also install `deck-chores` from the Python Package Index with ``pip`` or ``pipsi``
-(recommended) and run it::
+(recommended)::
 
     $ pipsi install deck-chores
-    $ deck-chores
 
+and then run it::
+
+    $ deck-chores
 
 Caveats
 -------
