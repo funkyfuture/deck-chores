@@ -4,6 +4,11 @@
 from os import chdir, getcwd
 from pathlib import Path
 from setuptools import setup
+from sys import version_info
+
+
+if version_info < (3, 6):
+    raise RuntimeError('Requires Python 3.6 or later.')
 
 
 PROJECT_DIR = Path(__file__).parent
@@ -29,7 +34,7 @@ setup(
     packages=['deck_chores',],
     package_dir={'deck_chores': 'deck_chores'},
     include_package_data=True,
-    install_requires=['APScheduler', 'cerberus~=1.1', 'docker-py', 'fasteners'],
+    install_requires=['APScheduler~=3.3', 'cerberus~=1.1', 'docker-py~=1.10', 'fasteners~=0.14'],
     license="ISC license",
     zip_safe=False,
     keywords=['docker', 'cron', 'scheduler', 'jobs', 'labels', 'metadata'],
@@ -41,10 +46,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython'
     ],
-    entry_points="""
-    [console_scripts]
-    deck-chores=deck_chores.main:main
-    """
+    entry_points={'console_scripts': ['deck-chores = deck_chores.main:main']}
 )
 
 chdir(_old_cwd)
