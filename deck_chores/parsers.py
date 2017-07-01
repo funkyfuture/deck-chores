@@ -1,5 +1,5 @@
 from functools import lru_cache
-from collections import defaultdict, ChainMap
+from collections import defaultdict
 import logging
 from typing import Dict, Tuple, Union
 
@@ -130,7 +130,8 @@ def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
     options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
     service_id = _parse_service_id(_labels)
     if 'image' in options:
-        _labels = ChainMap(filtered_labels, _image_definition_labels_of_container(container_id))
+        _labels = _image_definition_labels_of_container(container_id).copy()
+        _labels.update(filtered_labels)
     else:
         _labels = filtered_labels
 
