@@ -9,7 +9,7 @@ from docker.constants import DEFAULT_TIMEOUT_SECONDS  # type: ignore
 from docker.tls import TLSConfig  # type: ignore
 
 from deck_chores.exceptions import ConfigurationError
-from deck_chores.utils import split_string, trueish
+from deck_chores.utils import log, split_string, trueish
 
 
 ####

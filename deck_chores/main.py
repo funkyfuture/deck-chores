@@ -2,7 +2,6 @@
 
 from datetime import datetime
 import logging
-import os
 import sys
 from signal import signal, SIGINT, SIGTERM
 
@@ -17,7 +16,7 @@ from deck_chores.exceptions import ConfigurationError
 from deck_chores.indexes import locking_container_to_services_map
 from deck_chores import jobs
 import deck_chores.parsers as parse
-from deck_chores.utils import from_json, generate_id, trueish
+from deck_chores.utils import from_json, generate_id, log, log_handler
 
 
 ####
@@ -52,15 +51,6 @@ def sigterm_handler(signum, frame):
 
 signal(SIGINT, sigint_handler)
 signal(SIGTERM, sigterm_handler)
-
-
-####
-
-
-log = logging.getLogger('deck_chores')
-log_handler = logging.StreamHandler(sys.stdout)
-log.addHandler(log_handler)
-log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INFO)
 
 
 ####
