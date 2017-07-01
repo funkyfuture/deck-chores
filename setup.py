@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from os import chdir, getcwd
+from os import chdir, environ, getcwd
 from pathlib import Path
 from setuptools import setup
 from sys import version_info
 
 
-if version_info < (3, 6):
+if version_info < (3, 6) and not environ.get('READTHEDOCS', False):
     raise RuntimeError('Requires Python 3.6 or later.')
 
 
