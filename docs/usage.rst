@@ -40,6 +40,10 @@ and then run it::
 
     $ deck-chores
 
+
+Now one instance of `deck-chores` is running and will handle all job definitions that it discovers
+on containers that run on the Docker host.
+
 Caveats
 -------
 
