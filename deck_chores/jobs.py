@@ -106,6 +106,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
         assert scheduler.get_job(job_id) is None
         raise AssertionError('Container is not running.')
 
+    # TODO when https://github.com/docker/docker-py/issues/1381 is solved
     exec_id = cfg.client.api.exec_create(container_id, command, user=definition['user'])['Id']
     response = cfg.client.api.exec_start(exec_id)
     exit_code = cfg.client.api.exec_inspect(exec_id)['ExitCode']
@@ -117,7 +118,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
 
 def add(container_id: str, definitions: dict) -> None:
-    container_name = cfg.client.api.inspect_container(container_id)['Name']
+    container_name = cfg.client.containers.get(container_id).name
     log.debug('Adding jobs for %s.' % container_name)
     for job_name, definition in definitions.items():
         job_id = generate_id(container_id, job_name)

@@ -1,6 +1,14 @@
 History
 -------
 
+0.2.rc1 (2017-07-01)
+~~~~~~~~~~~~~~~~~~~~
+
+* *refactoring*: uses the Python Docker SDK 2 (#14)
+* *removed*: ``ASSERT_FINGERPRINT`` environment variable
+* *renamed*: ``DOCKER_DAEMON`` to ``DOCKER_HOST`` to comply with the SDK
+
+
 0.1 (2017-03-02)
 ~~~~~~~~~~~~~~~~
 

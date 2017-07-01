@@ -10,7 +10,6 @@ from apscheduler.triggers.date import DateTrigger  # type: ignore
 from fasteners import InterProcessLock  # type: ignore
 
 from deck_chores import __version__
-from deck_chores.caches import get_image_labels_for_container
 from deck_chores.config import cfg, generate_config
 from deck_chores.exceptions import ConfigurationError
 from deck_chores.indexes import locking_container_to_services_map
@@ -28,8 +27,7 @@ lock = InterProcessLock('/tmp/deck-chores.lock')
 def there_is_another_deck_chores_container() -> bool:
     matched_containers = 0
     for container in cfg.client.containers.list():
-        labels = get_image_labels_for_container(container.id)
-        if labels.get('org.label-schema.name', '') == 'deck-chores':
+        if container.image.labels.get('org.label-schema.name', '') == 'deck-chores':
             matched_containers += 1
         if matched_containers > 1:
             return True
@@ -130,7 +128,7 @@ def handle_die(event: dict) -> None:
         else:
             return
 
-    container_name = cfg.client.api.inspect_container(container_id)['Name']
+    container_name = cfg.client.containers.get(container_id).name
     for job_name in definitions:
         log.info("Removing job '%s' for %s" % (job_name, container_name))
         jobs.remove(generate_id(container_id, job_name))

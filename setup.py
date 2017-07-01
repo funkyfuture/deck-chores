@@ -34,7 +34,7 @@ setup(
     packages=['deck_chores',],
     package_dir={'deck_chores': 'deck_chores'},
     include_package_data=True,
-    install_requires=['APScheduler~=3.3', 'cerberus~=1.1', 'docker~=2.3', 'fasteners~=0.14'],
+    install_requires=['APScheduler~=3.3', 'cerberus~=1.1', 'docker~=2.4', 'fasteners~=0.14'],
     license="ISC license",
     zip_safe=False,
     keywords=['docker', 'cron', 'scheduler', 'jobs', 'labels', 'metadata'],

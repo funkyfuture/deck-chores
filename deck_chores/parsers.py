@@ -1,7 +1,7 @@
 from functools import lru_cache
-from collections import defaultdict
+from collections import defaultdict, ChainMap
 import logging
-from typing import Tuple, Union
+from typing import Dict, Tuple, Union
 
 from apscheduler.triggers.cron import CronTrigger  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore
@@ -9,7 +9,6 @@ from apscheduler.triggers.interval import IntervalTrigger  # type: ignore
 import cerberus  # type: ignore
 from pytz import all_timezones
 
-from deck_chores.caches import get_filtered_image_labels_for_container
 from deck_chores.config import cfg
 from deck_chores.exceptions import ParsingError
 from deck_chores.utils import generate_id, split_string
@@ -124,15 +123,14 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 
 @lru_cache()
 def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
-    _labels = cfg.client.api.inspect_container(container_id)['Config'].get('Labels', {})
+    _labels = cfg.client.containers.get(container_id).labels
     log.debug('Parsing labels: %s' % _labels)
     filtered_labels = {k: v for k, v in _labels.items()
                        if k.startswith(cfg.label_ns)}
     options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
     service_id = _parse_service_id(_labels)
     if 'image' in options:
-        _labels = get_filtered_image_labels_for_container(container_id).copy()
-        _labels.update(filtered_labels)
+        _labels = ChainMap(filtered_labels, _image_definition_labels_of_container(container_id))
     else:
         _labels = filtered_labels
 
@@ -171,6 +169,12 @@ def _parse_service_id(_labels: dict) -> str:
         return ''
     identifiers = tuple(filtered_labels[x] for x in cfg.service_identifiers)
     return generate_id(*identifiers)
+
+
+@lru_cache()
+def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
+    labels = cfg.client.containers.get(container_id).image.labels
+    return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
 def _parse_job_defintion(_labels: dict) -> dict:

@@ -1,4 +1,4 @@
-docker-compose==1.9
+docker-compose==1.14
 flake8
 mock
 mypy

@@ -1,5 +1,7 @@
 from pytest import mark
 
+from docker.models.containers import Container
+
 from deck_chores.main import listen, there_is_another_deck_chores_container
 from deck_chores.parsers import _parse_job_defintion
 
@@ -19,16 +21,17 @@ _events = b'''{"status":"rename","id":"a84c8e16c1b1b2339bd276f725f08425935c51a5d
 {"status":"stop","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"stop","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1"}},"time":1481662833,"timeNano":1481662833364283106}'''  # noqa: E501
 
 
-def test_event_dispatching(mocker):
-    mocker.patch('deck_chores.config.DockerClient.events',
-                 return_value=(x for x in _events.splitlines() if x))
-    mocker.patch('deck_chores.config.DockerClient.api.inspect_container',
-                 return_value={'Name': 'foo'})
-    labels = mocker.patch('deck_chores.parsers.labels')
+def test_event_dispatching(cfg, mocker):
+    cfg.client.events.return_value = (x for x in _events.splitlines() if x)
+    container = mocker.MagicMock()
+    container.name = 'foo'
+    cfg.client.containers.get.return_value = container
     definition = _parse_job_defintion({'deck-chores.beep.command': '/beep.sh',
                                        'deck-chores.beep.interval': '15'})
-    labels.return_value = ('foo', 'service', definition)
+    labels = mocker.patch('deck_chores.parsers.labels',
+                          return_value=('foo', 'service', definition))
     add = mocker.patch('deck_chores.jobs.add')
+
     listen()
     assert labels.call_count == 2
     assert add.call_count == 1
@@ -37,20 +40,11 @@ def test_event_dispatching(mocker):
 @mark.parametrize('has_label_seq, exp_result',
                   (([True, False, True], True),
                    ([True, False], False)))
-def test_deck_chores_container_check(mocker, has_label_seq, exp_result):
-    def inspect_image(self, id):
-        nonlocal has_label_seq
-        if has_label_seq.pop(0):
-            return {'Config': {'Labels': {'org.label-schema.name': 'deck-chores'}}}
-        else:
-            return {'Config': {}}
+def test_deck_chores_container_check(cfg, mocker, has_label_seq, exp_result):
+    containers = []
+    for x in has_label_seq:
+        containers.append(mocker.MagicMock(Container))
+        containers[-1].image.labels = {'org.label-schema.name': 'deck-chores'} if x else {}
+    cfg.client.containers.list.return_value = containers
 
-    def inspect_container(self, id):
-        nonlocal has_label_seq
-        return {'Id': str(has_label_seq[0]), 'Image': str(has_label_seq[0])}
-
-    mocker.patch('docker.client.APIClient.containers',
-                 return_value=[{'Id': str(x), 'State': 'running'} for x in range(len(has_label_seq))])  # noqa: E501
-    mocker.patch('docker.client.APIClient.inspect_image', inspect_image)
-    mocker.patch('docker.client.APIClient.inspect_container', inspect_container)
     assert there_is_another_deck_chores_container() == exp_result

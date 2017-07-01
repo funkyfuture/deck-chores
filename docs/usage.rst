@@ -190,7 +190,7 @@ deck-chore's behaviour is defined by these environment variables:
 
     The timeout for responses from the Docker daemon. The default is imported from *docker-py*.
 
-.. envvar:: DOCKER_DAEMON
+.. envvar:: DOCKER_HOST
 
     default: ``unix://var/run/docker.sock``
 
@@ -247,10 +247,6 @@ default: ``UTC``
 
 TLS options
 ~~~~~~~~~~~
-
-.. envvar:: ASSERT_FINGERPRINT
-
-    default: ``no``
 
 .. envvar:: ASSERT_HOSTNAME
 

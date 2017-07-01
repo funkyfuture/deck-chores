@@ -31,7 +31,7 @@ run: build ## runs deck-chores in a temporary container
 build-dev: ## builds the Docker image for debugging
 	docker build -t $(REPO_NAME):dev --rm -f Dockerfile-dev .
 
-run-dev: ## runs deck-chores in a temporary container for debugging
+run-dev: build-dev ## runs deck-chores in a temporary container for debugging
 	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(REPO_NAME):dev
 
 clean: clean-build clean-pyc clean-test ## cleans all artifacts
