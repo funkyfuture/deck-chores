@@ -117,9 +117,24 @@ cron
 ~~~~
 
 cron triggers allow definitions for repeated run times like for the well-known *cron* daemon.
-The fields are separated by spaces, missing fields are filled up with ``*`` on the left.
+In contrast to the classic, the sequence of fields is flipped, starting with the greatest unit
+on the left. The fields are separated by spaces, missing fields are filled up with ``*`` on the
+left.
 
-See APScheduler's `documentation <cron-trigger_>`_ for details, including versatile expressions.
+The fields from left to right define:
+
+  * ``year``
+  * ``month``
+  * ``day`` (of month)
+  * ``week`` (of year)
+  * ``day_of_week``
+  * ``hour``
+  * ``minute``
+  * ``second``
+
+See APScheduler's documentation for details on its versatile expressions_.
+
+.. _expressions: https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#expression-types
 
 Examples
 ........
@@ -127,9 +142,11 @@ Examples
 ::
 
     * * * * * */3 0 0  # run on all hours dividable by 3
-    * * * * 7 0 1 0    # run every Sunday at 1:00
-    * * * * * 1-4 0 0  # or less verbose:
-    1-4 0 0            # run daily at 1:00, 2:00, 3:00 and 4:00
+    */3 0 0            # as shortened expression
+    * * * * 7 1 0 0    # run every Sunday at 1:00
+    7 1 0 0            # as shortened expression
+    * * * * * 1-4 0 0  # run daily at 1:00, 2:00, 3:00 and 4:00
+    1-4 0 0            # as shortened expression
 
 .. _date:
 
@@ -266,7 +283,6 @@ Authentication related files are expected to be available at ``/config/ca.pem``,
 ``/config/cert.pem`` respectively ``/config/key.pem``.
 
 
-.. _cron-trigger: https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#introduction
 .. _docker-issue-15211: https://github.com/docker/docker/issues/15211
 .. _docker-compose: https://docs.docker.com/compose/
 .. _log record attributes: https://docs.python.org/library/logging.html#logrecord-attributes
