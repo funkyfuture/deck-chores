@@ -3,5 +3,6 @@ flake8
 mock
 mypy
 pytest
+pytest-cov
 pytest-mock
 tox
