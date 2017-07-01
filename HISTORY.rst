@@ -7,6 +7,8 @@ History
 * *refactoring*: uses the Python Docker SDK 2 (#14)
 * *removed*: ``ASSERT_FINGERPRINT`` environment variable
 * *renamed*: ``DOCKER_DAEMON`` to ``DOCKER_HOST`` to comply with the SDK
+* *fix*: check on fixed labels (#18 by @aeri4list)
+* documentation updates
 
 
 0.1 (2017-03-02)

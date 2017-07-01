@@ -76,7 +76,7 @@ It wouldn't be as charming to write this piece of software without these project
 Roadmap
 -------
 
-0.2
+0.3
 ...
 
 - parse time units for interval triggers
@@ -86,7 +86,7 @@ Roadmap
 - maybe add a randomize expression for cron triggers
 
 
-0.3
+0.4
 ...
 
 - keep output of job executions
