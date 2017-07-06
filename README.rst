@@ -9,7 +9,7 @@ deck-chores
 
 **A job scheduler for Docker containers, configured via container labels.**
 
-* Documentation: http://deck-chores.rtfd.io
+* Documentation: https://deck-chores.readthedocs.io/en/latest/
 * Image repository: https://hub.docker.com/r/funkyfuture/deck-chores
 * Code repository: https://github.com/funkyfuture/deck-chores
 * Issue tracker: https://github.com/funkyfuture/deck-chores/issues
