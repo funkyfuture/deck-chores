@@ -1,46 +1,49 @@
 #!/usr/bin/env bash
 
+# requires at least manifest-tool v0.6
+# https://github.com/estesp/manifest-tool
+
 set -e
 
 IMAGE=$1
 VERSION=$2
 
-ARCHITECTURES="amd64 arm"
+PLATFORMS="amd64::amd64 arm:armv6l:arm32v6"
 MANIFEST_FILE="$(dirname $0)/multiimage.yml"
 
-
-for agnostic_tag in $VERSION latest ; do
-
-    cat > $MANIFEST_FILE <<-EOF
-image: $IMAGE:$agnostic_tag
+cat > $MANIFEST_FILE <<-EOF
+image: $IMAGE:$VERSION
+tags:
+  - latest
 manifests:
 EOF
 
-    for arch in $ARCHITECTURES ; do
-        tag=$agnostic_tag-$arch
+for platform in $PLATFORMS ; do
+    architecture=$(echo $platform | cut -d: -f1)
+    variant=$(echo $platform | cut -d: -f2)
+    suffix=$(echo $platform | cut -d: -f3)
+    tag=$VERSION-$suffix
+    while ! docker pull $IMAGE:$tag ; do
+        sleep 10
+    done
 
-        while ! docker pull $IMAGE:$tag ; do
-            sleep 10
-        done
-
-        cat >> $MANIFEST_FILE <<-EOF
+    cat >> $MANIFEST_FILE <<-EOF
   - image: $IMAGE:$tag
     platform:
-      architecture: $arch
+      architecture: $architecture
+      variant: $variant
       os: linux
 EOF
 
-    done
-
-
-    cat $MANIFEST_FILE
-    echo
-    read -p "Push multiimage? " inp
-    case $inp in
-        [Yy]*) manifest-tool push from-spec $MANIFEST_FILE ;;
-        *) ;;
-    esac
-
 done
+
+
+cat $MANIFEST_FILE
+echo
+read -p "Push multiimage? " inp
+case $inp in
+    [Yy]*) manifest-tool push from-spec $MANIFEST_FILE ;;
+    *) ;;
+esac
 
 rm $MANIFEST_FILE

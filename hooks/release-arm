@@ -2,20 +2,17 @@
 
 set -ex
 
-ARM_HOST=arm-host
-IMAGE_NAME="$1-arm"
+BUILD_HOST=arm32v6-host
+REMOTE_PATH="docker/images/deck-chores"
+IMAGE_NAME="$1-arm32v6"
 SOURCE_COMMIT=$2
 
-rsync -e ssh -vca --filter=':- .gitignore' --exclude='.git/' --del . $ARM_HOST:~/docker/images/deck-chores
+rsync -e ssh -vca --filter=':- .gitignore' --exclude='.git/' --del . $BUILD_HOST:~/$REMOTE_PATH
 
-ssh $ARM_HOST <<-SCRIPT
-    cd docker/images/python
-    ./build.sh
-    cd ../deck-chores
-    sed -i "1 s_python_funkyfuture/python_g" Dockerfile
-    sed -i "1 s_-alpine_-arm_g" Dockerfile
+ssh $BUILD__HOST <<-SCRIPT
+    cd $REMOTE_PATH
+    sed -i "1 s_python_arm32v6/python_g" Dockerfile
+    sed -i "1 s_-alpine_-alpine3.6_g" Dockerfile
     IMAGE_NAME="${IMAGE_NAME}" GIT_SHA1="${SOURCE_COMMIT}" hooks/build
     docker push "${IMAGE_NAME}"
-    docker tag \$(docker images -q "${IMAGE_NAME}") funkyfuture/deck-chores:latest-arm
-    docker push funkyfuture/deck-chores:latest-arm
 SCRIPT
