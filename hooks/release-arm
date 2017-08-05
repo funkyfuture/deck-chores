@@ -9,8 +9,8 @@ SOURCE_COMMIT=$2
 
 rsync -e ssh -vca --filter=':- .gitignore' --exclude='.git/' --del . $BUILD_HOST:~/$REMOTE_PATH
 
-ssh $BUILD__HOST <<-SCRIPT
-    cd $REMOTE_PATH
+ssh $BUILD_HOST <<-SCRIPT
+    cd ${REMOTE_PATH}
     sed -i "1 s_python_arm32v6/python_g" Dockerfile
     sed -i "1 s_-alpine_-alpine3.6_g" Dockerfile
     IMAGE_NAME="${IMAGE_NAME}" GIT_SHA1="${SOURCE_COMMIT}" hooks/build
