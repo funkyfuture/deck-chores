@@ -25,7 +25,7 @@ with open('HISTORY.rst') as history_file:
 
 setup(
     name='deck-chores',
-    version='0.2-rc1',
+    version='0.2-rc2',
     description="Job scheduler for Docker containers, configured via container labels.",
     long_description=readme + '\n\n' + history,
     author="Frank Sachsenheim",

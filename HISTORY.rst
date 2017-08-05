@@ -1,7 +1,14 @@
 History
 -------
 
-0.2.rc1 (2017-07-01)
+0.2-rc2 (2017-08-05)
+~~~~~~~~~~~~~~~~~~~~
+
+* *changed*: arm builds base on `arm32v6/python <https://hub.docker.com/r/arm32v6/python/>`_
+* *changed*: therefore ``arm32v6`` replaces the ``arm``-suffix in image tags
+* *changed*: there are no more images that get tagged with ``latest-$architecture``
+
+0.2-rc1 (2017-07-01)
 ~~~~~~~~~~~~~~~~~~~~
 
 * *refactoring*: uses the Python Docker SDK 2 (#14)
