@@ -107,6 +107,18 @@ Or baked into an image:
           deck-chores.clear-caches.interval="daily" \
           deck-chores.clear-caches.user="www-data"
 
+If the container you want to run is not a long running service, you can start the container with the following example snippet from a ``docker-compose.yml`` file:
+
+.. code-block:: yaml
+
+    services:
+      shortlived:
+        # ...
+        command: >
+          tail -f /dev/null
+        labels:
+          deck-chores.short.command: shortlived param1
+          deck-chores.short.interval: daily
 
 Job triggers
 ------------
