@@ -8,7 +8,7 @@ set -e
 IMAGE=$1
 VERSION=$2
 
-PLATFORMS="amd64::amd64 arm:armv6l:arm32v6"
+PLATFORMS="amd64::amd64 arm:v7:armv7l"
 MANIFEST_FILE="$(dirname $0)/multiimage.yml"
 
 cat > $MANIFEST_FILE <<-EOF

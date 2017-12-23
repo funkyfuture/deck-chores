@@ -24,7 +24,7 @@ Features
 - use date, interval and cron-like triggers
 - set a maximum of simultaneously running instances per job
 - restrict job scheduling to one container per service
-- multi-architecture image supports ``amd64`` and ``arm32v6`` platforms, no emulator involved
+- multi-architecture image supports ``amd64`` and ``armv7l`` platforms, no emulator involved
 
 
 Example
