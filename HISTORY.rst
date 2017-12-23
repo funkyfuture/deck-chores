@@ -6,6 +6,7 @@ History
 
 * *changed*: arm builds base on `python:3.6-alpine <https://hub.docker.com/_/python/>`_
   that are executed on an ARMv7l architecture
+* *changed*: Updated dependencies *APScheduler* and *docker-py*
 
 
 0.2-rc2 (2017-08-05)
