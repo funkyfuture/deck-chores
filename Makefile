@@ -79,10 +79,8 @@ docs: ## generate Sphinx HTML documentation, including API docs
 .PHONY: release
 release: test clean build ## release the current version on github, the PyPI and the Docker hub
 	git tag -f $(VERSION)
-	git tag -f latest
 	git push origin master
 	git push -f origin $(VERSION)
-	git push -f origin latest
 	python setup.py sdist bdist_wheel upload
 	$(MAKE) release-multiimage
 
