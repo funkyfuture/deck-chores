@@ -44,8 +44,8 @@ and then run it::
 Now one instance of `deck-chores` is running and will handle all job definitions that it discovers
 on containers that run on the Docker host.
 
-Caveats
--------
+Caveats & Tips
+--------------
 
 .. caution::
 
@@ -55,6 +55,24 @@ Caveats
     It would possibly trigger these jobs, which might lead to a corrupted build.
     You can avoid this risk by building images on a host that is not observed by `deck-chores` or
     by pausing it during image builds.
+
+
+Containers without an enduring main process
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the container is supposed to only the scheduled commands and not a main process, use a
+non-stopping no-op command as main process like in this snippet of a ``docker-compose.yml`` file:
+
+.. code-block:: yaml
+
+    services:
+      neverending:
+        # …
+        command: >
+          tail -f /dev/null
+        labels:
+          deck-chores.short.command: daily_command …
+          deck-chores.short.interval: daily
 
 
 Job definitions
@@ -107,21 +125,6 @@ Or baked into an image:
           deck-chores.clear-caches.interval="daily" \
           deck-chores.clear-caches.user="www-data"
 
-Tips
----------------
-
-If the container you want to run is not a long running service, you can start the container with the following example snippet from a ``docker-compose.yml`` file:
-
-.. code-block:: yaml
-
-    services:
-      shortlived:
-        # ...
-        command: >
-          tail -f /dev/null
-        labels:
-          deck-chores.short.command: shortlived param1
-          deck-chores.short.interval: daily
 
 Job triggers
 ------------
