@@ -1,4 +1,4 @@
-FROM python:3.6-alpine
+FROM python:alpine3.7
 
 MAINTAINER Frank Sachsenheim <funkyfuture@riseup.net>
 
@@ -24,6 +24,8 @@ CMD ["deck-chores"]
 COPY . /src
 
 RUN apk upgrade --no-cache \
+ && apk add --no-cache --virtual .build-deps ca-certificates \
  && apk add --no-cache tini \
  && /src/setup.py install \
- && rm -Rf /root/.cache
+ && rm -Rf /root/.cache \
+ && apk del .build-deps
