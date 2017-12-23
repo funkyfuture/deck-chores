@@ -67,7 +67,7 @@ It wouldn't be as charming to write this piece of software without these project
 
 * `APScheduler <https://apscheduler.readthedocs.io>`_ for managing jobs
 * `cerberus <http://python-cerberus.org>`_ for processing metadata
-* `docker <https://docker-py.readthedocs.io>`_ for Docker interaction
+* `docker-py <https://docker-py.readthedocs.io>`_ for Docker interaction
 * `flake8 <http://flake8.pycqa.org/>`_, `mypy <http://mypy-lang.org>`_,
   `pytest <http://pytest.org>`_ and `tox <https://tox.readthedocs.io>`_ for testing
 * `Python <https://python.org>`_
@@ -82,8 +82,7 @@ Roadmap
 - parse time units for interval triggers
 - handle a global limit on concurrent jobs
 - print jobs when receiving SIGUSR1
-- randomization of interval triggered events
-- maybe add a randomize expression for cron triggers
+- support for configuring APScheduler's jitter option on Cron- & IntervalTrigger
 
 
 0.4
