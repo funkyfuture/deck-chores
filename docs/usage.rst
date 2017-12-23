@@ -161,8 +161,9 @@ Examples
 
     * * * * * */3 0 0  # run on all hours dividable by 3
     */3 0 0            # as shortened expression
-    * * * * 7 1 0 0    # run every Sunday at 1:00
-    7 1 0 0            # as shortened expression
+    * * * * 6 1 0 0    # run every Sunday at 1:00
+    6 1 0 0            # as shortened expression
+    sun 1 0 0          # as 'speaking' variant
     * * * * * 1-4 0 0  # run daily at 1:00, 2:00, 3:00 and 4:00
     1-4 0 0            # as shortened expression
 

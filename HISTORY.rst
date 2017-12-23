@@ -5,7 +5,7 @@ History
 ~~~~~~~~~~~~~~~~
 
 * *new*: documentation how to run scheduled jobs only (Brynjar Smári Bjarnason)
-
+* *fix*: documentation on cron triggers
 
 0.2-rc3 (2017-12-23)
 ~~~~~~~~~~~~~~~~~~~~
