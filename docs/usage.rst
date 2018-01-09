@@ -50,8 +50,9 @@ Caveats & Tips
 .. caution::
 
     There's yet no way to distinguish container events that happen during an **image build** from
-    others (#6 and `#15211 <docker-issue-15211_>`_). Thus when an image is built, `deck-chores`
-    will register and remove jobs on all intermediate containers following labels that define jobs.
+    others (:issue:`6` and `#15211 <docker-issue-15211_>`_). Thus when an image is built,
+    `deck-chores` will register and remove jobs on all intermediate containers following labels
+    that define jobs.
     It would possibly trigger these jobs, which might lead to a corrupted build.
     You can avoid this risk by building images on a host that is not observed by `deck-chores` or
     by pausing it during image builds.

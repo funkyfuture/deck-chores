@@ -40,8 +40,8 @@ import deck_chores
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode',
-              'sphinxcontrib.issuetracker']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.extlinks',
+              'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -110,6 +110,9 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built
 # documents.
 #keep_warnings = False
+
+extlinks = {'issue': ('https://github.com/funkyfuture/deck-chores/issues/%s',
+                      '#')}
 
 
 # -- Options for HTML output -------------------------------------------

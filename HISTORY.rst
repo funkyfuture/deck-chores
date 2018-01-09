@@ -4,8 +4,8 @@ History
 0.2 (unreleased)
 ~~~~~~~~~~~~~~~~
 
-* *new*: documentation how to run scheduled jobs only (Brynjar Smári Bjarnason)
-* *fix*: documentation on cron triggers
+* *new*: documentation how to run scheduled jobs only (:issue:`25` by @binnisb)
+* *fix*: documentation on cron triggers (:issue:`27` by @alpine-digger)
 
 0.2-rc3 (2017-12-23)
 ~~~~~~~~~~~~~~~~~~~~
@@ -24,10 +24,10 @@ History
 0.2-rc1 (2017-07-01)
 ~~~~~~~~~~~~~~~~~~~~
 
-* *refactoring*: uses the Python Docker SDK 2 (#14)
+* *refactoring*: uses the Python Docker SDK 2 (:issue:`14`)
 * *removed*: ``ASSERT_FINGERPRINT`` environment variable
 * *renamed*: ``DOCKER_DAEMON`` to ``DOCKER_HOST`` to comply with the SDK
-* *fix*: check on fixed labels (#18 by @aeri4list)
+* *fix*: check on fixed labels (:issue:`18` by @aeri4list)
 * documentation updates
 
 
@@ -35,7 +35,7 @@ History
 ~~~~~~~~~~~~~~~~
 
 * *fix*: docker-py returns ``None`` for labels of images that were created with
-  older Docker versions (#7)
+  older Docker versions (:issue:`7`)
 
 0.1.beta3 (2017-01-22)
 ~~~~~~~~~~~~~~~~~~~~~~
