@@ -1,11 +1,12 @@
 .DEFAULT_GOAL := build-dev
 
 REPO_NAME = funkyfuture/deck-chores
-VERSION = $(shell grep __version__ deck_chores/__init__.py | cut -f3 -d" " | tr -d "'")
+VERSION = $(shell grep VERSION setup.py | cut -f3 -d" " | tr -d "'")
 IMAGE_NAME = $(REPO_NAME):$(VERSION)
-SOURCE_COMMIT = $(shell git rev-parse HEAD)
-BUILD_DATE = "$(shell date --rfc-3339 seconds)"
-BUILD_ARGS = --build-arg BUILD_DATE=$(BUILD_DATE) --build-arg SOURCE_COMMIT=$(SOURCE_COMMIT) --build-arg VERSION=$(VERSION)
+GIT_SHA1 = $(shell git rev-parse HEAD)
+
+export IMAGE_NAME
+export GIT_SHA1
 
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -24,7 +25,7 @@ help:
 
 .PHONY: build
 build: ## builds the Docker image
-	docker build $(BUILD_ARGS) -t $(IMAGE_NAME) .
+	hooks/build
 
 .PHONY: run
 run: build ## runs deck-chores in a temporary container
@@ -86,7 +87,7 @@ release: test clean build ## release the current version on github, the PyPI and
 
 .PHONY: release-arm
 release-arm: ## release the arm build on the Docker hub
-	hooks/release-arm $(IMAGE_NAME) $(SOURCE_COMMIT)
+	hooks/release-arm $(IMAGE_NAME) $(GIT_SHA1)
 
 .PHONY: release-multiimage
 release-multiimage: release-arm ## release the multi-arch manifest on the Docker hub

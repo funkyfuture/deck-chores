@@ -7,6 +7,9 @@ from setuptools import setup
 from sys import version_info
 
 
+VERSION = '0.2-rc3'
+
+
 if version_info < (3, 6) and not environ.get('READTHEDOCS', False):
     raise RuntimeError('Requires Python 3.6 or later.')
 
@@ -25,7 +28,7 @@ with open('HISTORY.rst') as history_file:
 
 setup(
     name='deck-chores',
-    version='0.2-rc3',
+    version=VERSION,
     description="Job scheduler for Docker containers, configured via container labels.",
     long_description=readme + '\n\n' + history,
     author="Frank Sachsenheim",
