@@ -1,23 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from os import chdir, environ, getcwd
+from os import chdir, getcwd
 from pathlib import Path
 from setuptools import setup
-from sys import version_info
 
 
-VERSION = '0.2-rc3'
-
-
-if version_info < (3, 6) and not environ.get('READTHEDOCS', False):
-    raise RuntimeError('Requires Python 3.6 or later.')
-
-
-PROJECT_DIR = Path(__file__).parent
+VERSION = '0.2'
 
 _old_cwd = getcwd()
-chdir(str(PROJECT_DIR))
+chdir(Path(__file__).parent)
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -34,7 +26,7 @@ setup(
     author="Frank Sachsenheim",
     author_email='funkyfuture@riseup.net',
     url='https://github.com/funkyfuture/deck_chores',
-    packages=['deck_chores',],
+    packages=['deck_chores'],
     package_dir={'deck_chores': 'deck_chores'},
     include_package_data=True,
     install_requires=['APScheduler~=3.5', 'cerberus~=1.1', 'docker~=2.7', 'fasteners~=0.14'],
