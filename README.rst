@@ -1,6 +1,9 @@
 deck-chores
 ===========
 
+.. image:: https://img.shields.io/docker/pulls/funkyfuture/deck-chores.svg
+        :target: https://hub.docker.com/r/funkyfuture/deck-chores/
+
 .. image:: https://images.microbadger.com/badges/image/funkyfuture/deck-chores.svg
         :target: https://microbadger.com/images/funkyfuture/deck-chores
 
@@ -96,3 +99,6 @@ Authors
 -------
 
 - Frank Sachsenheim (maintaining)
+- aeri4list
+- alpine-digger
+- Brynjar Smári Bjarnason
