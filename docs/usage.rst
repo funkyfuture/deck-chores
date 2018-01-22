@@ -61,7 +61,7 @@ Caveats & Tips
 Containers without an enduring main process
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the container is supposed to only the scheduled commands and not a main process, use a
+If the container is supposed to only run the scheduled commands and not a main process, use a
 non-stopping no-op command as main process like in this snippet of a ``docker-compose.yml`` file:
 
 .. code-block:: yaml
@@ -202,7 +202,8 @@ There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``ev
 Container options
 -----------------
 
-Option flags control *deck-chores*'s behaviour. The schema for an option label name is::
+Option flags control *deck-chores*'s behaviour with regard to the labeled container and override
+the setting of :envvar:`DEFAULT_OPTIONS`. The schema for an option label name is::
 
     $LABEL_NAMESPACE.options
 
@@ -213,7 +214,8 @@ These options are available:
 
 .. option:: image
 
-    Job definitions in image labels are also parsed while container label keys override these.
+    Job definitions in the container's basing image labels are also parsed while container label
+    keys override these.
 
 .. option:: service
 
@@ -229,7 +231,8 @@ deck-chore's behaviour is defined by these environment variables:
 
 .. envvar:: CLIENT_TIMEOUT
 
-    The timeout for responses from the Docker daemon. The default is imported from *docker-py*.
+    The timeout for responses from the Docker daemon in seconds without unit indicator. The
+    default is imported from *docker-py*.
 
 .. envvar:: DOCKER_HOST
 
@@ -241,7 +244,7 @@ deck-chore's behaviour is defined by these environment variables:
 
     default: ``no``
 
-    Log debugging messages.
+    Log debugging messages, enabled by ``on``, ``true`` or ``yes``.
 
 .. envvar:: DEFAULT_MAX
 
@@ -292,6 +295,8 @@ TLS options
 .. envvar:: ASSERT_HOSTNAME
 
     default: ``no``
+
+    Enabled by ``on``, ``true`` or ``yes``.
 
 .. envvar:: SSL_VERSION
 
