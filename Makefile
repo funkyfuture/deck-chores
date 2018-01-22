@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := build-dev
 
 REPO_NAME = funkyfuture/deck-chores
-VERSION = $(shell git describe --tags)
+VERSION = $(shell grep "VERSION = " setup.py | cut -d"=" -f2 | tr -d " '")
 IMAGE_NAME = $(REPO_NAME):$(VERSION)
 GIT_SHA1 = $(shell git rev-parse HEAD)
 
