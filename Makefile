@@ -19,6 +19,10 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
+.PHONY: black
+black: ## code-formatting with black
+	 black deck_chores tests setup.py 
+
 .PHONY: help
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)

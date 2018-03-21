@@ -22,11 +22,13 @@ def generate_id(*args) -> str:
 # dead code
 def lru_dict_arg_cache(func: Callable) -> Callable:
     # TODO? wrapper that allows maxsize
+
     def unpacking_func(func: Callable, arg: frozenset) -> Any:
         return func(dict(arg))
 
-    _unpacking_func = _lru_cache_wrapper(partial(unpacking_func, func),  # type: ignore
-                                         64, False, _CacheInfo)
+    _unpacking_func = _lru_cache_wrapper(
+        partial(unpacking_func, func), 64, False, _CacheInfo  # type: ignore
+    )
 
     def packing_func(arg: Dict[Hashable, Hashable]) -> Any:
         return _unpacking_func(frozenset(arg.items()))
@@ -36,8 +38,9 @@ def lru_dict_arg_cache(func: Callable) -> Callable:
     return packing_func
 
 
-def split_string(value: str, delimiter: str = ',', strip: bool = True,
-                 sort: bool = False) -> Tuple[str, ...]:
+def split_string(
+    value: str, delimiter: str = ',', strip: bool = True, sort: bool = False
+) -> Tuple[str, ...]:
     result = []
     for part in value.split(delimiter):
         if strip:
@@ -59,8 +62,11 @@ log.addHandler(log_handler)
 log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INFO)
 
 
-__all__ = [from_json.__name__,
-           'log', 'log_handler',
-           lru_dict_arg_cache.__name__,
-           split_string.__name__,
-           trueish.__name__]
+__all__ = [
+    from_json.__name__,
+    'log',
+    'log_handler',
+    lru_dict_arg_cache.__name__,
+    split_string.__name__,
+    trueish.__name__,
+]

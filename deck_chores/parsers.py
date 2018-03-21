@@ -24,11 +24,11 @@ Trigger = Union[CronTrigger, DateTrigger, IntervalTrigger]
 
 
 NAME_INTERVAL_MAP = {
-    'weekly':       (1, 0, 0, 0, 0),
-    'daily':        (0, 1, 0, 0, 0),
-    'hourly':       (0, 0, 1, 0, 0),
+    'weekly': (1, 0, 0, 0, 0),
+    'daily': (0, 1, 0, 0, 0),
+    'hourly': (0, 0, 1, 0, 0),
     'every minute': (0, 0, 0, 1, 0),
-    'every second': (0, 0, 0, 0, 1)
+    'every second': (0, 0, 0, 0, 1),
 }
 
 
@@ -42,6 +42,7 @@ log = logging.getLogger('deck_chores')
 
 
 class JobConfigValidator(cerberus.Validator):
+
     @staticmethod
     @lru_cache(128)
     def _fill_args(value: str, length: int, filling: str) -> Tuple[str, ...]:
@@ -70,31 +71,50 @@ class JobConfigValidator(cerberus.Validator):
     def _validator_trigger(self, field, value):
         if isinstance(value, str):  # normalization failed
             return
+
         cls, args = value[0], value[1]
         try:
             cls(*args, timezone=self.document.get('timezone', cfg.timezone))
         except Exception as e:
             message = "Error while instantiating a {trigger} with '{args}'.".format(
-                trigger=cls.__name__, args=args)
+                trigger=cls.__name__, args=args
+            )
             if cfg.debug:
                 message += "\n%s" % e
             self._error(field, message)
 
 
-job_def_validator = JobConfigValidator({
-    'command': {'required': True},
-    'cron': {'coerce': 'cron', 'validator': 'trigger',
-             'required': True, 'excludes': ['date', 'interval']},
-    'date': {'coerce': 'date', 'validator': 'trigger',
-             'required': True, 'excludes': ['cron', 'interval']},
-    'interval': {'coerce': 'interval', 'validator': 'trigger',
-                 'required': True, 'excludes': ['cron', 'date']},
-    'max': {'coerce': int, 'default_setter': lambda x: cfg.default_max},
-    'name': {'regex': r'[a-z0-9.-]+'},
-    'timezone': {'default_setter': lambda x: cfg.timezone, 'allowed': all_timezones,
-                 'required': True},
-    'user': {'default_setter': lambda x: cfg.default_user}
-})
+job_def_validator = JobConfigValidator(
+    {
+        'command': {'required': True},
+        'cron': {
+            'coerce': 'cron',
+            'validator': 'trigger',
+            'required': True,
+            'excludes': ['date', 'interval'],
+        },
+        'date': {
+            'coerce': 'date',
+            'validator': 'trigger',
+            'required': True,
+            'excludes': ['cron', 'interval'],
+        },
+        'interval': {
+            'coerce': 'interval',
+            'validator': 'trigger',
+            'required': True,
+            'excludes': ['cron', 'date'],
+        },
+        'max': {'coerce': int, 'default_setter': lambda x: cfg.default_max},
+        'name': {'regex': r'[a-z0-9.-]+'},
+        'timezone': {
+            'default_setter': lambda x: cfg.timezone,
+            'allowed': all_timezones,
+            'required': True,
+        },
+        'user': {'default_setter': lambda x: cfg.default_user},
+    }
+)
 
 
 ####
@@ -104,6 +124,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
     # don't call this from unittests
     try:
         return _parse_labels(*args, **kwargs)
+
     except ParsingError as e:
         if isinstance(e.args[0], str):
             lines = e.args[0].splitlines()
@@ -111,12 +132,14 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
             lines = e.args[0]
         else:
             raise RuntimeError
+
         for line in lines:
             if isinstance(line, str):
                 log.error(line)
             elif isinstance(line, Exception):
                 log.exception(line)  # type: ignore
         return '', '', {}
+
     except Exception as e:
         raise e
 
@@ -125,8 +148,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug('Parsing labels: %s' % _labels)
-    filtered_labels = {k: v for k, v in _labels.items()
-                       if k.startswith(cfg.label_ns)}
+    filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
     options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
     service_id = _parse_service_id(_labels)
     if 'image' in options:
@@ -164,10 +186,15 @@ def _parse_service_id(_labels: dict) -> str:
     log.debug('Considering labels for service id: %s' % filtered_labels)
     if not filtered_labels:
         return ''
+
     if len(filtered_labels) != len(cfg.service_identifiers):
-        log.critical('Missing service identity labels: {}'
-                     .format(', '.join(set(cfg.service_identifiers) - set(filtered_labels))))
+        log.critical(
+            'Missing service identity labels: {}'.format(
+                ', '.join(set(cfg.service_identifiers) - set(filtered_labels))
+            )
+        )
         return ''
+
     identifiers = tuple(filtered_labels[x] for x in cfg.service_identifiers)
     return generate_id(*identifiers)
 
@@ -184,6 +211,7 @@ def _parse_job_defintion(_labels: dict) -> dict:
     for key, value in _labels.items():
         if key == cfg.label_ns + 'options':
             continue
+
         name, attribute = key[len(cfg.label_ns):].rsplit('.', 1)
         name_grouped_definitions[name][attribute] = value
 
@@ -202,6 +230,7 @@ def _parse_job_defintion(_labels: dict) -> dict:
                 trigger = job.pop(trigger_name, None)
                 if trigger is None:
                     continue
+
                 job['trigger'] = trigger
             log.debug('Normalized definition: %s' % job)
             result[name] = job

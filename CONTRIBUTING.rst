@@ -61,24 +61,26 @@ Ready to contribute? Here's how to set up `deck-chores` for local development.
 
     $ git clone git@github.com:your_name_here/deck-chores.git
 
-3. Install your local copy into a virtualenv. Assuming you have pew_ installed, this is how you set up your fork for local development::
+3. Install your local copy and developemnt tools into a virtualenv. Assuming
+   you have pew_ installed, this is how you set up your fork for local
+   development::
 
     $ cd deck-chores
     $ pew new -p $(which python) -a $(pwd) deck-chores
+    $ pip install -r requirements-dev.txt
     $ python setup.py develop
 
-4. Create a branch for local development::
+4. Create a branch for the scope of your issue or feature::
 
     $ git checkout -b name-of-your-bugfix-or-feature
 
    Now you can make your changes locally.
 
-5a. When you're done making changes, check that your changes pass flake8 and the tests::
+5a. When you're done making changes, reformat the code with black_ and check
+    that your changes pass flake8 and the tests::
 
-    $ tox
-
-
-   To get flake8 and pytest, just pip install them into your virtualenv.
+    $ make black
+    $ make test
 
 5b. If you want to run a container for testing purposes::
 
@@ -98,8 +100,10 @@ Pull Request Guidelines
 Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated.
+2. The code must be formatted with black_ (see 6. above).
+3. If the pull request adds functionality, the docs should be updated.
 
 
+,, _black: https://pypi.org/project/black/
 .. _Fork: https://github.com/funkyfuture/deck-chores/fork
 .. _pew: https://github.com/berdario/pew

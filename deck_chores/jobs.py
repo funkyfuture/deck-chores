@@ -40,8 +40,10 @@ def on_max_instances(event: events.JobSubmissionEvent) -> None:
     job_name = job.kwargs['job_name']
     container_name = job.kwargs['container_name']
     max_inst = job.max_instances
-    log.info('Not running %s in %s, maximum instances of %s are still running.'
-             '' % (job_name, container_name, max_inst))
+    log.info(
+        'Not running %s in %s, maximum instances of %s are still running.'
+        '' % (job_name, container_name, max_inst)
+    )
 
 
 def on_executed(event: events.JobExecutionEvent) -> None:
@@ -55,10 +57,11 @@ def on_executed(event: events.JobExecutionEvent) -> None:
 
     log.log(
         logging.INFO if exit_code == 0 else logging.CRITICAL,
-        'Command {command} in {container_name} finished with exit code {exit_code}'
-        .format(command=definition['command'],
-                container_name=definition['container_name'],
-                exit_code=exit_code)
+        'Command {command} in {container_name} finished with exit code {exit_code}'.format(
+            command=definition['command'],
+            container_name=definition['container_name'],
+            exit_code=exit_code,
+        ),
     )
     if response_lines:
         longest_line = max(len(x) for x in response_lines)
@@ -74,7 +77,9 @@ def on_error(event: events.JobExecutionEvent) -> None:
     job = scheduler.get_job(event.job_id)
     job_name = job.kwargs['job_name']
     container_name = job.kwargs['container_name']
-    log.warning('An exception occured while executing %s in %s:' % (job_name, container_name))
+    log.warning(
+        'An exception occured while executing %s in %s:' % (job_name, container_name)
+    )
     log.exception(event.exception)
 
 
@@ -83,7 +88,9 @@ def on_missed(event: events.JobExecutionEvent) -> None:
     job_name = job.kwargs['job_name']
     container_name = job.kwargs['container_name']
     run_time = event.scheduled_run_time
-    log.warning('Missed execution of %s in %s at %s' % (job_name, container_name, run_time))
+    log.warning(
+        'Missed execution of %s in %s at %s' % (job_name, container_name, run_time)
+    )
 
 
 ####
@@ -95,19 +102,28 @@ def exec_job(**definition) -> Tuple[int, bytes]:
     container_id = definition['container_id']
     command = definition['command']
 
-    log.info("Executing '%s' in %s" % (definition['job_name'], definition['container_name']))
+    log.info(
+        "Executing '%s' in %s" % (definition['job_name'], definition['container_name'])
+    )
 
     # some sanity checks, to be removed eventually
     assert scheduler.get_job(job_id) is not None
     if cfg.client.containers.list(filters={'id': container_id, 'status': 'paused'}):
         raise AssertionError('Container is paused.')
-    if not cfg.client.containers.list(filters={'id': container_id, 'status': 'running'}):
+
+    if not cfg.client.containers.list(
+        filters={'id': container_id, 'status': 'running'}
+    ):
         scheduler.remove_job(job_id)
         assert scheduler.get_job(job_id) is None
         raise AssertionError('Container is not running.')
 
     # TODO when https://github.com/docker/docker-py/issues/1381 is solved
-    exec_id = cfg.client.api.exec_create(container_id, command, user=definition['user'])['Id']
+    exec_id = cfg.client.api.exec_create(
+        container_id, command, user=definition['user']
+    )[
+        'Id'
+    ]
     response = cfg.client.api.exec_start(exec_id)
     exit_code = cfg.client.api.exec_inspect(exec_id)['ExitCode']
 
@@ -123,17 +139,22 @@ def add(container_id: str, definitions: dict) -> None:
     for job_name, definition in definitions.items():
         job_id = generate_id(container_id, job_name)
         trigger = definition['trigger']
-        definition.update({
-            'job_name': job_name, 'job_id': job_id,
-            'container_id': container_id, 'container_name': container_name}
+        definition.update(
+            {
+                'job_name': job_name,
+                'job_id': job_id,
+                'container_id': container_id,
+                'container_name': container_name,
+            }
         )
-        scheduler.add_job(func=exec_job,
-                          trigger=trigger[0](*trigger[1],
-                                             timezone=definition['timezone']),
-                          kwargs=definition,
-                          id=job_id,
-                          max_instances=definition['max'],
-                          replace_existing=True)
+        scheduler.add_job(
+            func=exec_job,
+            trigger=trigger[0](*trigger[1], timezone=definition['timezone']),
+            kwargs=definition,
+            id=job_id,
+            max_instances=definition['max'],
+            replace_existing=True,
+        )
         log.info("Added '%s' for %s" % (job_name, container_name))
 
 

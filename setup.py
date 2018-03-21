@@ -29,7 +29,9 @@ setup(
     packages=['deck_chores'],
     package_dir={'deck_chores': 'deck_chores'},
     include_package_data=True,
-    install_requires=['APScheduler~=3.5', 'cerberus~=1.1', 'docker~=2.7', 'fasteners~=0.14'],
+    install_requires=[
+        'APScheduler~=3.5', 'cerberus~=1.1', 'docker~=2.7', 'fasteners~=0.14'
+    ],
     license="ISC license",
     zip_safe=False,
     keywords=['docker', 'cron', 'scheduler', 'jobs', 'labels', 'metadata'],
@@ -39,9 +41,9 @@ setup(
         'License :: OSI Approved :: ISC License (ISCL)',
         'Natural Language :: English',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: CPython'
+        'Programming Language :: Python :: Implementation :: CPython',
     ],
-    entry_points={'console_scripts': ['deck-chores = deck_chores.main:main']}
+    entry_points={'console_scripts': ['deck-chores = deck_chores.main:main']},
 )
 
 chdir(_old_cwd)

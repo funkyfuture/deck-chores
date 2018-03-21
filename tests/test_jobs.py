@@ -14,6 +14,7 @@ def test_job_execution(cfg, mocker):
     def docker_containers(filters={}):
         if filters['status'] == 'paused':
             return []
+
         if filters['status'] == 'running':
             return [container]
 
@@ -30,11 +31,13 @@ def test_job_execution(cfg, mocker):
     cfg.client.api.exec_start = docker_exec_start
 
     definitions = {
-        'foo':
-            {'command': 'sleep 2',
-             'max': 2, 'timezone': 'UTC',
-             'trigger': (IntervalTrigger, (0, 0, 0, 0, 1)),
-             'user': 'test'}
+        'foo': {
+            'command': 'sleep 2',
+            'max': 2,
+            'timezone': 'UTC',
+            'trigger': (IntervalTrigger, (0, 0, 0, 0, 1)),
+            'user': 'test',
+        }
     }
     add('void', definitions)
     sleep(3)

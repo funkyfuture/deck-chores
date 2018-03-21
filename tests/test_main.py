@@ -26,10 +26,12 @@ def test_event_dispatching(cfg, mocker):
     container = mocker.MagicMock()
     container.name = 'foo'
     cfg.client.containers.get.return_value = container
-    definition = _parse_job_defintion({'deck-chores.beep.command': '/beep.sh',
-                                       'deck-chores.beep.interval': '15'})
-    labels = mocker.patch('deck_chores.parsers.labels',
-                          return_value=('foo', 'service', definition))
+    definition = _parse_job_defintion(
+        {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '15'}
+    )
+    labels = mocker.patch(
+        'deck_chores.parsers.labels', return_value=('foo', 'service', definition)
+    )
     add = mocker.patch('deck_chores.jobs.add')
 
     listen()
@@ -37,14 +39,16 @@ def test_event_dispatching(cfg, mocker):
     assert add.call_count == 1
 
 
-@mark.parametrize('has_label_seq, exp_result',
-                  (([True, False, True], True),
-                   ([True, False], False)))
+@mark.parametrize(
+    'has_label_seq, exp_result', (([True, False, True], True), ([True, False], False))
+)
 def test_deck_chores_container_check(cfg, mocker, has_label_seq, exp_result):
     containers = []
     for x in has_label_seq:
         containers.append(mocker.MagicMock(Container))
-        containers[-1].image.labels = {'org.label-schema.name': 'deck-chores'} if x else {}
+        containers[-1].image.labels = {
+            'org.label-schema.name': 'deck-chores'
+        } if x else {}
     cfg.client.containers.list.return_value = containers
 
     assert there_is_another_deck_chores_container() == exp_result

@@ -31,6 +31,7 @@ def there_is_another_deck_chores_container() -> bool:
             matched_containers += 1
         if matched_containers > 1:
             return True
+
     return False
 
 
@@ -58,10 +59,12 @@ def process_running_container_labels(container_id: str) -> None:
     service_id, options, definitions = parse.labels(container_id)
     if not definitions:
         return
+
     if service_id and 'service' in options:
         if service_id in locking_container_to_services_map.values():
             log.debug('Service id has a registered job: %s' % service_id)
             return
+
         log.info('Locking service id: %s' % service_id)
         locking_container_to_services_map[container_id] = service_id
     jobs.add(container_id, definitions)
@@ -71,8 +74,12 @@ def inspect_running_containers() -> datetime:
     log.debug('Fetching running containers')
     containers = cfg.client.containers.list()
     inspection_time = datetime.utcnow()  # FIXME get last eventtime
-    jobs.scheduler.add_job(exec_inspection, trigger=DateTrigger(), args=(containers,),
-                           id='container_inspection')
+    jobs.scheduler.add_job(
+        exec_inspection,
+        trigger=DateTrigger(),
+        args=(containers,),
+        id='container_inspection',
+    )
     return inspection_time
 
 
@@ -91,6 +98,7 @@ def listen(since: datetime = None) -> None:
     for event_json in cfg.client.events(since=since):
         if b'container' not in event_json:
             continue
+
         if not any((x in event_json) for x in (b'start', b'die', b'pause', b'unpause')):
             continue
 
@@ -98,6 +106,7 @@ def listen(since: datetime = None) -> None:
         log.debug('Daemon event: %s' % event)
         if event['Type'] != 'container':
             continue
+
         elif event['Action'] == 'start':
             handle_start(event)
         elif event['Action'] == 'die':
@@ -138,7 +147,10 @@ def handle_pause(event: dict) -> None:
     log.debug('Handling pause.')
     container_id = event['Actor']['ID']
     for job in jobs.get_jobs_for_container(container_id):
-        log.info('Pausing job %s for %s' % (job.kwargs['job_name'], job.kwargs['container_name']))
+        log.info(
+            'Pausing job %s for %s' %
+            (job.kwargs['job_name'], job.kwargs['container_name'])
+        )
         job.pause()
 
 
@@ -146,7 +158,10 @@ def handle_unpause(event: dict) -> None:
     log.debug('Handling unpause.')
     container_id = event['Actor']['ID']
     for job in jobs.get_jobs_for_container(container_id):
-        log.info('Resuming job %s for %s' % (job.kwargs['job_name'], job.kwargs['container_name']))
+        log.info(
+            'Resuming job %s for %s' %
+            (job.kwargs['job_name'], job.kwargs['container_name'])
+        )
         job.resume()
 
 
@@ -170,8 +185,11 @@ def main() -> None:
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
         log.debug('Config: %s' % cfg.__dict__)
         if there_is_another_deck_chores_container():
-            log.error("There's another container running deck-chores, maybe paused or restarting.")
+            log.error(
+                "There's another container running deck-chores, maybe paused or restarting."
+            )
             raise SystemExit(1)
+
         jobs.start_scheduler()
         inspection_time = inspect_running_containers()
         listen(since=inspection_time)

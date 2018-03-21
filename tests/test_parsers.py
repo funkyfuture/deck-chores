@@ -17,21 +17,36 @@ def test_parse_labels(cfg, mocker):
         'deck-chores.pull-data.command': '/usr/local/bin/pull.sh',
         'deck-chores.gen-thumbs.cron': '*/10 * * * *',
         'deck-chores.gen-thumbs.command': 'python /scripts/gen_thumbs.py',
-        'deck-chores.gen-thumbs.max': '3'
+        'deck-chores.gen-thumbs.max': '3',
     }
     container = mocker.MagicMock(Container)
     container.labels = labels
     container.image.labels = {}
     cfg.client.containers.get.return_value = container
 
-    expected_jobs = \
-        {'backup': {'trigger': (IntervalTrigger, (0, 1, 0, 0, 0)), 'name': 'backup',
-                    'command': '/usr/local/bin/backup.sh', 'user': 'www-data', 'max': 1},
-         'pull-data': {'trigger': (DateTrigger, ('1945-05-08 00:01:00',)), 'name': 'pull-data',
-                       'command': '/usr/local/bin/pull.sh', 'user': 'root', 'max': 1},
-         'gen-thumbs': {'trigger': (CronTrigger, ('*', '*', '*', '*/10', '*', '*', '*', '*')),
-                        'name': 'gen-thumbs', 'command': 'python /scripts/gen_thumbs.py',
-                        'user': 'root', 'max': 3}}
+    expected_jobs = {
+        'backup': {
+            'trigger': (IntervalTrigger, (0, 1, 0, 0, 0)),
+            'name': 'backup',
+            'command': '/usr/local/bin/backup.sh',
+            'user': 'www-data',
+            'max': 1,
+        },
+        'pull-data': {
+            'trigger': (DateTrigger, ('1945-05-08 00:01:00',)),
+            'name': 'pull-data',
+            'command': '/usr/local/bin/pull.sh',
+            'user': 'root',
+            'max': 1,
+        },
+        'gen-thumbs': {
+            'trigger': (CronTrigger, ('*', '*', '*', '*/10', '*', '*', '*', '*')),
+            'name': 'gen-thumbs',
+            'command': 'python /scripts/gen_thumbs.py',
+            'user': 'root',
+            'max': 3,
+        },
+    }
     _, _, result = parse_labels('')
     assert len(result) == len(expected_jobs)
     for name, definition in result.items():
@@ -47,13 +62,17 @@ def test_interval_trigger():
     assert result == (IntervalTrigger, (0, 0, 0, 0, 15))
 
 
-@mark.parametrize('default,value,result',
-                  ((('image', 'service'), '', 'image,service'),
-                   (('image', 'service'), 'noservice', 'image'),
-                   (('service',), 'image', 'image,service')))
+@mark.parametrize(
+    'default,value,result',
+    (
+        (('image', 'service'), '', 'image,service'),
+        (('image', 'service'), 'noservice', 'image'),
+        (('service',), 'image', 'image,service'),
+    ),
+)
 def test_options(cfg, mocker, default, value, result):
     cfg.default_options = default
     container = mocker.MagicMock(Container)
     container.labels = {'deck-chores.options': value}
     cfg.client.containers.get.return_value = container
-    assert parse_labels(str(default)+value)[1] == result
+    assert parse_labels(str(default) + value)[1] == result
