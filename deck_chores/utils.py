@@ -1,10 +1,9 @@
-from functools import _lru_cache_wrapper, lru_cache, partial, update_wrapper
-from functools import _CacheInfo  # type: ignore
 import logging
 import json
 import os
 import sys
-from typing import Any, Callable, Dict, Hashable, Tuple, Union
+from functools import lru_cache
+from typing import Tuple, Union
 from uuid import NAMESPACE_OID, uuid5
 
 
@@ -17,25 +16,6 @@ def from_json(s: Union[bytes, str]) -> dict:
 @lru_cache(128)
 def generate_id(*args) -> str:
     return str(uuid5(NAMESPACE_OID, ''.join(args)))
-
-
-# dead code
-def lru_dict_arg_cache(func: Callable) -> Callable:
-    # TODO? wrapper that allows maxsize
-
-    def unpacking_func(func: Callable, arg: frozenset) -> Any:
-        return func(dict(arg))
-
-    _unpacking_func = _lru_cache_wrapper(
-        partial(unpacking_func, func), 64, False, _CacheInfo  # type: ignore
-    )
-
-    def packing_func(arg: Dict[Hashable, Hashable]) -> Any:
-        return _unpacking_func(frozenset(arg.items()))
-
-    update_wrapper(packing_func, func)
-    packing_func.cache_info = _unpacking_func.cache_info  # type: ignore
-    return packing_func
 
 
 def split_string(
@@ -66,7 +46,6 @@ __all__ = [
     from_json.__name__,
     'log',
     'log_handler',
-    lru_dict_arg_cache.__name__,
     split_string.__name__,
     trueish.__name__,
 ]
