@@ -197,6 +197,14 @@ Examples
 There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``every minute`` and
 ``every second``.
 
+.. note::
+
+    Though it uses the same units of measurement, an interval is different from a point in time,
+    it describes the time *between* two events. Hence you should expect a job that is defined with
+    this type of trigger to run the defined time *after* the job has been registered. To define a
+    point in time, see cron_.
+
+
 .. _options:
 
 Container options
