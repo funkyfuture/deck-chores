@@ -4,7 +4,10 @@ import ssl
 from docker import DockerClient
 from docker.constants import DEFAULT_TIMEOUT_SECONDS
 
-from deck_chores.config import cfg, generate_config
+import deck_chores.config
+
+
+cfg, generate_config = deck_chores.config.cfg, deck_chores.config.generate_config
 
 
 def test_default_config(monkeypatch):
@@ -12,7 +15,7 @@ def test_default_config(monkeypatch):
         return True
 
     monkeypatch.setenv('DEBUG', '0')
-    monkeypatch.setattr(os.path, 'exists', every_file_exists)
+    monkeypatch.setattr(deck_chores.config, 'exists', every_file_exists)
     generate_config()
     result = cfg.__dict__.copy()
     assert isinstance(result.pop('client'), DockerClient)
