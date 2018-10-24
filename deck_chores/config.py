@@ -21,18 +21,6 @@ getenv = local_environment.get
 ####
 
 
-def _handle_deprecated_config():
-    if 'ASSERT_FINGERPRINT' in local_environment:
-        log.critical('The environment variable ASSERT_FINGERPRINT has no effect.')
-
-    if 'DOCKER_DAEMON' in local_environment:
-        log.warn(
-            'The environment variable DOCKER_DAEMON is deprecated, use DOCKER_HOST instead.'
-        )
-        local_environment['DOCKER_HOST'] = local_environment['DOCKER_DAEMON']
-        local_environment.pop('DOCKER_DAEMON')
-
-
 def _resolve_tls_version(version: str) -> int:
     return getattr(ssl, 'PROTOCOL_' + version.replace('.', '_'))
 
@@ -48,7 +36,6 @@ def _test_daemon_socket(url: str) -> str:
 
 
 def generate_config() -> None:
-    _handle_deprecated_config()
     cfg.__dict__.clear()
     cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
     cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
