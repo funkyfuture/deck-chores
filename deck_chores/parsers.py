@@ -1,7 +1,7 @@
 from functools import lru_cache
 from collections import defaultdict
 import logging
-from typing import Dict, Tuple, Union
+from typing import DefaultDict, Dict, Optional, Tuple, Type, Union
 
 from apscheduler.triggers.cron import CronTrigger  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore
@@ -52,14 +52,16 @@ class JobConfigValidator(cerberus.Validator):
         tokens = value.split(' ')
         return tuple([filling] * (length - len(tokens)) + tokens)
 
-    def _normalize_coerce_cron(self, value: str) -> Tuple[object, tuple]:
+    def _normalize_coerce_cron(self, value: str) -> Tuple[Type, Tuple[str, ...]]:
+        # TODO there's a constant               here
         args = self._fill_args(value, len(CronTrigger.FIELD_NAMES), '*')
         return CronTrigger, args
 
-    def _normalize_coerce_date(self, value: str) -> Tuple[object, tuple]:
+    def _normalize_coerce_date(self, value: str) -> Tuple[Type, Tuple[str]]:
         return DateTrigger, (value,)
 
-    def _normalize_coerce_interval(self, value: str) -> Tuple[object, tuple]:
+    def _normalize_coerce_interval(self, value: str) \
+            -> Tuple[Type, Optional[Tuple[int, int, int, int, int]]]:
         args = NAME_INTERVAL_MAP.get(value)
         if args is None:
             for c in '.:/':
@@ -72,12 +74,12 @@ class JobConfigValidator(cerberus.Validator):
         if isinstance(value, str):  # normalization failed
             return
 
-        cls, args = value[0], value[1]
+        trigger_class, args = value[0], value[1]
         try:
-            cls(*args, timezone=self.document.get('timezone', cfg.timezone))
+            trigger_class(*args, timezone=self.document.get('timezone', cfg.timezone))
         except Exception as e:
             message = "Error while instantiating a {trigger} with '{args}'.".format(
-                trigger=cls.__name__, args=args
+                trigger=trigger_class.__name__, args=args
             )
             if cfg.debug:
                 message += "\n%s" % e
@@ -137,7 +139,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
             if isinstance(line, str):
                 log.error(line)
             elif isinstance(line, Exception):
-                log.exception(line)  # type: ignore
+                log.exception(line)
         return '', '', {}
 
     except Exception as e:
@@ -207,7 +209,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
 
 def _parse_job_defintion(_labels: dict) -> dict:
     log.debug('Considering labels for job definitions: %s' % _labels)
-    name_grouped_definitions = defaultdict(dict)  # type: ignore
+    name_grouped_definitions = defaultdict(dict)  # type: DefaultDict[str, Dict[str, str]]
     for key, value in _labels.items():
         if key == cfg.label_ns + 'options':
             continue

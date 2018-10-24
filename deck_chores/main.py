@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from datetime import datetime
 import logging
 import sys
@@ -200,7 +198,7 @@ def main() -> None:
         exit_code = 1
     except Exception as e:
         log.error('Caught unhandled exception:')
-        log.exception(e)  # type: ignore
+        log.exception(e)
         exit_code = 3
     else:
         exit_code = 0
