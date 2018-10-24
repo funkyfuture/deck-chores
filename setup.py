@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from os import chdir, getcwd
 from pathlib import Path
 from setuptools import setup
 
 
-VERSION = '0.2'
+VERSION = '0.3.dev0'
 
 _old_cwd = getcwd()
 chdir(Path(__file__).parent)
