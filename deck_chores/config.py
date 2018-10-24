@@ -49,6 +49,7 @@ def _test_daemon_socket(url: str) -> str:
 
 def generate_config() -> None:
     _handle_deprecated_config()
+    cfg.__dict__.clear()
     cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
     cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
     cfg.docker_host = _test_daemon_socket(
