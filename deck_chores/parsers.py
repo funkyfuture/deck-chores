@@ -1,7 +1,7 @@
 from functools import lru_cache
 from collections import defaultdict
 import logging
-from typing import DefaultDict, Dict, Optional, Tuple, Type, Union
+from typing import DefaultDict, Dict, Optional, Tuple, Type, Union  # noqa: F401
 
 from apscheduler.triggers.cron import CronTrigger  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore

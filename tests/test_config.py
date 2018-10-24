@@ -1,3 +1,4 @@
+import os.path
 import ssl
 
 from docker import DockerClient
@@ -7,7 +8,11 @@ from deck_chores.config import cfg, generate_config
 
 
 def test_default_config(monkeypatch):
+    def every_file_exists(*args, **kwargs):
+        return True
+
     monkeypatch.setenv('DEBUG', '0')
+    monkeypatch.setattr(os.path, 'exists', every_file_exists)
     generate_config()
     result = cfg.__dict__.copy()
     assert isinstance(result.pop('client'), DockerClient)
