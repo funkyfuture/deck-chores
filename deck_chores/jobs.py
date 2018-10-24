@@ -168,8 +168,8 @@ def remove(job_id: str) -> None:
 ####
 
 
-# TODO make that an index
 def get_jobs_for_container(container_id: str) -> List[Job]:
+    # TODO make that an index
     result = []
     for job in scheduler.get_jobs():
         if job.kwargs['container_id'] == container_id:

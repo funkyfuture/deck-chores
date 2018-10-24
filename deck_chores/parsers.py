@@ -60,8 +60,9 @@ class JobConfigValidator(cerberus.Validator):
     def _normalize_coerce_date(self, value: str) -> Tuple[Type, Tuple[str]]:
         return DateTrigger, (value,)
 
-    def _normalize_coerce_interval(self, value: str) \
-            -> Tuple[Type, Optional[Tuple[int, int, int, int, int]]]:
+    def _normalize_coerce_interval(
+        self, value: str
+    ) -> Tuple[Type, Optional[Tuple[int, int, int, int, int]]]:
         args = NAME_INTERVAL_MAP.get(value)
         if args is None:
             for c in '.:/':
@@ -209,7 +210,9 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
 
 def _parse_job_defintion(_labels: dict) -> dict:
     log.debug('Considering labels for job definitions: %s' % _labels)
-    name_grouped_definitions = defaultdict(dict)  # type: DefaultDict[str, Dict[str, str]]
+    name_grouped_definitions = defaultdict(
+        dict
+    )  # type: DefaultDict[str, Dict[str, str]]
     for key, value in _labels.items():
         if key == cfg.label_ns + 'options':
             continue
