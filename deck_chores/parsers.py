@@ -79,11 +79,10 @@ class JobConfigValidator(cerberus.Validator):
         try:
             trigger_class(*args, timezone=self.document.get('timezone', cfg.timezone))
         except Exception as e:
-            message = "Error while instantiating a {trigger} with '{args}'.".format(
-                trigger=trigger_class.__name__, args=args
-            )
+            message = f"Error while instantiating a {trigger_class.__name__} " \
+                      f"with '{args}'."
             if cfg.debug:
-                message += "\n%s" % e
+                message += f"\n{e}"
             self._error(field, message)
 
 
@@ -150,7 +149,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 @lru_cache()
 def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
     _labels = cfg.client.containers.get(container_id).labels
-    log.debug('Parsing labels: %s' % _labels)
+    log.debug(f'Parsing labels: {_labels}')
     filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
     options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
     service_id = _parse_service_id(_labels)
@@ -163,7 +162,7 @@ def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
     job_definitions = _parse_job_defintion(_labels)
 
     if service_id:
-        log.debug('Assigning service id: %s' % service_id)
+        log.debug(f'Assigning service id: {service_id}')
         for definition in job_definitions.values():
             # this is informative, not functional
             definition['service_id'] = service_id
@@ -180,13 +179,13 @@ def _parse_options(options: str) -> str:
             else:
                 result.add(option)
     result_string = ','.join(sorted(x for x in result if x))
-    log.debug('Parsed options: %s' % result_string)
+    log.debug(f'Parsed options: {result_string}')
     return result_string
 
 
 def _parse_service_id(_labels: dict) -> str:
     filtered_labels = {k: v for k, v in _labels.items() if k in cfg.service_identifiers}
-    log.debug('Considering labels for service id: %s' % filtered_labels)
+    log.debug(f'Considering labels for service id: {filtered_labels}')
     if not filtered_labels:
         return ''
 
@@ -209,7 +208,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
 
 
 def _parse_job_defintion(_labels: dict) -> dict:
-    log.debug('Considering labels for job definitions: %s' % _labels)
+    log.debug(f'Considering labels for job definitions: {_labels}')
     name_grouped_definitions = defaultdict(
         dict
     )  # type: DefaultDict[str, Dict[str, str]]
@@ -220,15 +219,15 @@ def _parse_job_defintion(_labels: dict) -> dict:
         name, attribute = key[len(cfg.label_ns):].rsplit('.', 1)
         name_grouped_definitions[name][attribute] = value
 
-    log.debug('Definitions: %s' % name_grouped_definitions)
+    log.debug(f'Definitions: {name_grouped_definitions}')
 
     result = {}
     for name, definition in name_grouped_definitions.items():
-        log.debug('Processing %s' % name)
+        log.debug(f'Processing {name}')
         definition['name'] = name
         if not job_def_validator(definition):
-            log.error('Misconfigured job definition: %s' % definition)
-            log.error('Errors: %s' % job_def_validator.errors)
+            log.error(f'Misconfigured job definition: {definition}')
+            log.error(f'Errors: {job_def_validator.errors}')
         else:
             job = job_def_validator.document
             for trigger_name in ('cron', 'date', 'interval'):
@@ -237,7 +236,7 @@ def _parse_job_defintion(_labels: dict) -> dict:
                     continue
 
                 job['trigger'] = trigger
-            log.debug('Normalized definition: %s' % job)
+            log.debug(f'Normalized definition: {job}')
             result[name] = job
 
     return result

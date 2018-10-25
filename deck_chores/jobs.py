@@ -41,8 +41,8 @@ def on_max_instances(event: events.JobSubmissionEvent) -> None:
     container_name = job.kwargs['container_name']
     max_inst = job.max_instances
     log.info(
-        'Not running %s in %s, maximum instances of %s are still running.'
-        '' % (job_name, container_name, max_inst)
+        f'Not running {job_name} in {container_name}, '
+        f'maximum instances of {max_inst} are still running.'
     )
 
 
@@ -57,11 +57,8 @@ def on_executed(event: events.JobExecutionEvent) -> None:
 
     log.log(
         logging.INFO if exit_code == 0 else logging.CRITICAL,
-        'Command {command} in {container_name} finished with exit code {exit_code}'.format(
-            command=definition['command'],
-            container_name=definition['container_name'],
-            exit_code=exit_code,
-        ),
+        f'Command {definition["command"]} in {definition["container_name"]} '
+        f'finished with exit code {exit_code}',
     )
     if response_lines:
         longest_line = max(len(x) for x in response_lines)
@@ -77,9 +74,7 @@ def on_error(event: events.JobExecutionEvent) -> None:
     job = scheduler.get_job(event.job_id)
     job_name = job.kwargs['job_name']
     container_name = job.kwargs['container_name']
-    log.warning(
-        'An exception occured while executing %s in %s:' % (job_name, container_name)
-    )
+    log.warning(f'An exception occured while executing {job_name} in {container_name}:')
     log.exception(event.exception)
 
 
@@ -88,9 +83,7 @@ def on_missed(event: events.JobExecutionEvent) -> None:
     job_name = job.kwargs['job_name']
     container_name = job.kwargs['container_name']
     run_time = event.scheduled_run_time
-    log.warning(
-        'Missed execution of %s in %s at %s' % (job_name, container_name, run_time)
-    )
+    log.warning(f'Missed execution of {job_name} in {container_name} at {run_time}')
 
 
 ####
@@ -102,9 +95,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
     container_id = definition['container_id']
     command = definition['command']
 
-    log.info(
-        "Executing '%s' in %s" % (definition['job_name'], definition['container_name'])
-    )
+    log.info(f"Executing '{definition['job_name']}' in {definition['container_name']}")
 
     # some sanity checks, to be removed eventually
     assert scheduler.get_job(job_id) is not None
@@ -135,7 +126,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
 def add(container_id: str, definitions: dict) -> None:
     container_name = cfg.client.containers.get(container_id).name
-    log.debug('Adding jobs for %s.' % container_name)
+    log.debug(f'Adding jobs for {container_name}.')
     for job_name, definition in definitions.items():
         job_id = generate_id(container_id, job_name)
         trigger = definition['trigger']
@@ -155,7 +146,7 @@ def add(container_id: str, definitions: dict) -> None:
             max_instances=definition['max'],
             replace_existing=True,
         )
-        log.info("Added '%s' for %s" % (job_name, container_name))
+        log.info(f"Added '{job_name}' for {container_name}")
 
 
 def remove(job_id: str) -> None:

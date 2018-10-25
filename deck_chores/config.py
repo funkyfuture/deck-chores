@@ -27,7 +27,7 @@ def _resolve_tls_version(version: str) -> int:
 
 def _test_daemon_socket(url: str) -> str:
     if url.startswith('unix:') and not exists(url[len('unix:/'):]):
-        raise ConfigurationError('Docker socket file not found: %s' % url)
+        raise ConfigurationError(f'Docker socket file not found: {url}')
 
     return url
 

@@ -7,7 +7,7 @@ from apscheduler.schedulers import SchedulerNotRunningError  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore
 from fasteners import InterProcessLock  # type: ignore
 
-from deck_chores import __version__
+from deck_chores import __version__  # noqa: F401  # used only in f-string
 from deck_chores.config import cfg, generate_config
 from deck_chores.exceptions import ConfigurationError
 from deck_chores.indexes import locking_container_to_services_map
@@ -60,10 +60,10 @@ def process_running_container_labels(container_id: str) -> None:
 
     if service_id and 'service' in options:
         if service_id in locking_container_to_services_map.values():
-            log.debug('Service id has a registered job: %s' % service_id)
+            log.debug(f'Service id has a registered job: {service_id}')
             return
 
-        log.info('Locking service id: %s' % service_id)
+        log.info(f'Locking service id: {service_id}')
         locking_container_to_services_map[container_id] = service_id
     jobs.add(container_id, definitions)
 
@@ -101,7 +101,7 @@ def listen(since: datetime = None) -> None:
             continue
 
         event = from_json(event_json)
-        log.debug('Daemon event: %s' % event)
+        log.debug(f'Daemon event: {event}')
         if event['Type'] != 'container':
             continue
 
@@ -130,14 +130,14 @@ def handle_die(event: dict) -> None:
 
     if service_id and 'service' in options:
         if container_id in locking_container_to_services_map:
-            log.info('Unlocking service id: %s' % service_id)
+            log.info(f'Unlocking service id: {service_id}')
             del locking_container_to_services_map[container_id]
         else:
             return
 
     container_name = cfg.client.containers.get(container_id).name
     for job_name in definitions:
-        log.info("Removing job '%s' for %s" % (job_name, container_name))
+        log.info(f"Removing job '{job_name}' for {container_name}")
         jobs.remove(generate_id(container_id, job_name))
 
 
@@ -146,8 +146,7 @@ def handle_pause(event: dict) -> None:
     container_id = event['Actor']['ID']
     for job in jobs.get_jobs_for_container(container_id):
         log.info(
-            'Pausing job %s for %s' %
-            (job.kwargs['job_name'], job.kwargs['container_name'])
+            f'Pausing job {job.kwargs["job_name"]} for {job.kwargs["container_name"]}'
         )
         job.pause()
 
@@ -157,8 +156,7 @@ def handle_unpause(event: dict) -> None:
     container_id = event['Actor']['ID']
     for job in jobs.get_jobs_for_container(container_id):
         log.info(
-            'Resuming job %s for %s' %
-            (job.kwargs['job_name'], job.kwargs['container_name'])
+            'Resuming job {job.kwargs["job_name"]} for {job.kwargs["container_name"]}'
         )
         job.resume()
 
@@ -175,13 +173,13 @@ def shutdown() -> None:
 
 def main() -> None:
     if not lock.acquire(blocking=False):
-        print("Couldn't acquire lock file at %s, exiting." % lock.path)
+        print(f"Couldn't acquire lock file at {lock.path}, exiting.")
         sys.exit(1)
-    log.info('Deck Chores %s started.' % __version__)
+    log.info('Deck Chores {__version__} started.')
     try:
         generate_config()
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
-        log.debug('Config: %s' % cfg.__dict__)
+        log.debug(f'Config: {cfg.__dict__}')
         if there_is_another_deck_chores_container():
             log.error(
                 "There's another container running deck-chores, maybe paused or restarting."
