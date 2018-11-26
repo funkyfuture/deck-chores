@@ -43,5 +43,9 @@ log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INF
 
 
 __all__ = [
-    from_json.__name__, 'log', 'log_handler', split_string.__name__, trueish.__name__
+    from_json.__name__,
+    'log',
+    'log_handler',
+    split_string.__name__,
+    trueish.__name__,
 ]

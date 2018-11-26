@@ -10,7 +10,6 @@ cfg, generate_config = deck_chores.config.cfg, deck_chores.config.generate_confi
 
 
 def test_default_config(monkeypatch):
-
     def docker_api_version(self):
         return '1.37'
 
@@ -37,7 +36,8 @@ def test_default_config(monkeypatch):
         'label_ns': 'deck-chores.',
         'logformat': '{asctime}|{levelname:8}|{message}',
         'service_identifiers': (
-            'com.docker.compose.project', 'com.docker.compose.service'
+            'com.docker.compose.project',
+            'com.docker.compose.service',
         ),
         'ssl_version': ssl.PROTOCOL_TLS,
         'timezone': 'UTC',

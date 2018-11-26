@@ -3,7 +3,12 @@ from pytest import mark
 from docker.models.containers import Container
 
 from deck_chores.parsers import _parse_labels as parse_labels
-from deck_chores.parsers import CronTrigger, DateTrigger, IntervalTrigger, JobConfigValidator
+from deck_chores.parsers import (
+    CronTrigger,
+    DateTrigger,
+    IntervalTrigger,
+    JobConfigValidator,
+)
 
 
 def test_parse_labels(cfg, mocker):

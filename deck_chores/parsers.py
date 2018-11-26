@@ -42,7 +42,6 @@ log = logging.getLogger('deck_chores')
 
 
 class JobConfigValidator(cerberus.Validator):
-
     @staticmethod
     @lru_cache(128)
     def _fill_args(value: str, length: int, filling: str) -> Tuple[str, ...]:
@@ -219,7 +218,7 @@ def _parse_job_defintion(_labels: dict) -> dict:
         if key == cfg.label_ns + 'options':
             continue
 
-        name, attribute = key[len(cfg.label_ns):].rsplit('.', 1)
+        name, attribute = key[len(cfg.label_ns) :].rsplit('.', 1)
         name_grouped_definitions[name][attribute] = value
 
     log.debug(f'Definitions: {name_grouped_definitions}')

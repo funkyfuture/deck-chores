@@ -46,9 +46,9 @@ def test_deck_chores_container_check(cfg, mocker, has_label_seq, exp_result):
     containers = []
     for x in has_label_seq:
         containers.append(mocker.MagicMock(Container))
-        containers[-1].image.labels = {
-            'org.label-schema.name': 'deck-chores'
-        } if x else {}
+        containers[-1].image.labels = (
+            {'org.label-schema.name': 'deck-chores'} if x else {}
+        )
     cfg.client.containers.list.return_value = containers
 
     assert there_is_another_deck_chores_container() == exp_result
