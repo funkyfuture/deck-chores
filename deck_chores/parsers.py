@@ -1,5 +1,5 @@
 from functools import lru_cache
-from collections import defaultdict
+from collections import defaultdict, ChainMap
 import logging
 from typing import DefaultDict, Dict, Optional, Tuple, Type, Union  # noqa: F401
 
@@ -79,8 +79,9 @@ class JobConfigValidator(cerberus.Validator):
         try:
             trigger_class(*args, timezone=self.document.get('timezone', cfg.timezone))
         except Exception as e:
-            message = f"Error while instantiating a {trigger_class.__name__} " \
-                      f"with '{args}'."
+            message = (
+                f"Error while instantiating a {trigger_class.__name__} with '{args}'."
+            )
             if cfg.debug:
                 message += f"\n{e}"
             self._error(field, message)
@@ -117,6 +118,7 @@ job_def_validator = JobConfigValidator(
         'user': {'default_setter': lambda x: cfg.default_user},
     }
 )
+# TODO rather update the schema when the config was parsed than using lambdas
 
 
 ####
@@ -154,8 +156,9 @@ def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
     options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
     service_id = _parse_service_id(_labels)
     if 'image' in options:
-        _labels = _image_definition_labels_of_container(container_id).copy()
-        _labels.update(filtered_labels)
+        _labels = ChainMap(
+            filtered_labels, _image_definition_labels_of_container(container_id)
+        )
     else:
         _labels = filtered_labels
 
@@ -163,14 +166,14 @@ def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
 
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
-        for definition in job_definitions.values():
+        for job_definition in job_definitions.values():
             # this is informative, not functional
-            definition['service_id'] = service_id
+            job_definition['service_id'] = service_id
     return service_id, options, job_definitions
 
 
 @lru_cache(4)
-def _parse_options(options: str) -> str:
+def _parse_options(options: Optional[str]) -> str:
     result = set(cfg.default_options)
     if options is not None:
         for option in split_string(options):
