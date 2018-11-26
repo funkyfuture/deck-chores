@@ -6,12 +6,14 @@ from docker.models.containers import Container
 from deck_chores.jobs import add, scheduler, start_scheduler
 
 
-def test_job_execution(cfg, mocker):
+# TODO silence logger
+def test_job_execution(capsys, cfg, mocker):
     container = mocker.MagicMock(Container)
     container.name = 'foo_0'
+    container.exec_run.return_value = (0, b'')
     cfg.client.containers.get.return_value = container
 
-    def docker_containers(filters={}):
+    def docker_containers(filters=None):
         if filters['status'] == 'paused':
             return []
 
@@ -20,14 +22,10 @@ def test_job_execution(cfg, mocker):
 
     def docker_exec_start(id):
         sleep(2)
-        return b'boo'
 
     start_scheduler()
 
     cfg.client.containers.list = docker_containers
-    exec_create = mocker.MagicMock(return_value={'Id': 'id'})
-    cfg.client.api.exec_create = exec_create
-    cfg.client.api.exec_inspect.return_value = {'ExitCode': 0}
     cfg.client.api.exec_start = docker_exec_start
 
     definitions = {
@@ -40,8 +38,8 @@ def test_job_execution(cfg, mocker):
         }
     }
     add('void', definitions)
-    sleep(3)
+    sleep(2.5)
 
     scheduler.shutdown(wait=False)
 
-    assert exec_create.call_count == 2
+    assert container.exec_run.call_count == 2

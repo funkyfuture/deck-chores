@@ -12,6 +12,13 @@ from deck_chores.utils import generate_id
 
 ####
 
+CAPTURED_OPENER = '== BEGIN of captured stdout & stderr =='
+CAPTURED_CLOSER = '== END of captured stdout & stderr ===='
+CAPTURED_SURROUNDING_LENGTH = len(CAPTURED_OPENER)
+
+
+####
+
 
 log = logging.getLogger('deck_chores')
 
@@ -62,28 +69,27 @@ def on_executed(event: events.JobExecutionEvent) -> None:
     )
     if response_lines:
         longest_line = max(len(x) for x in response_lines)
-        b = '== BEGIN of output =='
-        e = '== END of output ===='
-        log.info(b + '=' * (longest_line - len(b)))
+        log.info(CAPTURED_OPENER + '=' * (longest_line - CAPTURED_SURROUNDING_LENGTH))
         for line in response_lines:
             log.info(line)
-        log.info(e + '=' * (longest_line - len(e)))
+        log.info(CAPTURED_CLOSER + '=' * (longest_line - CAPTURED_SURROUNDING_LENGTH))
 
 
 def on_error(event: events.JobExecutionEvent) -> None:
-    job = scheduler.get_job(event.job_id)
-    job_name = job.kwargs['job_name']
-    container_name = job.kwargs['container_name']
-    log.warning(f'An exception occured while executing {job_name} in {container_name}:')
+    definition = scheduler.get_job(event.job_id).kwargs
+    log.critical(
+        f'An exception in deck-chores occured while executing {definition["job_name"]} '
+        f'in {definition["container_name"]}:'
+    )
     log.exception(event.exception)
 
 
 def on_missed(event: events.JobExecutionEvent) -> None:
-    job = scheduler.get_job(event.job_id)
-    job_name = job.kwargs['job_name']
-    container_name = job.kwargs['container_name']
-    run_time = event.scheduled_run_time
-    log.warning(f'Missed execution of {job_name} in {container_name} at {run_time}')
+    definition = scheduler.get_job(event.job_id).kwargs
+    log.warning(
+        f'Missed execution of {definition["job_name"]} in '
+        f'{definition["container_name"]} at {event.scheduled_run_time}'
+    )
 
 
 ####
@@ -108,17 +114,12 @@ def exec_job(**definition) -> Tuple[int, bytes]:
         scheduler.remove_job(job_id)
         assert scheduler.get_job(job_id) is None
         raise AssertionError('Container is not running.')
+    # end of sanity checks
 
-    # TODO when https://github.com/docker/docker-py/issues/1381 is solved
-    exec_id = cfg.client.api.exec_create(
-        container_id, command, user=definition['user']
-    )[
-        'Id'
-    ]
-    response = cfg.client.api.exec_start(exec_id)
-    exit_code = cfg.client.api.exec_inspect(exec_id)['ExitCode']
-
-    return exit_code, response or b''
+    # TODO allow to set environment and workdir in options
+    return cfg.client.containers.get(container_id).exec_run(
+        cmd=command, user=definition['user']
+    )
 
 
 ####

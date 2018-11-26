@@ -2,9 +2,11 @@ from datetime import datetime
 import logging
 import sys
 from signal import signal, SIGINT, SIGTERM
+from typing import List
 
 from apscheduler.schedulers import SchedulerNotRunningError  # type: ignore
 from apscheduler.triggers.date import DateTrigger  # type: ignore
+from docker.models.containers import Container
 from fasteners import InterProcessLock  # type: ignore
 
 from deck_chores import __version__  # noqa: F401  # used only in f-string
@@ -70,7 +72,7 @@ def process_running_container_labels(container_id: str) -> None:
 
 def inspect_running_containers() -> datetime:
     log.debug('Fetching running containers')
-    containers = cfg.client.containers.list()
+    containers = cfg.client.containers.list(ignore_removed=True, sparse=True)
     inspection_time = datetime.utcnow()  # FIXME get last eventtime
     jobs.scheduler.add_job(
         exec_inspection,
@@ -81,7 +83,7 @@ def inspect_running_containers() -> datetime:
     return inspection_time
 
 
-def exec_inspection(containers: dict) -> None:
+def exec_inspection(containers: List[Container]) -> None:
     # TODO handle paused containers
     log.info('Inspecting running containers.')
     for container in containers:
@@ -166,6 +168,7 @@ def shutdown() -> None:
         jobs.scheduler.shutdown()
     except SchedulerNotRunningError:
         pass
+    cfg.client.close()
 
 
 ####
