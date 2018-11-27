@@ -25,7 +25,7 @@ COPY . /src
 
 RUN apk upgrade --no-cache \
  && apk add --no-cache --virtual .build-deps ca-certificates \
- && apk add --no-cache tini \
+ && apk add --no-cache tini tzdata \
  && /src/setup.py install \
  && rm -Rf /root/.cache \
  && apk del .build-deps
