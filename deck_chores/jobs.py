@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from apscheduler import events
 from apscheduler.job import Job
@@ -125,12 +125,13 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 ####
 
 
-def add(container_id: str, definitions: dict) -> None:
-    container_name = cfg.client.containers.get(container_id).name
+def add(container_id: str, definitions: Dict[str, Dict]) -> None:
+    container = cfg.client.containers.get(container_id)
+    container_name = container.name
     log.debug(f'Adding jobs for {container_name}.')
     for job_name, definition in definitions.items():
         job_id = generate_id(container_id, job_name)
-        trigger = definition['trigger']
+
         definition.update(
             {
                 'job_name': job_name,
@@ -139,6 +140,16 @@ def add(container_id: str, definitions: dict) -> None:
                 'container_name': container_name,
             }
         )
+
+        if 'user' not in definition:
+            definition['user'] = (
+                container.attrs['Config']['User']
+                or container.image.attrs['Config']['User']
+                or 'root'
+            )
+
+        trigger = definition['trigger']
+
         scheduler.add_job(
             func=exec_job,
             trigger=trigger[0](*trigger[1], timezone=definition['timezone']),

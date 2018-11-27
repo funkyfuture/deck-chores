@@ -41,24 +41,21 @@ def test_parse_labels(cfg, mocker):
             'trigger': (DateTrigger, ('1945-05-08 00:01:00',)),
             'name': 'pull-data',
             'command': '/usr/local/bin/pull.sh',
-            'user': 'root',
             'max': 1,
         },
         'gen-thumbs': {
             'trigger': (CronTrigger, ('*', '*', '*', '*/10', '*', '*', '*', '*')),
             'name': 'gen-thumbs',
             'command': 'python /scripts/gen_thumbs.py',
-            'user': 'root',
             'max': 3,
         },
     }
-    _, _, result = parse_labels('')
-    assert len(result) == len(expected_jobs)
-    for name, definition in result.items():
-        definition.pop('service_id')
-        assert definition.pop('timezone') == 'UTC'
-        assert len(definition) == 5
-        assert definition == expected_jobs[name]
+    _, _, job_definitions = parse_labels('')
+    assert len(job_definitions) == len(expected_jobs)
+    for name, job_config in job_definitions.items():
+        job_config.pop('service_id')
+        assert job_config.pop('timezone') == 'UTC'
+        assert job_config == expected_jobs[name]
 
 
 def test_interval_trigger():

@@ -100,8 +100,10 @@ max        the maximum of simultaneously running command instances,
            defaults to :envvar:`DEFAULT_MAX`
 timezone   the timezone that *cron* and *date* relate to,
            defaults to :envvar:`TIMEZONE`
-user       the user to run the command,
-           defaults to :envvar:`DEFAULT_USER`
+user       the user to run the command. the default is the first
+           non-empty value of: the user that was specified when the
+           container was created, the user that is specified in the
+           underlying image or the literal ``root``.
 =========  ========================================================
 
 The attribute ``command`` and one of ``cron``, ``date`` or ``interval`` are *required* for each job.
@@ -265,12 +267,6 @@ deck-chore's behaviour is defined by these environment variables:
     default: ``image,service``
 
     The default for a job's :ref:`options <options>` attribute.
-
-.. envvar:: DEFAULT_USER
-
-    default: ``root``
-
-    The default for a job's ``user`` attribute.
 
 .. envvar:: LABEL_NAMESPACE
 

@@ -47,7 +47,6 @@ def generate_config() -> None:
     cfg.default_options = split_string(
         getenv('DEFAULT_OPTIONS', 'image,service'), sort=True
     )
-    cfg.default_user = getenv('DEFAULT_USER', 'root')
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
     cfg.logformat = getenv('LOG_FORMAT', '{asctime}|{levelname:8}|{message}')
     cfg.service_identifiers = split_string(

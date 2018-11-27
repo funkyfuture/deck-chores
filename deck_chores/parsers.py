@@ -114,7 +114,7 @@ job_def_validator = JobConfigValidator(
             'allowed': all_timezones,
             'required': True,
         },
-        'user': {'default_setter': lambda x: cfg.default_user},
+        'user': {'regex': r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]*'},
     }
 )
 # TODO rather update the schema when the config was parsed than using lambdas
@@ -148,7 +148,7 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 
 
 @lru_cache()
-def _parse_labels(container_id: str) -> Tuple[str, str, dict]:
+def _parse_labels(container_id: str) -> Tuple[str, str, Dict[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
     filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
@@ -185,7 +185,7 @@ def _parse_options(options: Optional[str]) -> str:
     return result_string
 
 
-def _parse_service_id(_labels: dict) -> str:
+def _parse_service_id(_labels: Dict[str, str]) -> str:
     filtered_labels = {k: v for k, v in _labels.items() if k in cfg.service_identifiers}
     log.debug(f'Considering labels for service id: {filtered_labels}')
     if not filtered_labels:
@@ -209,7 +209,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
-def _parse_job_defintion(_labels: dict) -> dict:
+def _parse_job_defintion(_labels: Dict[str, str]) -> Dict[str, Dict]:
     log.debug(f'Considering labels for job definitions: {_labels}')
     name_grouped_definitions = defaultdict(
         dict

@@ -32,7 +32,6 @@ def test_default_config(monkeypatch):
         'debug': False,
         'default_max': 1,
         'default_options': ('image', 'service'),
-        'default_user': 'root',
         'label_ns': 'deck-chores.',
         'logformat': '{asctime}|{levelname:8}|{message}',
         'service_identifiers': (
