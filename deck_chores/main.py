@@ -56,11 +56,11 @@ signal(SIGTERM, sigterm_handler)
 
 
 def process_running_container_labels(container_id: str) -> None:
-    service_id, options, definitions = parse.labels(container_id)
+    service_id, flags, definitions = parse.labels(container_id)
     if not definitions:
         return
 
-    if service_id and 'service' in options:
+    if service_id and 'service' in flags:
         if service_id in locking_container_to_services_map.values():
             log.debug(f'Service id has a registered job: {service_id}')
             return
@@ -126,11 +126,11 @@ def handle_start(event: dict) -> None:
 def handle_die(event: dict) -> None:
     log.debug('Handling die.')
     container_id = event['Actor']['ID']
-    service_id, options, definitions = parse.labels(container_id)
+    service_id, flags, definitions = parse.labels(container_id)
     if not definitions:
         return
 
-    if service_id and 'service' in options:
+    if service_id and 'service' in flags:
         if container_id in locking_container_to_services_map:
             log.info(f'Unlocking service id: {service_id}')
             del locking_container_to_services_map[container_id]

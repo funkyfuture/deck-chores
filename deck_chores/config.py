@@ -1,3 +1,4 @@
+import logging
 from os import environ
 from os.path import exists
 import ssl
@@ -15,10 +16,18 @@ from deck_chores.utils import split_string, trueish
 
 cfg = SimpleNamespace()
 local_environment = environ.copy()
+log = logging.getLogger('deck_chores')
 getenv = local_environment.get
 
 
 ####
+
+
+def _handle_deprecated():
+    if 'DEFAULT_OPTIONS' in environ:
+        environ['DEFAULT_FLAGS'] = environ.pop('DEFAULT_OPTIONS')
+        log.warning('The environment variable `DEFAULT_OPTIONS` was renamed to '
+                    '`DEFAULT_FLAGS`')
 
 
 def _resolve_tls_version(version: str) -> int:
@@ -36,17 +45,18 @@ def _test_daemon_socket(url: str) -> str:
 
 
 def generate_config() -> None:
+    _handle_deprecated()
     cfg.__dict__.clear()
     cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
     cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
+    cfg.default_flags = split_string(
+        getenv('DEFAULT_FLAGS', 'image,service'), sort=True
+    )
     cfg.docker_host = _test_daemon_socket(
         getenv('DOCKER_HOST', 'unix://var/run/docker.sock')
     )
     cfg.debug = trueish(getenv('DEBUG', 'no'))
     cfg.default_max = int(getenv('DEFAULT_MAX', '1'))
-    cfg.default_options = split_string(
-        getenv('DEFAULT_OPTIONS', 'image,service'), sort=True
-    )
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
     cfg.logformat = getenv('LOG_FORMAT', '{asctime}|{levelname:8}|{message}')
     cfg.service_identifiers = split_string(

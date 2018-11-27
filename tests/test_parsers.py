@@ -4,6 +4,7 @@ from docker.models.containers import Container
 
 from deck_chores.parsers import _parse_labels as parse_labels
 from deck_chores.parsers import (
+    _parse_flags,
     CronTrigger,
     DateTrigger,
     IntervalTrigger,
@@ -64,17 +65,32 @@ def test_interval_trigger():
     assert result == (IntervalTrigger, (0, 0, 0, 0, 15))
 
 
+@mark.parametrize('labels', (
+        {'deck-chores.options': 'noimage'},  # deprecated form
+        {'deck-chores.options.flags': 'noimage'},
+))
+def test_options_parsing(cfg, labels, mocker):
+    container = mocker.MagicMock(Container)
+    container.labels = labels
+    container.image.labels = {}
+    cfg.client.containers.get.return_value = container
+
+    _, options, _ = parse_labels('test_option_parsing')
+    assert options == 'service'
+
+
 @mark.parametrize(
     'default,value,result',
     (
         (('image', 'service'), '', 'image,service'),
         (('image', 'service'), 'noservice', 'image'),
+        (('image', 'service'), 'noimage', 'service'),
         (('service',), 'image', 'image,service'),
     ),
 )
-def test_options(cfg, mocker, default, value, result):
-    cfg.default_options = default
+def test_flags(cfg, mocker, default, value, result):
+    cfg.default_flags = default
     container = mocker.MagicMock(Container)
-    container.labels = {'deck-chores.options': value}
+    container.labels = {'deck-chores.options.flags': value}
     cfg.client.containers.get.return_value = container
-    assert parse_labels(str(default) + value)[1] == result
+    assert _parse_flags(value) == result

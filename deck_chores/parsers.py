@@ -151,37 +151,57 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 def _parse_labels(container_id: str) -> Tuple[str, str, Dict[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
-    filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
-    options = _parse_options(_labels.get(cfg.label_ns + 'options', None))
+
     service_id = _parse_service_id(_labels)
-    if 'image' in options:
-        _labels = ChainMap(
+
+    filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
+    flags = _parse_options(filtered_labels)
+
+    if 'image' in flags:
+        jobs_labels = ChainMap(
             filtered_labels, _image_definition_labels_of_container(container_id)
         )
     else:
-        _labels = filtered_labels
+        jobs_labels = filtered_labels
 
-    job_definitions = _parse_job_defintion(_labels)
+    job_definitions = _parse_job_defintion(jobs_labels)
 
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
         for job_definition in job_definitions.values():
             # this is informative, not functional
             job_definition['service_id'] = service_id
-    return service_id, options, job_definitions
+    return service_id, flags, job_definitions
+
+
+def _parse_options(_labels: Dict[str, str]) -> str:
+    label_ns = cfg.label_ns
+
+    # backward compatibility
+    deprecated_flags_key = label_ns + 'options'
+    flags_key = label_ns + 'options.flags'
+    if deprecated_flags_key in _labels:
+        log.warning(
+            'The `options` name in a label is now itself a namespace. It contains its '
+            'replacement `options.flags` with the same semantics.')
+        if flags_key in _labels:
+            log.critical('Container flags are set redundantly.')
+        _labels[flags_key] = _labels.pop(deprecated_flags_key)
+
+    return _parse_flags(_labels.pop(flags_key, None))
 
 
 @lru_cache(4)
-def _parse_options(options: Optional[str]) -> str:
-    result = set(cfg.default_options)
-    if options is not None:
+def _parse_flags(options: Optional[str]) -> str:
+    result = set(cfg.default_flags)
+    if options:
         for option in split_string(options):
             if option.startswith('no'):
-                result.remove(option[2:])
+                result.discard(option[2:])
             else:
                 result.add(option)
-    result_string = ','.join(sorted(x for x in result if x))
-    log.debug(f'Parsed options: {result_string}')
+    result_string = ','.join(sorted(result))
+    log.debug(f'Parsed & resolved container flags: {result_string}')
     return result_string
 
 
@@ -215,9 +235,6 @@ def _parse_job_defintion(_labels: Dict[str, str]) -> Dict[str, Dict]:
         dict
     )  # type: DefaultDict[str, Dict[str, str]]
     for key, value in _labels.items():
-        if key == cfg.label_ns + 'options':
-            continue
-
         name, attribute = key[len(cfg.label_ns) :].rsplit('.', 1)  # noqa: E203
         name_grouped_definitions[name][attribute] = value
 

@@ -31,7 +31,7 @@ def test_default_config(monkeypatch):
         'docker_host': 'unix://var/run/docker.sock',
         'debug': False,
         'default_max': 1,
-        'default_options': ('image', 'service'),
+        'default_flags': ('image', 'service'),
         'label_ns': 'deck-chores.',
         'logformat': '{asctime}|{levelname:8}|{message}',
         'service_identifiers': (
