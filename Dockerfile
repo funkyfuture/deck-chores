@@ -1,4 +1,4 @@
-FROM python:alpine3.7
+FROM python:alpine3.8
 
 MAINTAINER Frank Sachsenheim <funkyfuture@riseup.net>
 
