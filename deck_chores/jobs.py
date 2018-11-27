@@ -1,10 +1,10 @@
 import logging
 from typing import List, Tuple
 
-from apscheduler import events  # type: ignore
-from apscheduler.job import Job  # type: ignore
-from apscheduler.jobstores.base import JobLookupError  # type: ignore
-from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
+from apscheduler import events
+from apscheduler.job import Job
+from apscheduler.jobstores.base import JobLookupError
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from deck_chores.config import cfg
 from deck_chores.utils import generate_id

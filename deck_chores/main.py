@@ -4,10 +4,10 @@ import sys
 from signal import signal, SIGINT, SIGTERM
 from typing import List
 
-from apscheduler.schedulers import SchedulerNotRunningError  # type: ignore
-from apscheduler.triggers.date import DateTrigger  # type: ignore
+from apscheduler.schedulers import SchedulerNotRunningError
+from apscheduler.triggers.date import DateTrigger
 from docker.models.containers import Container
-from fasteners import InterProcessLock  # type: ignore
+from fasteners import InterProcessLock
 
 from deck_chores import __version__  # noqa: F401  # used only in f-string
 from deck_chores.config import cfg, generate_config

@@ -3,10 +3,10 @@ from collections import defaultdict, ChainMap
 import logging
 from typing import DefaultDict, Dict, Optional, Tuple, Type, Union  # noqa: F401
 
-from apscheduler.triggers.cron import CronTrigger  # type: ignore
-from apscheduler.triggers.date import DateTrigger  # type: ignore
-from apscheduler.triggers.interval import IntervalTrigger  # type: ignore
-import cerberus  # type: ignore
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.interval import IntervalTrigger
+import cerberus
 from pytz import all_timezones
 
 from deck_chores.config import cfg
