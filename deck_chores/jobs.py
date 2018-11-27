@@ -97,10 +97,7 @@ def on_missed(event: events.JobExecutionEvent) -> None:
 
 def exec_job(**definition) -> Tuple[int, bytes]:
     job_id = definition['job_id']
-
     container_id = definition['container_id']
-    command = definition['command']
-
     log.info(f"Executing '{definition['job_name']}' in {definition['container_name']}")
 
     # some sanity checks, to be removed eventually
@@ -118,7 +115,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
     # TODO allow to set environment and workdir in options
     return cfg.client.containers.get(container_id).exec_run(
-        cmd=command, user=definition['user']
+        cmd=definition['command'], user=definition.get('user', '')
     )
 
 
@@ -148,11 +145,11 @@ def add(container_id: str, definitions: Dict[str, Dict]) -> None:
                 or 'root'
             )
 
-        trigger = definition['trigger']
+        trigger_class, trigger_config = definition['trigger']
 
         scheduler.add_job(
             func=exec_job,
-            trigger=trigger[0](*trigger[1], timezone=definition['timezone']),
+            trigger=trigger_class(*trigger_config, timezone=definition['timezone']),
             kwargs=definition,
             id=job_id,
             max_instances=definition['max'],

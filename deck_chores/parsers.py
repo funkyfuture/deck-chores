@@ -221,7 +221,7 @@ def _parse_job_defintion(_labels: Dict[str, str]) -> Dict[str, Dict]:
         name, attribute = key[len(cfg.label_ns) :].rsplit('.', 1)  # noqa: E203
         name_grouped_definitions[name][attribute] = value
 
-    log.debug(f'Definitions: {name_grouped_definitions}')
+    log.debug(f'Job definitions: {name_grouped_definitions}')
 
     result = {}
     for name, definition in name_grouped_definitions.items():

@@ -50,7 +50,7 @@ def test_parse_labels(cfg, mocker):
             'max': 3,
         },
     }
-    _, _, job_definitions = parse_labels('')
+    _, _, job_definitions = parse_labels('test_parse_labels')
     assert len(job_definitions) == len(expected_jobs)
     for name, job_config in job_definitions.items():
         job_config.pop('service_id')

@@ -13,7 +13,7 @@ def cfg(mocker):
     cfg.client.api = mocker.MagicMock(APIClient)
     cfg.debug = True
     cfg.default_max = 1
-    cfg.default_options = 'image,service'
+    cfg.default_options = split_string('image,service', sort=True)
     cfg.default_user = 'root'
     cfg.label_ns = 'deck-chores.'
     cfg.service_identifiers = split_string(
