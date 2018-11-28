@@ -31,6 +31,7 @@ Trigger = Union[CronTrigger, DateTrigger, IntervalTrigger]
 ####
 
 
+CRON_TRIGGER_FIELDS_COUNT = len(CronTrigger.FIELD_NAMES)
 NAME_INTERVAL_MAP = {
     'weekly': (1, 0, 0, 0, 0),
     'daily': (0, 1, 0, 0, 0),
@@ -60,8 +61,7 @@ class JobConfigValidator(cerberus.Validator):
         return tuple([filling] * (length - len(tokens)) + tokens)
 
     def _normalize_coerce_cron(self, value: str) -> Tuple[Type, Tuple[str, ...]]:
-        # TODO there's a constant               here
-        args = self._fill_args(value, len(CronTrigger.FIELD_NAMES), '*')
+        args = self._fill_args(value, CRON_TRIGGER_FIELDS_COUNT, '*')
         return CronTrigger, args
 
     def _normalize_coerce_date(self, value: str) -> Tuple[Type, Tuple[str]]:
