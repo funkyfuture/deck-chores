@@ -5,7 +5,7 @@ from pathlib import Path
 from setuptools import setup
 
 
-VERSION = '0.3.dev0'
+VERSION = '0.3.dev1'
 
 _old_cwd = getcwd()
 chdir(Path(__file__).parent)
