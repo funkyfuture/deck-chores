@@ -169,9 +169,10 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
     jobs_labels = {}  # type: Mapping[str, str]
 
     if 'image' in flags:
-        jobs_labels = ChainMap(
-            filtered_labels, _image_definition_labels_of_container(container_id)
-        )
+        image_labels = _image_definition_labels_of_container(container_id)
+        if not user:
+            _, user = _parse_options(image_labels)
+        jobs_labels = ChainMap(filtered_labels, image_labels)
     else:
         jobs_labels = filtered_labels
 
@@ -207,7 +208,7 @@ def _parse_options(_labels: Dict[str, str]) -> Tuple[str, Optional[str]]:
     flags = _parse_flags(_labels.pop(flags_key, None))
 
     user_key = label_ns + 'options.user'
-    user = _labels.get(user_key)
+    user = _labels.pop(user_key, None)
 
     return flags, user
 

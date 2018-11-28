@@ -65,9 +65,10 @@ def test_parse_labels_with_user_option(cfg, mocker):
         'deck-chores.job.command': 'a_command',
         'deck-chores.job.interval': 'hourly',
     }
+    image_labels = {'deck-chores.options.user': 'l_options_user'}
     container = mocker.MagicMock(Container)
     container.labels = labels
-    container.image.labels = {}
+    container.image.labels = image_labels
     cfg.client.containers.get.return_value = container
 
     expected_jobs = {
@@ -82,6 +83,34 @@ def test_parse_labels_with_user_option(cfg, mocker):
     }
 
     _, _, job_definitions = parse_labels('test_parse_labels_with_user_option')
+    assert job_definitions == expected_jobs, job_definitions
+
+
+def test_parse_labels_with_user_option_from_image(cfg, mocker):
+    labels = {
+        'deck-chores.job.command': 'a_command',
+        'deck-chores.job.interval': 'hourly',
+    }
+    image_labels = {'deck-chores.options.user': 'l_options_user'}
+    container = mocker.MagicMock(Container)
+    container.labels = labels
+    container.image.labels = image_labels
+    cfg.client.containers.get.return_value = container
+
+    expected_jobs = {
+        'job': {
+            'trigger': (IntervalTrigger, (0, 0, 1, 0, 0)),
+            'name': 'job',
+            'command': 'a_command',
+            'user': 'l_options_user',
+            'max': 1,
+            'timezone': 'UTC',
+        }
+    }
+
+    _, _, job_definitions = parse_labels(
+        'test_parse_labels_with_user_option_from_image'
+    )
     assert job_definitions == expected_jobs, job_definitions
 
 
