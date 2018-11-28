@@ -8,7 +8,7 @@ deck-chores
         :target: https://microbadger.com/images/funkyfuture/deck-chores
 
 .. image:: https://img.shields.io/pypi/v/deck-chores.svg
-        :target: https://pypi.python.org/pypi/deck-chores
+        :target: https://pypi.org/project/deck-chores/
 
 **A job scheduler for Docker containers, configured via container labels.**
 
@@ -73,7 +73,7 @@ It wouldn't be as charming to write this piece of software without these project
 * `docker-py <https://docker-py.readthedocs.io>`_ for Docker interaction
 * `flake8 <http://flake8.pycqa.org/>`_, `mypy <http://mypy-lang.org>`_,
   `pytest <http://pytest.org>`_ and `tox <https://tox.readthedocs.io>`_ for testing
-* `Python <https://python.org>`_
+* `Python <https://www.python.org>`_
 
 
 Roadmap

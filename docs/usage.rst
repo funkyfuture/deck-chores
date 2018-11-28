@@ -331,7 +331,7 @@ Authentication related files are expected to be available at ``/config/ca.pem``,
 ``/config/cert.pem`` respectively ``/config/key.pem``.
 
 
-.. _docker-issue-15211: https://github.com/docker/docker/issues/15211
+.. _docker-issue-15211: https://github.com/moby/moby/issues/15211
 .. _docker-compose: https://docs.docker.com/compose/
-.. _log record attributes: https://docs.python.org/library/logging.html#logrecord-attributes
-.. _ssl: https://docs.python.org/library/ssl.html#ssl.PROTOCOL_TLS
+.. _log record attributes: https://docs.python.org/3/library/logging.html#logrecord-attributes
+.. _ssl: https://docs.python.org/3/library/ssl.html#ssl.PROTOCOL_TLS

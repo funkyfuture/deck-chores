@@ -104,6 +104,6 @@ Before you submit a pull request, check that it meets these guidelines:
 3. If the pull request adds functionality, the docs should be updated.
 
 
-,, _black: https://pypi.org/project/black/
+.. _black: https://pypi.org/project/black/
 .. _Fork: https://github.com/funkyfuture/deck-chores/fork
 .. _pew: https://github.com/berdario/pew
