@@ -100,13 +100,12 @@ max        the maximum of simultaneously running command instances,
            defaults to :envvar:`DEFAULT_MAX`
 timezone   the timezone that *cron* and *date* relate to,
            defaults to :envvar:`TIMEZONE`
-user       the user to run the command. the default is the first
-           non-empty value of: the user that was specified when the
-           container was created, the user that is specified in the
-           underlying image or the literal ``root``.
+user       the user to run the command. See :ref:`options-user`
+           for details regarding the defaults.
 =========  ========================================================
 
-The attribute ``command`` and one of ``cron``, ``date`` or ``interval`` are *required* for each job.
+The attribute ``command`` and one of ``cron``, ``date`` or ``interval`` are *required* for each
+job.
 
 Example snippet from a ``docker-compose.yml`` file:
 
@@ -209,15 +208,35 @@ There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``ev
 
 .. _options:
 
-Container options
------------------
+Container-scoped configuration
+------------------------------
+
+.. _options-user:
+
+user
+~~~~
+
+A user that shall run *all* jobs for a container can be set with a label name of this form::
+
+    $LABEL_NAMESPACE.options.user
+
+The option can also be defined for an image and is considered when the ``image``
+:ref:`flag <options-flags>` is set.
+If this option is not set, Docker uses the user that was specified with the ``--user`` option on
+container creation or falls back to the one defined in the underlying image.
+
+
+.. _options-flags:
+
+flags
+~~~~~
 
 Option flags control *deck-chores*'s behaviour with regard to the labeled container and override
-the setting of :envvar:`DEFAULT_OPTIONS`. The schema for an option label name is::
+the setting of :envvar:`DEFAULT_FLAGS`. The schema for a flags label name is::
 
-    $LABEL_NAMESPACE.options
+    $LABEL_NAMESPACE.options.flags
 
-Options are set as comma-separated list of flags. An option set by :envvar:`DEFAULT_OPTIONS` can
+Options are set as comma-separated list of flags. An option set by :envvar:`DEFAULT_FLAGS` can
 be unset by prefixing with ``no``.
 
 These options are available:
@@ -272,7 +291,7 @@ deck-chore's behaviour is defined by these environment variables:
 
     default: ``deck-chores``
 
-    The label namespace to look for job definitions.
+    The label namespace to look for job definitions and container options.
 
 .. envvar:: LOG_FORMAT
 

@@ -1,6 +1,20 @@
 History
 -------
 
+0.3-rc1 (unreleased)
+~~~~~~~~~~~~~~~~~~~~
+
+* *new*: the container configuration ``options.user`` allows to set an executing user
+  for all jobs that don't define one, can also be set on an image (:issue:`5`)
+* *removed*: the ``DEFAULT_USER`` environment variable is removed (:issue:`17`)
+* *removed*: parsing of environment variables ``ASSERT_FINGERPRINT`` and ``DOCKER_DAEMON``
+* *changed*: the container configuration ``options`` is moved to ``options.flags``
+* *changed*: the environment variable ``DEFAULT_OPTIONS`` is renamed to ``DEFAULT_FLAGS``
+* *changed*: upgraded base image
+* *changed*: upgraded used Cerberus version
+* *fix*: includes the ``tzdata`` package in the image (:issue:`33`)
+* *refactoring*: uses the Python Docker SDK 3.5 (:issue:`31`)
+
 0.2 (2018-02-23)
 ~~~~~~~~~~~~~~~~
 
