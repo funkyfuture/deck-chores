@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Mapping, Tuple
 
 from apscheduler import events
 from apscheduler.job import Job
@@ -122,7 +122,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 ####
 
 
-def add(container_id: str, definitions: Dict[str, Dict]) -> None:
+def add(container_id: str, definitions: Mapping[str, Dict]) -> None:
     container = cfg.client.containers.get(container_id)
     container_name = container.name
     log.debug(f'Adding jobs for {container_name}.')
@@ -137,13 +137,6 @@ def add(container_id: str, definitions: Dict[str, Dict]) -> None:
                 'container_name': container_name,
             }
         )
-
-        if 'user' not in definition:
-            definition['user'] = (
-                container.attrs['Config']['User']
-                or container.image.attrs['Config']['User']
-                or 'root'
-            )
 
         trigger_class, trigger_config = definition['trigger']
 

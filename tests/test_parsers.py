@@ -59,6 +59,32 @@ def test_parse_labels(cfg, mocker):
         assert job_config == expected_jobs[name]
 
 
+def test_parse_labels_with_user_option(cfg, mocker):
+    labels = {
+        'deck-chores.options.user': 'c_options_user',
+        'deck-chores.job.command': 'a_command',
+        'deck-chores.job.interval': 'hourly',
+    }
+    container = mocker.MagicMock(Container)
+    container.labels = labels
+    container.image.labels = {}
+    cfg.client.containers.get.return_value = container
+
+    expected_jobs = {
+        'job': {
+            'trigger': (IntervalTrigger, (0, 0, 1, 0, 0)),
+            'name': 'job',
+            'command': 'a_command',
+            'user': 'c_options_user',
+            'max': 1,
+            'timezone': 'UTC',
+        }
+    }
+
+    _, _, job_definitions = parse_labels('test_parse_labels_with_user_option')
+    assert job_definitions == expected_jobs, job_definitions
+
+
 def test_interval_trigger():
     validator = JobConfigValidator({'trigger': {'coerce': 'interval'}})
     result = validator.validated({'trigger': '15'})['trigger']

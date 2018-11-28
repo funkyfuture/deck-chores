@@ -1,7 +1,15 @@
 from functools import lru_cache
 from collections import defaultdict, ChainMap
 import logging
-from typing import DefaultDict, Dict, Optional, Tuple, Type, Union  # noqa: F401
+from typing import (  # noqa: F401
+    DefaultDict,
+    Dict,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
@@ -123,7 +131,7 @@ job_def_validator = JobConfigValidator(
 ####
 
 
-def labels(*args, **kwargs) -> Tuple[str, str, dict]:
+def labels(*args, **kwargs) -> Tuple[str, str, Mapping[str, Dict]]:
     # don't call this from unittests
     try:
         return _parse_labels(*args, **kwargs)
@@ -148,14 +156,17 @@ def labels(*args, **kwargs) -> Tuple[str, str, dict]:
 
 
 @lru_cache()
-def _parse_labels(container_id: str) -> Tuple[str, str, Dict[str, Dict]]:
+def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
 
     service_id = _parse_service_id(_labels)
 
     filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
-    flags = _parse_options(filtered_labels)
+    flags, user = _parse_options(filtered_labels)
+
+    # just for type information
+    jobs_labels = {}  # type: Mapping[str, str]
 
     if 'image' in flags:
         jobs_labels = ChainMap(
@@ -166,6 +177,10 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Dict[str, Dict]]:
 
     job_definitions = _parse_job_defintion(jobs_labels)
 
+    if user:
+        for job_definition in job_definitions.values():
+            job_definition.setdefault('user', user)
+
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
         for job_definition in job_definitions.values():
@@ -174,7 +189,7 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Dict[str, Dict]]:
     return service_id, flags, job_definitions
 
 
-def _parse_options(_labels: Dict[str, str]) -> str:
+def _parse_options(_labels: Dict[str, str]) -> Tuple[str, Optional[str]]:
     label_ns = cfg.label_ns
 
     # backward compatibility
@@ -188,7 +203,12 @@ def _parse_options(_labels: Dict[str, str]) -> str:
             log.critical('Container flags are set redundantly.')
         _labels[flags_key] = _labels.pop(deprecated_flags_key)
 
-    return _parse_flags(_labels.pop(flags_key, None))
+    flags = _parse_flags(_labels.pop(flags_key, None))
+
+    user_key = label_ns + 'options.user'
+    user = _labels.get(user_key)
+
+    return flags, user
 
 
 @lru_cache(4)
@@ -229,7 +249,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
-def _parse_job_defintion(_labels: Dict[str, str]) -> Dict[str, Dict]:
+def _parse_job_defintion(_labels: Mapping[str, str]) -> Dict[str, Dict]:
     log.debug(f'Considering labels for job definitions: {_labels}')
     name_grouped_definitions = defaultdict(
         dict
