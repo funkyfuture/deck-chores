@@ -198,7 +198,8 @@ def _parse_options(_labels: Dict[str, str]) -> Tuple[str, Optional[str]]:
     if deprecated_flags_key in _labels:
         log.warning(
             'The `options` name in a label is now itself a namespace. It contains its '
-            'replacement `options.flags` with the same semantics.')
+            'replacement `options.flags` with the same semantics.'
+        )
         if flags_key in _labels:
             log.critical('Container flags are set redundantly.')
         _labels[flags_key] = _labels.pop(deprecated_flags_key)

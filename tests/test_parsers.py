@@ -91,10 +91,13 @@ def test_interval_trigger():
     assert result == (IntervalTrigger, (0, 0, 0, 0, 15))
 
 
-@mark.parametrize('labels', (
+@mark.parametrize(
+    'labels',
+    (
         {'deck-chores.options': 'noimage'},  # deprecated form
         {'deck-chores.options.flags': 'noimage'},
-))
+    ),
+)
 def test_options_parsing(cfg, labels, mocker):
     container = mocker.MagicMock(Container)
     container.labels = labels

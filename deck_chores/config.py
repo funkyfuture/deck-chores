@@ -26,8 +26,10 @@ getenv = local_environment.get
 def _handle_deprecated():
     if 'DEFAULT_OPTIONS' in environ:
         environ['DEFAULT_FLAGS'] = environ.pop('DEFAULT_OPTIONS')
-        log.warning('The environment variable `DEFAULT_OPTIONS` was renamed to '
-                    '`DEFAULT_FLAGS`')
+        log.warning(
+            'The environment variable `DEFAULT_OPTIONS` was renamed to '
+            '`DEFAULT_FLAGS`'
+        )
 
 
 def _resolve_tls_version(version: str) -> int:
