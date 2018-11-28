@@ -185,7 +185,8 @@ def main() -> None:
         log.debug(f'Config: {cfg.__dict__}')
         if there_is_another_deck_chores_container():
             log.error(
-                "There's another container running deck-chores, maybe paused or restarting."
+                "There's another container running deck-chores, maybe paused or "
+                "restarting."
             )
             raise SystemExit(1)
 
