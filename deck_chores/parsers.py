@@ -171,8 +171,8 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
 
     if 'image' in flags:
         image_labels = _image_definition_labels_of_container(container_id)
-        if not user:
-            _, user = _parse_options(image_labels)
+        _, image_options_user = _parse_options(image_labels)
+        user = user or image_options_user
         jobs_labels = ChainMap(filtered_labels, image_labels)
     else:
         jobs_labels = filtered_labels
