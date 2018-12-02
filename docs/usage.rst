@@ -81,9 +81,14 @@ Job definitions
 
 Job definitions are parsed from a container's metadata aka labels. A label's key must be in the
 namespace defined by :envvar:`LABEL_NAMESPACE` (default: ``deck-chores``) to be considered. A job
-has an own namespace that holds all its attributes. Thus an attribute's key has this schema::
+has an own namespace that holds all its attributes. Thus an attribute's key has usually this
+schema::
 
     $LABEL_NAMESPACE.<job name>.<job attribute>
+
+An exception is a job's ``env`` namespace that is structured like this:
+
+    $LABEL_NAMESPACE.<job name>.env.<variable name>
 
 The *job name* ``options`` cannot be used as it is reserved for setting :ref:`options`.
 
@@ -95,6 +100,8 @@ Attribute  Description
 command    the command to run
 cron       a :ref:`cron` definition
 date       a :ref:`date` definition
+env        this namespace holds environment variables that are set
+           on the command's context
 interval   a :ref:`interval` definition
 max        the maximum of simultaneously running command instances,
            defaults to :envvar:`DEFAULT_MAX`
@@ -118,6 +125,7 @@ Example snippet from a ``docker-compose.yml`` file:
           deck-chores.clear-caches.command: drush cc all
           deck-chores.clear-caches.interval: daily
           deck-chores.clear-caches.user: www-data
+          deck-chores.env.ENVIRONMENT: production
 
 Or baked into an image:
 
@@ -125,7 +133,8 @@ Or baked into an image:
 
     LABEL deck-chores.clear-caches.command="drush cc all" \
           deck-chores.clear-caches.interval="daily" \
-          deck-chores.clear-caches.user="www-data"
+          deck-chores.clear-caches.user="www-data" \
+          deck-chores.env.ENVIRONMENT="production"
 
 
 Job triggers

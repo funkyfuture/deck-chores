@@ -115,7 +115,8 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
     # TODO allow to set environment and workdir in options
     return cfg.client.containers.get(container_id).exec_run(
-        cmd=definition['command'], user=definition.get('user', '')
+        cmd=definition['command'], user=definition.get('user', ''),
+        environment=definition['environment']
     )
 
 

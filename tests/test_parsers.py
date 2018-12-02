@@ -21,6 +21,8 @@ def test_parse_labels(cfg, mocker):
         'deck-chores.backup.user': 'www-data',
         'deck-chores.pull-data.date': '1945-05-08 00:01:00',
         'deck-chores.pull-data.command': '/usr/local/bin/pull.sh',
+        'deck-chores.pull-data.env.BASE_URL': 'https://foo.org/records/',
+        'deck-chores.pull-data.env.TIMEOUT': '120',
         'deck-chores.gen-thumbs.cron': '*/10 * * * *',
         'deck-chores.gen-thumbs.command': 'python /scripts/gen_thumbs.py',
         'deck-chores.gen-thumbs.max': '3',
@@ -37,18 +39,21 @@ def test_parse_labels(cfg, mocker):
             'command': '/usr/local/bin/backup.sh',
             'user': 'www-data',
             'max': 1,
+            'environment': {},
         },
         'pull-data': {
             'trigger': (DateTrigger, ('1945-05-08 00:01:00',)),
             'name': 'pull-data',
             'command': '/usr/local/bin/pull.sh',
             'max': 1,
+            'environment': {'BASE_URL': 'https://foo.org/records/', 'TIMEOUT': '120'},
         },
         'gen-thumbs': {
             'trigger': (CronTrigger, ('*', '*', '*', '*/10', '*', '*', '*', '*')),
             'name': 'gen-thumbs',
             'command': 'python /scripts/gen_thumbs.py',
             'max': 3,
+            'environment': {},
         },
     }
     _, _, job_definitions = parse_labels('test_parse_labels')
@@ -79,6 +84,7 @@ def test_parse_labels_with_user_option(cfg, mocker):
             'user': 'c_options_user',
             'max': 1,
             'timezone': 'UTC',
+            'environment': {},
         }
     }
 
@@ -105,6 +111,7 @@ def test_parse_labels_with_user_option_from_image(cfg, mocker):
             'user': 'l_options_user',
             'max': 1,
             'timezone': 'UTC',
+            'environment': {},
         }
     }
 

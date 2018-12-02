@@ -109,6 +109,7 @@ job_def_validator = JobConfigValidator(
             'required': True,
             'excludes': ['cron', 'interval'],
         },
+        'environment': {'type': 'dict', 'default': {}},
         'interval': {
             'coerce': 'interval',
             'validator': 'trigger',
@@ -253,12 +254,22 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
 
 def _parse_job_defintion(_labels: Mapping[str, str]) -> Dict[str, Dict]:
     log.debug(f'Considering labels for job definitions: {_labels}')
+
     name_grouped_definitions = defaultdict(
         dict
-    )  # type: DefaultDict[str, Dict[str, str]]
+    )  # type: DefaultDict[str, Dict[str, Union[str, Dict]]]
+
     for key, value in _labels.items():
-        name, attribute = key[len(cfg.label_ns) :].rsplit('.', 1)  # noqa: E203
-        name_grouped_definitions[name][attribute] = value
+        key = key[len(cfg.label_ns) :]  # noqa: E203
+        if '.env.' in key:
+            name, _, variable = key.split('.', 2)
+            name_grouped_definitions[name].setdefault('environment', {})
+            name_grouped_definitions[name]['environment'][  # type: ignore
+                variable
+            ] = value
+        else:
+            name, attribute = key.split('.', 1)
+            name_grouped_definitions[name][attribute] = value
 
     log.debug(f'Job definitions: {name_grouped_definitions}')
 

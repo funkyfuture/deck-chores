@@ -31,6 +31,7 @@ def test_job_execution(capsys, cfg, mocker):
     definitions = {
         'foo': {
             'command': 'sleep 2',
+            'environment': {},
             'max': 2,
             'timezone': 'UTC',
             'trigger': (IntervalTrigger, (0, 0, 0, 0, 1)),
