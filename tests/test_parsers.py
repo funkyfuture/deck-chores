@@ -19,6 +19,7 @@ def test_parse_labels(cfg, mocker):
         'deck-chores.backup.interval': 'daily',
         'deck-chores.backup.command': '/usr/local/bin/backup.sh',
         'deck-chores.backup.user': 'www-data',
+        'deck-chores.backup.workdir': '/backups',
         'deck-chores.pull-data.date': '1945-05-08 00:01:00',
         'deck-chores.pull-data.command': '/usr/local/bin/pull.sh',
         'deck-chores.pull-data.env.BASE_URL': 'https://foo.org/records/',
@@ -40,6 +41,7 @@ def test_parse_labels(cfg, mocker):
             'user': 'www-data',
             'max': 1,
             'environment': {},
+            'workdir': '/backups',
         },
         'pull-data': {
             'trigger': (DateTrigger, ('1945-05-08 00:01:00',)),

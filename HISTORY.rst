@@ -8,6 +8,7 @@ History
   for all jobs that don't define one, can also be set on an image (:issue:`5`)
 * *new*: environment variables for a job can be set in a job's ``env`` namespace
   (:issue:`41)
+* *new*: a job's ``workdir`` attribute can be used to set the working directory (:issue:`42`)
 * *removed*: the ``DEFAULT_USER`` environment variable is removed (:issue:`17`)
 * *removed*: parsing of environment variables ``ASSERT_FINGERPRINT`` and ``DOCKER_DAEMON``
 * *changed*: the container configuration ``options`` is moved to ``options.flags``

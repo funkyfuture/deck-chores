@@ -113,10 +113,11 @@ def exec_job(**definition) -> Tuple[int, bytes]:
         raise AssertionError('Container is not running.')
     # end of sanity checks
 
-    # TODO allow to set environment and workdir in options
     return cfg.client.containers.get(container_id).exec_run(
-        cmd=definition['command'], user=definition.get('user', ''),
-        environment=definition['environment']
+        cmd=definition['command'],
+        user=definition.get('user', ''),
+        environment=definition['environment'],
+        workdir=definition.get('workdir'),
     )
 
 

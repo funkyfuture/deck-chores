@@ -109,6 +109,7 @@ timezone   the timezone that *cron* and *date* relate to,
            defaults to :envvar:`TIMEZONE`
 user       the user to run the command. See :ref:`options-user`
            for details regarding the defaults.
+workdir    the working directory when the command is executed
 =========  ========================================================
 
 The attribute ``command`` and one of ``cron``, ``date`` or ``interval`` are *required* for each

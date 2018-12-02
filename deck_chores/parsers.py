@@ -124,6 +124,7 @@ job_def_validator = JobConfigValidator(
             'required': True,
         },
         'user': {'regex': r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]*'},
+        'workdir': {'regex': r'/.*'},
     }
 )
 # TODO rather update the schema when the config was parsed than using lambdas
