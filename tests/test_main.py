@@ -3,7 +3,7 @@ from pytest import mark
 from docker.models.containers import Container
 
 from deck_chores.main import listen, there_is_another_deck_chores_container
-from deck_chores.parsers import _parse_job_defintion
+from deck_chores.parsers import _parse_job_defintions
 
 
 _events = b'''{"status":"rename","id":"a84c8e16c1b1b2339bd276f725f08425935c51a5d2c68c5d28ec786c68155830","from":"sojus_beep","Type":"container","Action":"rename","Actor":{"ID":"a84c8e16c1b1b2339bd276f725f08425935c51a5d2c68c5d28ec786c68155830","Attributes":{"com.docker.compose.config-hash":"1319acc48e2ae136c2728263c594ddcf874dc7d1ea906236080ea6b37dc1851f","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"a84c8e16c1b1_sojus_beep_1","oldName":"/sojus_beep_1"}},"time":1481662806,"timeNano":1481662806327986727}\n
@@ -26,7 +26,7 @@ def test_event_dispatching(cfg, mocker):
     container = mocker.MagicMock()
     container.name = 'foo'
     cfg.client.containers.get.return_value = container
-    definition = _parse_job_defintion(
+    definition = _parse_job_defintions(
         {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '15'}
     )
     labels = mocker.patch(

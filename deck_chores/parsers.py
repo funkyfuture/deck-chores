@@ -177,7 +177,7 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
     else:
         jobs_labels = filtered_labels
 
-    job_definitions = _parse_job_defintion(jobs_labels)
+    job_definitions = _parse_job_defintions(jobs_labels)
 
     if user:
         for job_definition in job_definitions.values():
@@ -252,7 +252,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
-def _parse_job_defintion(_labels: Mapping[str, str]) -> Dict[str, Dict]:
+def _parse_job_defintions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
     log.debug(f'Considering labels for job definitions: {_labels}')
 
     name_grouped_definitions = defaultdict(
@@ -277,19 +277,22 @@ def _parse_job_defintion(_labels: Mapping[str, str]) -> Dict[str, Dict]:
     for name, definition in name_grouped_definitions.items():
         log.debug(f'Processing {name}')
         definition['name'] = name
-        if not job_def_validator(definition):
+
+        job = job_def_validator.validated(definition)
+        if job is None:
             log.error(f'Misconfigured job definition: {definition}')
             log.error(f'Errors: {job_def_validator.errors}')
-        else:
-            job = job_def_validator.document
-            for trigger_name in ('cron', 'date', 'interval'):
-                trigger = job.pop(trigger_name, None)
-                if trigger is None:
-                    continue
+            continue
 
-                job['trigger'] = trigger
-            log.debug(f'Normalized definition: {job}')
-            result[name] = job
+        for trigger_name in ('cron', 'date', 'interval'):
+            trigger = job.pop(trigger_name, None)
+            if trigger is None:
+                continue
+
+            job['trigger'] = trigger
+
+        log.debug(f'Normalized definition: {job}')
+        result[name] = job
 
     return result
 
