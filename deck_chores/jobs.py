@@ -144,7 +144,11 @@ def add(container_id: str, definitions: Mapping[str, Dict]) -> None:
 
         scheduler.add_job(
             func=exec_job,
-            trigger=trigger_class(*trigger_config, timezone=definition['timezone']),
+            trigger=trigger_class(
+                *trigger_config,
+                timezone=definition['timezone'],
+                jitter=definition['jitter'],
+            ),
             kwargs=definition,
             id=job_id,
             max_instances=definition['max'],

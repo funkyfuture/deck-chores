@@ -35,6 +35,7 @@ def test_job_execution(capsys, cfg, mocker):
             'max': 2,
             'timezone': 'UTC',
             'trigger': (IntervalTrigger, (0, 0, 0, 0, 1)),
+            'jitter': None,
             'user': 'test',
         }
     }

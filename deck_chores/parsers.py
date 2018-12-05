@@ -108,6 +108,7 @@ job_def_validator = JobConfigValidator(
             'validator': 'trigger',
             'required': True,
             'excludes': ['cron', 'interval'],
+            'dependencies': {'jitter': None},
         },
         'environment': {'type': 'dict', 'default': {}},
         'interval': {
@@ -115,6 +116,13 @@ job_def_validator = JobConfigValidator(
             'validator': 'trigger',
             'required': True,
             'excludes': ['cron', 'date'],
+        },
+        'jitter': {
+            'type': 'integer',
+            'coerce': int,
+            'nullable': True,
+            'default': None,
+            'min': 0,
         },
         'max': {'coerce': int, 'default_setter': lambda x: cfg.default_max},
         'name': {'regex': r'[a-z0-9.-]+'},

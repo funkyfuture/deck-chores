@@ -26,6 +26,7 @@ def test_parse_labels(cfg, mocker):
         'deck-chores.pull-data.env.TIMEOUT': '120',
         'deck-chores.gen-thumbs.cron': '*/10 * * * *',
         'deck-chores.gen-thumbs.command': 'python /scripts/gen_thumbs.py',
+        'deck-chores.gen-thumbs.jitter': '600',
         'deck-chores.gen-thumbs.max': '3',
     }
     container = mocker.MagicMock(Container)
@@ -42,6 +43,7 @@ def test_parse_labels(cfg, mocker):
             'max': 1,
             'environment': {},
             'workdir': '/backups',
+            'jitter': None,
         },
         'pull-data': {
             'trigger': (DateTrigger, ('1945-05-08 00:01:00',)),
@@ -49,6 +51,7 @@ def test_parse_labels(cfg, mocker):
             'command': '/usr/local/bin/pull.sh',
             'max': 1,
             'environment': {'BASE_URL': 'https://foo.org/records/', 'TIMEOUT': '120'},
+            'jitter': None,
         },
         'gen-thumbs': {
             'trigger': (CronTrigger, ('*', '*', '*', '*/10', '*', '*', '*', '*')),
@@ -56,6 +59,7 @@ def test_parse_labels(cfg, mocker):
             'command': 'python /scripts/gen_thumbs.py',
             'max': 3,
             'environment': {},
+            'jitter': 600,
         },
     }
     _, _, job_definitions = parse_labels('test_parse_labels')
@@ -87,6 +91,7 @@ def test_parse_labels_with_user_option(cfg, mocker):
             'max': 1,
             'timezone': 'UTC',
             'environment': {},
+            'jitter': None,
         }
     }
 
@@ -114,6 +119,7 @@ def test_parse_labels_with_user_option_from_image(cfg, mocker):
             'max': 1,
             'timezone': 'UTC',
             'environment': {},
+            'jitter': None,
         }
     }
 

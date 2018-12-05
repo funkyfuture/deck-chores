@@ -94,21 +94,23 @@ The *job name* ``options`` cannot be used as it is reserved for setting :ref:`op
 
 The following attributes are available:
 
-=========  ========================================================
+=========  ==========================================================
 Attribute  Description
-=========  ========================================================
+=========  ==========================================================
 command    the command to run
 cron       a :ref:`cron` definition
 date       a :ref:`date` definition
-env        this namespace holds environment variables that are set
-           on the command's context
+env        this namespace holds environment variables that are set on
+           the command's context
 interval   a :ref:`interval` definition
+jitter     the maximum length of a random delay before each job's
+           execution (in conjunction with a cron or interval trigger)
 max        the maximum of simultaneously running command instances,
            defaults to :envvar:`DEFAULT_MAX`
-timezone   the timezone that *cron* and *date* relate to,
-           defaults to :envvar:`TIMEZONE`
-user       the user to run the command. See :ref:`options-user`
-           for details regarding the defaults.
+timezone   the timezone that the trigger relates to, defaults to
+           :envvar:`TIMEZONE`
+user       the user to run the command; see :ref:`options-user` for
+           details regarding the defaults
 workdir    the working directory when the command is executed
 =========  ========================================================
 
