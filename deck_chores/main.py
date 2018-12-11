@@ -184,7 +184,7 @@ def shutdown() -> None:
 
 def main() -> None:
     if not lock.acquire(blocking=False):
-        print(f"Couldn't acquire lock file at {lock.path}, exiting.")
+        log.error(f"Couldn't acquire lock file at {lock.path}, exiting.")
         sys.exit(1)
     log.info('Deck Chores {__version__} started.')
     try:

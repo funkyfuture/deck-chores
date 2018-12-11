@@ -70,6 +70,7 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
     return weeks, days, hours, minutes, value
 
 
+@lru_cache(4)
 def split_string(
     value: str, delimiter: str = ',', strip: bool = True, sort: bool = False
 ) -> Tuple[str, ...]:
@@ -98,6 +99,9 @@ __all__ = [
     from_json.__name__,
     'log',
     'log_handler',
-    split_string.__name__,
+    # https://github.com/python/mypy/issues/1317
+    parse_time_from_string_with_units.__name__,  # type: ignore
+    seconds_as_interval_tuple.__name__,  # type: ignore
+    split_string.__name__,  # type: ignore
     trueish.__name__,
 ]
