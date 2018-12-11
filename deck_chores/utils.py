@@ -30,7 +30,7 @@ def generate_id(*args) -> str:
 @lru_cache(64)
 def parse_time_from_string_with_units(value: str) -> Optional[int]:
     digits: str = ''
-    result: int = 0
+    result: float = 0
     ignore: bool = False
 
     try:

@@ -88,7 +88,7 @@ class JobConfigValidator(cerberus.Validator):
                 args = tuple(int(x) for x in args)  # type: ignore
         return IntervalTrigger, args
 
-    def _normalize_coerce_timeunits(self, value: str) -> Union[int, str]:
+    def _normalize_coerce_timeunits(self, value: str) -> Optional[int]:
         if any(x.isalpha() for x in value):
             return parse_time_from_string_with_units(value)
         return int(value)
