@@ -201,7 +201,7 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
     else:
         jobs_labels = filtered_labels
 
-    job_definitions = _parse_job_defintions(jobs_labels)
+    job_definitions = _parse_job_definitions(jobs_labels)
 
     if user:
         for job_definition in job_definitions.values():
@@ -276,7 +276,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
-def _parse_job_defintions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
+def _parse_job_definitions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
     log.debug(f'Considering labels for job definitions: {_labels}')
 
     name_grouped_definitions = defaultdict(
