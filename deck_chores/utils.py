@@ -3,8 +3,17 @@ import json
 import os
 import sys
 from functools import lru_cache
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 from uuid import NAMESPACE_OID, uuid5
+
+
+TIME_UNIT_MULTIPLIERS = {
+    's': 1,
+    'm': 1 * 60,
+    'h': 1 * 60 * 60,
+    'd': 1 * 60 * 60 * 24,
+    'w': 1 * 60 * 60 * 24 * 7,
+}
 
 
 def from_json(s: Union[bytes, str]) -> dict:
@@ -16,6 +25,49 @@ def from_json(s: Union[bytes, str]) -> dict:
 @lru_cache(128)
 def generate_id(*args) -> str:
     return str(uuid5(NAMESPACE_OID, ''.join(args)))
+
+
+@lru_cache(64)
+def parse_time_from_string_with_units(value: str) -> Optional[int]:
+    digits: str = ''
+    result: int = 0
+    ignore: bool = False
+
+    try:
+        for char in value:
+
+            if char.isdigit() or char == '.':
+                ignore = False
+                digits += char
+                continue
+
+            if ignore:
+                continue
+
+            char = char.lower()
+            if char in TIME_UNIT_MULTIPLIERS and digits:
+                if digits.startswith('.'):
+                    digits = '0' + digits
+
+                result += TIME_UNIT_MULTIPLIERS[char] * float(digits)
+                digits, ignore = '', True
+
+            if char.isalpha():
+                ignore = True
+
+    except (TypeError, ValueError):
+        return None
+
+    return int(result)
+
+
+@lru_cache(64)
+def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
+    weeks, value = divmod(value, TIME_UNIT_MULTIPLIERS['w'])
+    days, value = divmod(value, TIME_UNIT_MULTIPLIERS['d'])
+    hours, value = divmod(value, TIME_UNIT_MULTIPLIERS['h'])
+    minutes, value = divmod(value, TIME_UNIT_MULTIPLIERS['m'])
+    return weeks, days, hours, minutes, value
 
 
 def split_string(

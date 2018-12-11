@@ -70,6 +70,58 @@ def test_parse_labels(cfg, mocker):
         assert job_config == expected_jobs[name]
 
 
+def test_parse_labels_with_time_units(cfg, mocker):
+    labels = {
+        'com.docker.compose.project': 'test_project',
+        'com.docker.compose.service': 'time_machine',
+        'deck-chores.backup.interval': '2 weeks',
+        'deck-chores.backup.jitter': '0.5 day',
+        'deck-chores.backup.command': '/usr/local/bin/backup.sh',
+        'deck-chores.backup.user': 'www-data',
+        'deck-chores.backup.workdir': '/backups',
+        'deck-chores.pull-data.interval': '42 secs 1 day',
+        'deck-chores.pull-data.command': '/usr/local/bin/pull.sh',
+        'deck-chores.pull-data.env.BASE_URL': 'https://foo.org/records/',
+        'deck-chores.pull-data.env.TIMEOUT': '120',
+        'deck-chores.gen-thumbs.interval': '3 xongs',
+        'deck-chores.gen-thumbs.command': 'python /scripts/gen_thumbs.py',
+        'deck-chores.gen-thumbs.jitter': '600',
+        'deck-chores.gen-thumbs.max': '3',
+    }
+    container = mocker.MagicMock(Container)
+    container.labels = labels
+    container.image.labels = {}
+    cfg.client.containers.get.return_value = container
+
+    expected_jobs = {
+        'backup': {
+            'trigger': (IntervalTrigger, (2, 0, 0, 0, 0)),
+            'name': 'backup',
+            'command': '/usr/local/bin/backup.sh',
+            'user': 'www-data',
+            'max': 1,
+            'environment': {},
+            'workdir': '/backups',
+            'jitter': 0.5 * 24 * 60 * 60,
+        },
+        'pull-data': {
+            'trigger': (IntervalTrigger, (0, 1, 0, 0, 42)),
+            'name': 'pull-data',
+            'command': '/usr/local/bin/pull.sh',
+            'max': 1,
+            'environment': {'BASE_URL': 'https://foo.org/records/', 'TIMEOUT': '120'},
+            'jitter': None,
+        },
+    }
+    _, _, job_definitions = parse_labels('test_parse_labels_with__time_units')
+
+    assert len(job_definitions) == len(expected_jobs), job_definitions
+    for name, job_config in job_definitions.items():
+        job_config.pop('service_id')
+        assert job_config.pop('timezone') == 'UTC'
+        assert job_config == expected_jobs[name]
+
+
 def test_parse_labels_with_user_option(cfg, mocker):
     labels = {
         'deck-chores.options.user': 'c_options_user',

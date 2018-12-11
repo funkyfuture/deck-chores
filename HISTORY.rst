@@ -11,6 +11,8 @@ History
 * *new*: a job's ``workdir`` attribute can be used to set the working directory (:issue:`42`)
 * *new*: cron and interval triggers can be configured to delay randomly with the ``jitter``
   option (:issue:`43`)
+* *new*: interval triggers and the jitter option can be defined with strings containing
+  time units
 * *removed*: the ``DEFAULT_USER`` environment variable is removed (:issue:`17`)
 * *removed*: parsing of environment variables ``ASSERT_FINGERPRINT`` and ``DOCKER_DAEMON``
 * *changed*: the container configuration ``options`` is moved to ``options.flags``

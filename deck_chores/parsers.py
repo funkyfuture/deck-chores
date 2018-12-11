@@ -19,7 +19,12 @@ from pytz import all_timezones
 
 from deck_chores.config import cfg
 from deck_chores.exceptions import ParsingError
-from deck_chores.utils import generate_id, split_string
+from deck_chores.utils import (
+    generate_id,
+    parse_time_from_string_with_units,
+    seconds_as_interval_tuple,
+    split_string,
+)
 
 
 ####
@@ -72,11 +77,21 @@ class JobConfigValidator(cerberus.Validator):
     ) -> Tuple[Type, Optional[Tuple[int, int, int, int, int]]]:
         args = NAME_INTERVAL_MAP.get(value)
         if args is None:
-            for c in '.:/':
-                value = value.replace(c, ' ')
-            args = self._fill_args(value, 5, '0')  # type: ignore
-            args = tuple(int(x) for x in args)  # type: ignore
+            if any(x.isalpha() for x in value):
+                parsed_value = parse_time_from_string_with_units(value)
+                if parsed_value:
+                    args = seconds_as_interval_tuple(parsed_value)
+            else:
+                for c in '.:/':
+                    value = value.replace(c, ' ')
+                args = self._fill_args(value, 5, '0')  # type: ignore
+                args = tuple(int(x) for x in args)  # type: ignore
         return IntervalTrigger, args
+
+    def _normalize_coerce_timeunits(self, value: str) -> Union[int, str]:
+        if any(x.isalpha() for x in value):
+            return parse_time_from_string_with_units(value)
+        return int(value)
 
     def _validator_trigger(self, field, value):
         if isinstance(value, str):  # normalization failed
@@ -119,7 +134,7 @@ job_def_validator = JobConfigValidator(
         },
         'jitter': {
             'type': 'integer',
-            'coerce': int,
+            'coerce': 'timeunits',
             'nullable': True,
             'default': None,
             'min': 0,

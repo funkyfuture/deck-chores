@@ -94,25 +94,27 @@ The *job name* ``options`` cannot be used as it is reserved for setting :ref:`op
 
 The following attributes are available:
 
-=========  ==========================================================
+=========  ====================================================================
 Attribute  Description
-=========  ==========================================================
+=========  ====================================================================
 command    the command to run
 cron       a :ref:`cron` definition
 date       a :ref:`date` definition
-env        this namespace holds environment variables that are set on
-           the command's context
+env        this namespace holds environment variables that are set on the
+           command's context
 interval   a :ref:`interval` definition
-jitter     the maximum length of a random delay before each job's
-           execution (in conjunction with a cron or interval trigger)
-max        the maximum of simultaneously running command instances,
-           defaults to :envvar:`DEFAULT_MAX`
+jitter     the maximum length of a random delay before each job's execution (in
+           conjunction with a :ref:`cron` or :ref:`interval` trigger); can be
+           either a number that define seconds or numbers with subsequent time
+           unit indicator like the :ref:`interval` trigger can be defined with
+max        the maximum of simultaneously running command instances, defaults to
+           :envvar:`DEFAULT_MAX`
 timezone   the timezone that the trigger relates to, defaults to
            :envvar:`TIMEZONE`
-user       the user to run the command; see :ref:`options-user` for
-           details regarding the defaults
+user       the user to run the command; see :ref:`options-user` for details
+           regarding the defaults
 workdir    the working directory when the command is executed
-=========  ========================================================
+=========  ====================================================================
 
 The attribute ``command`` and one of ``cron``, ``date`` or ``interval`` are *required* for each
 job.
@@ -195,15 +197,24 @@ An omitted time is interpreted as ``0:00:00``. Note that times must include a se
 interval
 ~~~~~~~~
 
-This trigger defines a repetition by a fixed interval. The interval is added up by the fields
-*weeks*, *days*, *hours*, *minutes* and *seconds*. Possible field separators are ``.``, ``:``,
-``/`` and spaces. Missing fields are filled up with ``0`` on the left.
+This trigger defines a repetition by a fixed interval. It can either be a string where time
+units follow numbers or a sequence of numbers that qualify by order.
+
+In the first form the numbers can be decimal fractions and the time units are determined by
+the first letter as **w**\ eek, **d**\ ay, **h**\ our, **m**\ inute or **s**\ econd.
+
+In the anonymous form the interval is added up by the fields *weeks*, *days*, *hours*, *minutes*
+and *seconds* in that order. Possible field separators are ``.``, ``:``, ``/`` and spaces. Missing
+fields are filled up with ``0`` on the left.
 
 Examples
 ........
 
 ::
 
+    28 Days       # run every 4 weeks
+    4 wookies     # run every 4 weeks
+    42s 0.5d      # run every twelve hours and 42 seconds
     42:00:00      # run every fourty-two hours
     100/00:00:00  # run every one hundred days
 
