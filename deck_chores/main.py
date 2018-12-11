@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import sys
-from signal import signal, SIGINT, SIGTERM
+from signal import signal, SIGINT, SIGTERM, SIGUSR1
 from typing import List
 
 from apscheduler.schedulers import SchedulerNotRunningError
@@ -48,8 +48,16 @@ def sigterm_handler(signum, frame):
     raise SystemExit(0)
 
 
+def sigusr1_handler(signum, frame):
+    log.info('SIGUSR1 received, echoing all jobs.')
+    for job in jobs.scheduler.get_jobs():
+        log.info(f'ID: {job.id}   Next execution: {job.next_run_time}   Configuration:')
+        log.info(job.kwargs)
+
+
 signal(SIGINT, sigint_handler)
 signal(SIGTERM, sigterm_handler)
+signal(SIGUSR1, sigusr1_handler)
 
 
 ####

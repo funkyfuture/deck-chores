@@ -76,6 +76,17 @@ non-stopping no-op command as main process like in this snippet of a ``docker-co
           deck-chores.short.interval: daily
 
 
+Listing all registered jobs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Information, including the next scheduled execution, about the registered jobs of a deck-chores
+instance can be logged at once by sending ``SIGUSR1`` signal to the process, e.g. to one that runs
+in a container::
+
+    docker kill --signal USR1 <CONTAINER>
+
+
+
 Job definitions
 ---------------
 
