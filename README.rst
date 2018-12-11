@@ -76,25 +76,6 @@ It wouldn't be as charming to write this piece of software without these project
 * `Python <https://www.python.org>`_
 
 
-Roadmap
--------
-
-0.3
-...
-
-- parse time units for interval triggers
-- handle a global limit on concurrent jobs
-- print jobs when receiving SIGUSR1
-- support for configuring APScheduler's jitter option on Cron- & IntervalTrigger
-
-
-0.4
-...
-
-- keep output of job executions
-- a rudimentary web ui
-
-
 Authors
 -------
 

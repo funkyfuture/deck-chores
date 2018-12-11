@@ -97,7 +97,7 @@ schema::
 
     $LABEL_NAMESPACE.<job name>.<job attribute>
 
-An exception is a job's ``env`` namespace that is structured like this:
+An exception is a job's ``env`` namespace that is structured like this::
 
     $LABEL_NAMESPACE.<job name>.env.<variable name>
 
@@ -116,13 +116,13 @@ env        this namespace holds environment variables that are set on the
 interval   a :ref:`interval` definition
 jitter     the maximum length of a random delay before each job's execution (in
            conjunction with a :ref:`cron` or :ref:`interval` trigger); can be
-           either a number that define seconds or numbers with subsequent time
-           unit indicator like the :ref:`interval` trigger can be defined with
-max        the maximum of simultaneously running command instances, defaults to
-           :envvar:`DEFAULT_MAX`
+           either a number that define seconds or numbers with a subsequent
+           time unit indicator like the :ref:`interval` trigger can be defined
+           with max the maximum of simultaneously running command instances,
+           defaults to :envvar:`DEFAULT_MAX`
 timezone   the timezone that the trigger relates to, defaults to
            :envvar:`TIMEZONE`
-user       the user to run the command; see :ref:`options-user` for details
+user       the user to run the command; see :ref:`the user option <options-user>` for details
            regarding the defaults
 workdir    the working directory when the command is executed
 =========  ====================================================================
@@ -141,7 +141,7 @@ Example snippet from a ``docker-compose.yml`` file:
           deck-chores.clear-caches.command: drush cc all
           deck-chores.clear-caches.interval: daily
           deck-chores.clear-caches.user: www-data
-          deck-chores.env.ENVIRONMENT: production
+          deck-chores.clear-caches.env.ENVIRONMENT: production
 
 Or baked into an image:
 
@@ -150,7 +150,7 @@ Or baked into an image:
     LABEL deck-chores.clear-caches.command="drush cc all" \
           deck-chores.clear-caches.interval="daily" \
           deck-chores.clear-caches.user="www-data" \
-          deck-chores.env.ENVIRONMENT="production"
+          deck-chores.clear-caches.env.ENVIRONMENT="production"
 
 
 Job triggers
@@ -208,11 +208,11 @@ An omitted time is interpreted as ``0:00:00``. Note that times must include a se
 interval
 ~~~~~~~~
 
-This trigger defines a repetition by a fixed interval. It can either be a string where time
-units follow numbers or a sequence of numbers that qualify by order.
+This trigger defines a repetition by a fixed interval. It can either be a string where time units
+follow numbers or a sequence of numbers that qualify time units by order.
 
-In the first form the numbers can be decimal fractions and the time units are determined by
-the first letter as **w**\ eek, **d**\ ay, **h**\ our, **m**\ inute or **s**\ econd.
+In the first form the numbers can be decimal fractions and the time units are determined by the
+first letter of a token as **w**\ eek, **d**\ ay, **h**\ our, **m**\ inute or **s**\ econd.
 
 In the anonymous form the interval is added up by the fields *weeks*, *days*, *hours*, *minutes*
 and *seconds* in that order. Possible field separators are ``.``, ``:``, ``/`` and spaces. Missing
@@ -234,10 +234,10 @@ There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``ev
 
 .. note::
 
-    Though it uses the same units of measurement, an interval is different from a point in time,
-    it describes the time *between* two events. Hence you should expect a job that is defined with
-    this type of trigger to run the defined time *after* the job has been registered. To define a
-    point in time, see cron_.
+    Though it uses the same units of measurement, an interval is different from a point in time of
+    a specific calendar system, it describes the time *between* two events. Hence you should
+    expect a job that is defined with this type of trigger to run the defined time *after* the job
+    has been registered. To define a point in time, see cron_.
 
 
 .. _options:
@@ -309,17 +309,17 @@ deck-chore's behaviour is defined by these environment variables:
 
     Log debugging messages, enabled by ``on``, ``true`` or ``yes``.
 
+.. envvar:: DEFAULT_FLAGS
+
+    default: ``image,service``
+
+    The default for a job option's :ref:`flags <options-flags>` attribute.
+
 .. envvar:: DEFAULT_MAX
 
     default: ``1``
 
     The default for a job's ``max`` attribute.
-
-.. envvar:: DEFAULT_OPTIONS
-
-    default: ``image,service``
-
-    The default for a job's :ref:`options <options>` attribute.
 
 .. envvar:: LABEL_NAMESPACE
 
