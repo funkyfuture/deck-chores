@@ -3,6 +3,11 @@
 from os import chdir, getcwd
 from pathlib import Path
 from setuptools import setup
+from sys import version_info
+
+
+if version_info < (3, 7):
+    raise RuntimeError("Requires Python 3.7 or later.")
 
 
 VERSION = '0.3.dev1'
@@ -42,7 +47,7 @@ setup(
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: ISC License (ISCL)',
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
     entry_points={'console_scripts': ['deck-chores = deck_chores.main:main']},

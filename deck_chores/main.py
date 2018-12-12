@@ -1,12 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import sys
 from signal import signal, SIGINT, SIGTERM, SIGUSR1
-from typing import List
 
 from apscheduler.schedulers import SchedulerNotRunningError
-from apscheduler.triggers.date import DateTrigger
-from docker.models.containers import Container
 from fasteners import InterProcessLock
 
 from deck_chores import __version__  # noqa: F401  # used only in f-string
@@ -79,24 +76,23 @@ def process_running_container_labels(container_id: str) -> None:
 
 
 def inspect_running_containers() -> datetime:
-    log.debug('Fetching running containers')
-    containers = cfg.client.containers.list(ignore_removed=True, sparse=True)
-    inspection_time = datetime.utcnow()  # FIXME get last eventtime
-    jobs.scheduler.add_job(
-        exec_inspection,
-        trigger=DateTrigger(),
-        args=(containers,),
-        id='container_inspection',
-    )
-    return inspection_time
-
-
-def exec_inspection(containers: List[Container]) -> None:
     # TODO handle paused containers
+
     log.info('Inspecting running containers.')
+    last_event_time = datetime.utcnow()
+    containers = cfg.client.containers.list(ignore_removed=True, sparse=True)
+
     for container in containers:
+        data = cfg.client.api.inspect_container(container.id)
+        last_event_time = max(
+            last_event_time,
+            # not sure why mypy doesn't know about this method:
+            datetime.fromisoformat(data['State']['StartedAt'][:26]),  # type: ignore
+        )
         process_running_container_labels(container.id)
+
     log.debug('Finished inspection of running containers.')
+    return last_event_time
 
 
 def listen(since: datetime = None) -> None:
@@ -166,7 +162,7 @@ def handle_unpause(event: dict) -> None:
     container_id = event['Actor']['ID']
     for job in jobs.get_jobs_for_container(container_id):
         log.info(
-            'Resuming job {job.kwargs["job_name"]} for {job.kwargs["container_name"]}'
+            f'Resuming job {job.kwargs["job_name"]} for {job.kwargs["container_name"]}'
         )
         job.resume()
 
@@ -198,9 +194,10 @@ def main() -> None:
             )
             raise SystemExit(1)
 
+        last_event_time = inspect_running_containers()
         jobs.start_scheduler()
-        inspection_time = inspect_running_containers()
-        listen(since=inspection_time)
+        listen(since=last_event_time + timedelta(microseconds=1))
+
     except SystemExit as e:
         exit_code = e.code
     except ConfigurationError as e:
