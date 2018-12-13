@@ -5,6 +5,7 @@ from apscheduler import events
 from apscheduler.job import Job
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.util import undefined as undefined_runtime
 
 from deck_chores.config import cfg
 from deck_chores.utils import generate_id
@@ -124,7 +125,9 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 ####
 
 
-def add(container_id: str, definitions: Mapping[str, Dict]) -> None:
+def add(
+    container_id: str, definitions: Mapping[str, Dict], paused: bool = False
+) -> None:
     container = cfg.client.containers.get(container_id)
     container_name = container.name
     log.debug(f'Adding jobs for {container_name}.')
@@ -152,9 +155,14 @@ def add(container_id: str, definitions: Mapping[str, Dict]) -> None:
             kwargs=definition,
             id=job_id,
             max_instances=definition['max'],
+            next_run_time=None if paused else undefined_runtime,
             replace_existing=True,
         )
-        log.info(f"Added '{job_name}' for {container_name}")
+        log.info(
+            "Added "
+            + ("paused " if paused else "")
+            + f"'{job_name}' for {container_name}"
+        )
 
 
 def remove(job_id: str) -> None:

@@ -20,6 +20,7 @@ History
 * *changed*: upgraded base image
 * *changed*: upgraded used Cerberus version
 * *fix*: includes the ``tzdata`` package in the image (:issue:`33`)
+* *fix*: add jobs as paused for paused containers on startup
 * *refactoring*: uses the Python Docker SDK 3.5 (:issue:`31`)
 
 0.2 (2018-02-23)

@@ -60,8 +60,9 @@ signal(SIGUSR1, sigusr1_handler)
 ####
 
 
-def process_running_container_labels(container_id: str) -> None:
+def process_started_container_labels(container_id: str, paused: bool = False) -> None:
     service_id, flags, definitions = parse.labels(container_id)
+
     if not definitions:
         return
 
@@ -70,14 +71,13 @@ def process_running_container_labels(container_id: str) -> None:
             log.debug(f'Service id has a registered job: {service_id}')
             return
 
-        log.info(f'Locking service id: {service_id}')
+        log.info(f'Locking service: {service_id}')
         locking_container_to_services_map[container_id] = service_id
-    jobs.add(container_id, definitions)
+
+    jobs.add(container_id, definitions, paused=paused)
 
 
 def inspect_running_containers() -> datetime:
-    # TODO handle paused containers
-
     log.info('Inspecting running containers.')
     last_event_time = datetime.utcnow()
     containers = cfg.client.containers.list(ignore_removed=True, sparse=True)
@@ -89,7 +89,9 @@ def inspect_running_containers() -> datetime:
             # not sure why mypy doesn't know about this method:
             datetime.fromisoformat(data['State']['StartedAt'][:26]),  # type: ignore
         )
-        process_running_container_labels(container.id)
+        process_started_container_labels(
+            container.id, paused=container.status == 'paused'
+        )
 
     log.debug('Finished inspection of running containers.')
     return last_event_time
@@ -124,7 +126,7 @@ def listen(since: datetime = None) -> None:
 def handle_start(event: dict) -> None:
     log.debug('Handling start.')
     container_id = event['Actor']['ID']
-    process_running_container_labels(container_id)
+    process_started_container_labels(container_id)
 
 
 def handle_die(event: dict) -> None:
