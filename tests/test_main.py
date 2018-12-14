@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pytest import mark
 
 from docker.models.containers import Container
@@ -34,7 +36,7 @@ def test_event_dispatching(cfg, mocker):
     )
     add = mocker.patch('deck_chores.jobs.add')
 
-    listen()
+    listen(datetime.utcnow())
     assert labels.call_count == 2
     assert add.call_count == 1
 

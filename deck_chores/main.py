@@ -97,9 +97,7 @@ def inspect_running_containers() -> datetime:
     return last_event_time
 
 
-def listen(since: datetime = None) -> None:
-    if since is None:
-        since = datetime.utcnow()
+def listen(since: datetime) -> None:
     log.info('Listening to events.')
     for event_json in cfg.client.events(since=since):
         if b'container' not in event_json:
