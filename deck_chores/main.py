@@ -23,7 +23,7 @@ lock = InterProcessLock('/tmp/deck-chores.lock')
 
 def there_is_another_deck_chores_container() -> bool:
     matched_containers = 0
-    for container in cfg.client.containers.list():
+    for container in cfg.client.containers.list(ignore_removed=True, sparse=True):
         if container.image.labels.get('org.label-schema.name', '') == 'deck-chores':
             matched_containers += 1
         if matched_containers > 1:
