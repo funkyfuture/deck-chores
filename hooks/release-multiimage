@@ -1,49 +1,23 @@
-#!/usr/bin/env bash
-
-# requires at least manifest-tool v0.6
-# https://github.com/estesp/manifest-tool
+#!/bin/sh
 
 set -e
 
 IMAGE=$1
 VERSION=$2
 
-PLATFORMS="amd64::amd64 arm:v7:armv7l"
-MANIFEST_FILE="$(dirname $0)/multiimage.yml"
+MANIFEST="${IMAGE}:${VERSION}"
 
-cat > $MANIFEST_FILE <<-EOF
-image: $IMAGE:$VERSION
-tags:
-  - latest
-manifests:
-EOF
+AMD64_IMAGE="${IMAGE}:${VERSION}-amd64"
+ARMV7L_IMAGE="${IMAGE}:${VERSION}-armv7l"
+docker manifest create "${MANIFEST}" "${AMD64_IMAGE}" "${ARMV7L_IMAGE}"
 
-for platform in $PLATFORMS ; do
-    architecture=$(echo $platform | cut -d: -f1)
-    variant=$(echo $platform | cut -d: -f2)
-    suffix=$(echo $platform | cut -d: -f3)
-    tag=$VERSION-$suffix
-    while ! docker pull $IMAGE:$tag ; do
-        sleep 10
-    done
+while ! docker pull ${AMD64_IMAGE} ; do sleep 10 ; done
+docker manifest annotate --arch "amd64" "${MANIFEST}" "${AMD64_IMAGE}"
+docker manifest inspect "${AMD64_IMAGE}"
 
-    cat >> $MANIFEST_FILE <<-EOF
-  - image: $IMAGE:$tag
-    platform:
-      architecture: $architecture
-      variant: $variant
-      os: linux
-EOF
+while ! docker pull ${ARMV7L_IMAGE} ; do sleep 10 ; done
+docker manifest annotate --arch "arm" --variant "v7" "${MANIFEST}" "${ARMV7L_IMAGE}"
+docker manifest inspect "${ARMV7L_IMAGE}"
 
-done
-
-
-cat $MANIFEST_FILE
-echo
-read -p "Push multiimage? " inp
-case $inp in
-    [Yy]*) manifest-tool push from-spec $MANIFEST_FILE ;;
-    *) ;;
-esac
-
-rm $MANIFEST_FILE
+docker manifest inspect "${MANIFEST}"
+docker manifest push "${MANIFEST}"
