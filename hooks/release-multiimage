@@ -9,15 +9,13 @@ MANIFEST="${IMAGE}:${VERSION}"
 
 AMD64_IMAGE="${IMAGE}:${VERSION}-amd64"
 ARMV7L_IMAGE="${IMAGE}:${VERSION}-armv7l"
-docker manifest create "${MANIFEST}" "${AMD64_IMAGE}" "${ARMV7L_IMAGE}"
 
 while ! docker pull ${AMD64_IMAGE} ; do sleep 10 ; done
-docker manifest annotate --arch "amd64" "${MANIFEST}" "${AMD64_IMAGE}"
-docker manifest inspect "${AMD64_IMAGE}"
-
 while ! docker pull ${ARMV7L_IMAGE} ; do sleep 10 ; done
+
+docker manifest create "${MANIFEST}" "${AMD64_IMAGE}" "${ARMV7L_IMAGE}"
+docker manifest annotate --arch "amd64" "${MANIFEST}" "${AMD64_IMAGE}"
 docker manifest annotate --arch "arm" --variant "v7" "${MANIFEST}" "${ARMV7L_IMAGE}"
-docker manifest inspect "${ARMV7L_IMAGE}"
 
 docker manifest inspect "${MANIFEST}"
 docker manifest push "${MANIFEST}"
