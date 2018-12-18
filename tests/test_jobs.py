@@ -44,4 +44,6 @@ def test_job_execution(capsys, cfg, mocker):
 
     scheduler.shutdown(wait=False)
 
-    assert container.exec_run.call_count == 2
+    container.exec_run.assert_has_calls(
+        2 * [mocker.call(cmd='sleep 2', user='test', environment={}, workdir=None)]
+    )
