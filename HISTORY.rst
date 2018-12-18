@@ -1,7 +1,7 @@
 History
 -------
 
-0.3-rc1 (unreleased)
+0.3-rc1 (2018-12-18)
 ~~~~~~~~~~~~~~~~~~~~
 
 * *new*: the container configuration ``options.user`` allows to set an executing user
@@ -19,6 +19,7 @@ History
 * *changed*: the environment variable ``DEFAULT_OPTIONS`` is renamed to ``DEFAULT_FLAGS``
 * *changed*: upgraded base image
 * *changed*: upgraded used Cerberus version
+* *changed*: requires Python 3.7
 * *fix*: includes the ``tzdata`` package in the image (:issue:`33`)
 * *fix*: add jobs as paused for paused containers on startup
 * *refactoring*: uses the Python Docker SDK 3.5 (:issue:`31`)
