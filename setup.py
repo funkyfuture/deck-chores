@@ -10,7 +10,7 @@ if version_info < (3, 7):
     raise RuntimeError("Requires Python 3.7 or later.")
 
 
-VERSION = '0.3.dev1'
+VERSION = '0.3-rc1'
 
 _old_cwd = getcwd()
 chdir(Path(__file__).parent)
@@ -29,7 +29,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author="Frank Sachsenheim",
     author_email='funkyfuture@riseup.net',
-    url='https://github.com/funkyfuture/deck_chores',
+    url='https://github.com/funkyfuture/deck-chores',
     packages=['deck_chores'],
     package_dir={'deck_chores': 'deck_chores'},
     include_package_data=True,
