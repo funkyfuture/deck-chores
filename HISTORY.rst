@@ -1,6 +1,11 @@
 History
 -------
 
+0.3 (2019-01-06)
+~~~~~~~~~~~~~~~~
+
+* *fix*: log the version at startup, not its variable name
+
 0.3-rc1 (2018-12-18)
 ~~~~~~~~~~~~~~~~~~~~
 
