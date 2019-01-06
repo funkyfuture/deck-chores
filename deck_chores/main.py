@@ -182,7 +182,7 @@ def main() -> None:
     if not lock.acquire(blocking=False):
         log.error(f"Couldn't acquire lock file at {lock.path}, exiting.")
         sys.exit(1)
-    log.info('Deck Chores {__version__} started.')
+    log.info(f'Deck Chores {__version__} started.')
     try:
         generate_config()
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
