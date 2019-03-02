@@ -10,7 +10,7 @@ if not getenv('READTHEDOCS', '') == 'True' and version_info < (3, 7):
     raise RuntimeError("Requires Python 3.7 or later.")
 
 
-VERSION = '0.3'
+VERSION = '0.3.1'
 
 _old_cwd = getcwd()
 chdir(Path(__file__).parent)

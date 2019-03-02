@@ -1,6 +1,11 @@
 History
 -------
 
+0.3.1 (2019-03-02)
+~~~~~~~~~~~~~~~~~~
+
+* *fix*: relax interpreter constraint for installations on rtfd.io
+
 0.3 (2019-01-06)
 ~~~~~~~~~~~~~~~~
 
