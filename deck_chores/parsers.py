@@ -84,8 +84,8 @@ class JobConfigValidator(cerberus.Validator):
             else:
                 for c in '.:/':
                     value = value.replace(c, ' ')
-                args = self._fill_args(value, 5, '0')  # type: ignore
-                args = tuple(int(x) for x in args)  # type: ignore
+                filled_args = self._fill_args(value, 5, '0')
+                args = tuple(int(x) for x in filled_args)  # type: ignore
         return IntervalTrigger, args
 
     def _normalize_coerce_timeunits(self, value: str) -> Optional[int]:
@@ -190,8 +190,7 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
     filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
     flags, user = _parse_options(filtered_labels)
 
-    # just for type information
-    jobs_labels = {}  # type: Mapping[str, str]
+    jobs_labels: Mapping[str, str]
 
     if 'image' in flags:
         image_labels = _image_definition_labels_of_container(container_id)
@@ -279,9 +278,9 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
 def _parse_job_definitions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
     log.debug(f'Considering labels for job definitions: {_labels}')
 
-    name_grouped_definitions = defaultdict(
-        dict
-    )  # type: DefaultDict[str, Dict[str, Union[str, Dict]]]
+    name_grouped_definitions: DefaultDict[
+        str, Dict[str, Union[str, Dict]]
+    ] = defaultdict(dict)
 
     for key, value in _labels.items():
         key = key[len(cfg.label_ns) :]  # noqa: E203
