@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-from os import chdir, getcwd, getenv
+from os import chdir, getcwd
 from pathlib import Path
 from setuptools import setup
-from sys import version_info
-
-
-if not getenv('READTHEDOCS', '') == 'True' and version_info < (3, 7):
-    raise RuntimeError("Requires Python 3.7 or later.")
 
 
 VERSION = '0.3.1'
