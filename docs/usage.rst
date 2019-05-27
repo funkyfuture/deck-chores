@@ -113,13 +113,13 @@ cron       a :ref:`cron` definition
 date       a :ref:`date` definition
 env        this namespace holds environment variables that are set on the
            command's context
-interval   a :ref:`interval` definition
+interval   an :ref:`interval` definition
 jitter     the maximum length of a random delay before each job's execution (in
            conjunction with a :ref:`cron` or :ref:`interval` trigger); can be
-           either a number that define seconds or numbers with a subsequent
-           time unit indicator like the :ref:`interval` trigger can be defined
-           with max the maximum of simultaneously running command instances,
-           defaults to :envvar:`DEFAULT_MAX`
+           either a number that define seconds or a number with a subsequent
+           time unit indicator like the :ref:`interval` trigger
+max        the maximum of simultaneously running command instances, defaults to
+           :envvar:`DEFAULT_MAX`
 timezone   the timezone that the trigger relates to, defaults to
            :envvar:`TIMEZONE`
 user       the user to run the command; see :ref:`the user option <options-user>` for details
