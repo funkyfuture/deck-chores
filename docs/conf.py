@@ -57,7 +57,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'deck-chores'
-copyright = '2016, Frank Sachsenheim'
+copyright = '2016-2019, Frank Sachsenheim'
 
 # Settings for `sphinxcontrib.issuetracker`
 issuetracker = 'github'
