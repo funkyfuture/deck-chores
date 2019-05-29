@@ -26,6 +26,7 @@ COPY . /src
 RUN apk upgrade --no-cache \
  && apk add --no-cache --virtual .build-deps build-base ca-certificates libffi-dev openssl-dev \
  && apk add --no-cache tini tzdata \
+ && echo "UTC" > /etc/timezone \
  && python /src/setup.py install \
  && rm -Rf /root/.cache \
  && apk del .build-deps
