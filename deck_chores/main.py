@@ -207,7 +207,9 @@ def shutdown() -> None:
         jobs.scheduler.shutdown()
     except SchedulerNotRunningError:
         pass
-    cfg.client.close()
+
+    if hasattr(cfg, "client"):
+        cfg.client.close()
 
 
 ####
