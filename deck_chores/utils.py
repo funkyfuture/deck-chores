@@ -4,7 +4,7 @@ import os
 import sys
 from functools import lru_cache
 from typing import Optional, Tuple, Union
-from uuid import NAMESPACE_OID, uuid5
+from uuid import NAMESPACE_DNS, uuid5
 
 
 TIME_UNIT_MULTIPLIERS = {
@@ -14,6 +14,7 @@ TIME_UNIT_MULTIPLIERS = {
     'd': 1 * 60 * 60 * 24,
     'w': 1 * 60 * 60 * 24 * 7,
 }
+UUID_NAMESPACE = uuid5(NAMESPACE_DNS, "deck-chores.readthedocs.io")
 
 
 def from_json(s: Union[bytes, str]) -> dict:
@@ -24,7 +25,7 @@ def from_json(s: Union[bytes, str]) -> dict:
 
 @lru_cache(128)
 def generate_id(*args) -> str:
-    return str(uuid5(NAMESPACE_OID, ''.join(args)))
+    return str(uuid5(UUID_NAMESPACE, ''.join(args)))
 
 
 @lru_cache(64)
@@ -74,14 +75,14 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
 def split_string(
     value: str, delimiter: str = ',', strip: bool = True, sort: bool = False
 ) -> Tuple[str, ...]:
-    result = []
-    for part in value.split(delimiter):
-        if strip:
-            result.append(part.strip())
-        else:
-            result.append(part)
+    result = value.split(delimiter)
+
+    if strip:
+        result = [x.strip() for x in result]
+
     if sort:
         result.sort()
+
     return tuple(result)
 
 
