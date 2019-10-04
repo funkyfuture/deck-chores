@@ -1,12 +1,12 @@
-FROM python:alpine3.8
+FROM python:alpine
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["deck-chores"]
 LABEL org.label-schema.name="deck-chores"
 ENV DEBUG=true
 
-RUN apk add --no-cache tini \
- && pip install cerberus~=1.1 docker~=2.4 fasteners~=0.14 APScheduler~=3.3
+RUN apk add --no-cache build-base libffi-dev openssl-dev tini tzdata \
+ && pip install cerberus~=1.2 docker[ssh,tls]~=4.0 fasteners~=0.14 APScheduler~=3.6
 
 COPY . /src
 

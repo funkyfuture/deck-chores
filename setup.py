@@ -34,9 +34,9 @@ setup(
     package_dir={'deck_chores': 'deck_chores'},
     include_package_data=True,
     install_requires=[
-        'APScheduler~=3.5',
+        'APScheduler~=3.6',
         'cerberus~=1.2',
-        'docker~=3.5',
+        'docker[ssh,tls]~=4.0',
         'fasteners~=0.14',
     ],
     license="ISC license",
