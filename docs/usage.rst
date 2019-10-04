@@ -76,6 +76,16 @@ non-stopping no-op command as main process like in this snippet of a ``docker-co
           deck-chores.short.interval: daily
 
 
+Making jobs' output available to ``docker logs``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Docker captures the output of the first process in a container as logged data. In order to capture
+the output of a job's command as well, its output needs to be redirected to the main process'
+``stdout`` or ``stderr``, e.g. with by redirecting a command's output with a shell::
+
+    deck-chores.a_job.command: sh -c "/usr/local/bin/job_script.sh &> /proc/1/fd/1"
+
+
 Listing all registered jobs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
