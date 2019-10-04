@@ -161,7 +161,7 @@ def add(
         log.info(
             "Added "
             + ("paused " if paused else "")
-            + f"'{job_name}' for {container_name}"
+            + f"'{job_name}' for {container_name} with id {job_id}"
         )
 
 

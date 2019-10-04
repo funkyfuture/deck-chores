@@ -276,7 +276,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
 
 
 def _parse_job_definitions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
-    log.debug(f'Considering labels for job definitions: {_labels}')
+    log.debug(f'Considering labels for job definitions: {dict(_labels)}')
 
     name_grouped_definitions: DefaultDict[
         str, Dict[str, Union[str, Dict]]
@@ -294,7 +294,7 @@ def _parse_job_definitions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
             name, attribute = key.split('.', 1)
             name_grouped_definitions[name][attribute] = value
 
-    log.debug(f'Job definitions: {name_grouped_definitions}')
+    log.debug(f'Job definitions: {dict(name_grouped_definitions)}')
 
     result = {}
     for name, definition in name_grouped_definitions.items():
