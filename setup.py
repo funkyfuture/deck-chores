@@ -35,7 +35,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'APScheduler~=3.6',
-        'cerberus~=1.2',
+        'cerberus~=1.3',
         'docker[ssh,tls]~=4.0',
         'fasteners~=0.14',
     ],

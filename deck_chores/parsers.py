@@ -93,7 +93,7 @@ class JobConfigValidator(cerberus.Validator):
             return parse_time_from_string_with_units(value)
         return int(value)
 
-    def _validator_trigger(self, field, value):
+    def _check_with_trigger(self, field, value):
         if isinstance(value, str):  # normalization failed
             return
 
@@ -114,13 +114,13 @@ job_def_validator = JobConfigValidator(
         'command': {'required': True},
         'cron': {
             'coerce': 'cron',
-            'validator': 'trigger',
+            'check_with': 'trigger',
             'required': True,
             'excludes': ['date', 'interval'],
         },
         'date': {
             'coerce': 'date',
-            'validator': 'trigger',
+            'check_with': 'trigger',
             'required': True,
             'excludes': ['cron', 'interval'],
             'dependencies': {'jitter': None},
@@ -128,7 +128,7 @@ job_def_validator = JobConfigValidator(
         'environment': {'type': 'dict', 'default': {}},
         'interval': {
             'coerce': 'interval',
-            'validator': 'trigger',
+            'check_with': 'trigger',
             'required': True,
             'excludes': ['cron', 'date'],
         },
