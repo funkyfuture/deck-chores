@@ -31,10 +31,10 @@ Likewise, docker-compose_ can be used with such configuration:
           - /var/run/docker.sock:/var/run/docker.sock
 
 
-You could also install `deck-chores` from the Python Package Index with ``pip`` or ``pipsi``
+You could also install `deck-chores` from the Python Package Index with ``pip`` or ``pipx``
 (recommended)::
 
-    $ pipsi install deck-chores
+    $ pipx install deck-chores
 
 and then run it::
 
