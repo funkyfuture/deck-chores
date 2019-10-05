@@ -9,8 +9,7 @@ from fasteners import InterProcessLock
 
 import deck_chores.parsers as parse
 from deck_chores import __version__, jobs, services
-from deck_chores.config import cfg, generate_config
-from deck_chores.exceptions import ConfigurationError
+from deck_chores.config import cfg, generate_config, ConfigurationError
 from deck_chores.utils import from_json, log, log_handler
 
 
@@ -147,13 +146,14 @@ def listen(since: datetime) -> None:
         if event['Type'] != 'container':
             continue
 
-        elif event['Action'] == 'start':
+        action = event['Action']
+        if action == 'start':
             handle_start(event)
-        elif event['Action'] == 'die':
+        elif action == 'die':
             handle_die(event)
-        elif event['Action'] == 'pause':
+        elif action == 'pause':
             handle_pause(event)
-        elif event['Action'] == 'unpause':
+        elif action == 'unpause':
             handle_unpause(event)
 
 

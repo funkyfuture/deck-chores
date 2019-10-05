@@ -95,13 +95,14 @@ log.addHandler(log_handler)
 log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INFO)
 
 
-__all__ = [
+# TODO remove ignore when this issue is solved:
+#      https://github.com/python/mypy/issues/1317
+__all__ = (
     from_json.__name__,
     'log',
     'log_handler',
-    # https://github.com/python/mypy/issues/1317
     parse_time_from_string_with_units.__name__,  # type: ignore
     seconds_as_interval_tuple.__name__,  # type: ignore
     split_string.__name__,  # type: ignore
     trueish.__name__,
-]
+)

@@ -2,7 +2,7 @@ from pytest import mark
 
 from docker.models.containers import Container
 
-from deck_chores.parsers import _parse_labels as parse_labels
+from deck_chores.parsers import labels as parse_labels
 from deck_chores.parsers import (
     _parse_flags,
     CronTrigger,

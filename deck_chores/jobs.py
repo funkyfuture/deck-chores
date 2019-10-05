@@ -3,12 +3,11 @@ from typing import Dict, List, Mapping, Tuple
 
 from apscheduler import events
 from apscheduler.job import Job
-from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.util import undefined as undefined_runtime
 
 from deck_chores.config import cfg
-from deck_chores.utils import generate_id
+from deck_chores.utils import generate_id, log
 
 
 ####
@@ -16,12 +15,6 @@ from deck_chores.utils import generate_id
 CAPTURED_OPENER = '== BEGIN of captured stdout & stderr =='
 CAPTURED_CLOSER = '== END of captured stdout & stderr ===='
 CAPTURED_SURROUNDING_LENGTH = len(CAPTURED_OPENER)
-
-
-####
-
-
-log = logging.getLogger('deck_chores')
 
 
 ####
@@ -165,13 +158,6 @@ def add(
         )
 
 
-def remove(job_id: str) -> None:
-    try:
-        scheduler.remove_job(job_id)
-    except JobLookupError as e:
-        log.critical(str(e))
-
-
 ####
 
 
@@ -182,3 +168,11 @@ def get_jobs_for_container(container_id: str) -> List[Job]:
         if job.kwargs['container_id'] == container_id:
             result.append(job)
     return result
+
+
+__all__ = (
+    "scheduler",
+    "start_scheduler",
+    add.__name__,
+    get_jobs_for_container.__name__,
+)

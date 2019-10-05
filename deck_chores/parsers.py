@@ -9,9 +9,9 @@ from apscheduler.triggers.interval import IntervalTrigger
 from pytz import all_timezones
 
 from deck_chores.config import cfg
-from deck_chores.exceptions import ParsingError
 from deck_chores.services import ServiceIdentifier
 from deck_chores.utils import (
+    log,
     parse_time_from_string_with_units,
     seconds_as_interval_tuple,
     split_string,
@@ -35,12 +35,6 @@ NAME_INTERVAL_MAP = {
     'every minute': (0, 0, 0, 1, 0),
     'every second': (0, 0, 0, 0, 1),
 }
-
-
-####
-
-
-log = logging.getLogger('deck_chores')
 
 
 ####
@@ -147,31 +141,9 @@ job_def_validator = JobConfigValidator(
 ####
 
 
-def labels(*args, **kwargs) -> Tuple[ServiceIdentifier, str, Mapping[str, Dict]]:
-    # don't call this from unittests
-    try:
-        return _parse_labels(*args, **kwargs)
-
-    except ParsingError as e:
-        if isinstance(e.args[0], str):
-            lines = e.args[0].splitlines()
-        elif isinstance(e.args[0], list):
-            lines = e.args[0]
-        else:
-            raise RuntimeError
-
-        for line in lines:
-            if isinstance(line, str):
-                log.error(line)
-            elif isinstance(line, Exception):
-                log.exception(line)
-        return (), '', {}
-
-
+# TODO make cache size configurable
 @lru_cache()
-def _parse_labels(
-    container_id: str
-) -> Tuple[ServiceIdentifier, str, Mapping[str, Dict]]:
+def labels(container_id: str) -> Tuple[ServiceIdentifier, str, Mapping[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
 
@@ -257,7 +229,6 @@ def _parse_service_id(_labels: Dict[str, str]) -> ServiceIdentifier:
     return tuple(f"{k}={v}" for k, v in filtered_labels.items())
 
 
-@lru_cache()
 def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
     labels = cfg.client.containers.get(container_id).image.labels
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
@@ -311,4 +282,6 @@ def _parse_job_definitions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
 ####
 
 
-__all__ = [labels.__name__]
+# TODO remove ignore when this issue is solved:
+#      https://github.com/python/mypy/issues/1317
+__all__ = (labels.__name__,)  # type: ignore

@@ -1,13 +1,12 @@
 import logging
+import ssl
 from os import environ
 from os.path import exists
-import ssl
 from types import SimpleNamespace
 
 import docker
 from docker.constants import DEFAULT_TIMEOUT_SECONDS
 
-from deck_chores.exceptions import ConfigurationError
 from deck_chores.utils import split_string, trueish
 
 
@@ -21,6 +20,10 @@ getenv = local_environment.get
 
 
 ####
+
+
+class ConfigurationError(Exception):
+    pass
 
 
 def _handle_deprecated():
@@ -77,4 +80,4 @@ def generate_config() -> None:
     )
 
 
-__all__ = ['cfg', generate_config.__name__]
+__all__ = ('cfg', generate_config.__name__, ConfigurationError.__name__)
