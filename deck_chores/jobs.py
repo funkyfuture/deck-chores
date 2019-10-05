@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Mapping, Tuple
+from typing import Dict, Iterator, Mapping, Tuple
 
 from apscheduler import events
 from apscheduler.job import Job
@@ -161,13 +161,11 @@ def add(
 ####
 
 
-def get_jobs_for_container(container_id: str) -> List[Job]:
-    # TODO make that an index
-    result = []
+def get_jobs_for_container(container_id: str) -> Iterator[Job]:
+    assert container_id, container_id
     for job in scheduler.get_jobs():
         if job.kwargs['container_id'] == container_id:
-            result.append(job)
-    return result
+            yield job
 
 
 __all__ = (
