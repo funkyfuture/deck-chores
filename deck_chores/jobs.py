@@ -109,7 +109,6 @@ def exec_job(**definition) -> Tuple[int, bytes]:
     if not cfg.client.containers.list(
         filters={'id': container_id, 'status': 'running'}
     ):
-        scheduler.remove_job(job_id)
         assert scheduler.get_job(job_id) is None
         raise AssertionError('Container is not running.')
     # end of sanity checks
@@ -131,8 +130,9 @@ def add(
     container = cfg.client.containers.get(container_id)
     container_name = container.name
     log.debug(f'Adding jobs for {container_name}.')
+
     for job_name, definition in definitions.items():
-        job_id = generate_id(container_id, job_name)
+        job_id = generate_id(*definition.get("service_id") or (container_id,), job_name)
 
         definition.update(
             {

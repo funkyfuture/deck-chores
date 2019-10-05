@@ -1,26 +1,17 @@
 from functools import lru_cache
 from collections import defaultdict, ChainMap
-import logging
-from typing import (  # noqa: F401
-    DefaultDict,
-    Dict,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import DefaultDict, Dict, Mapping, Optional, Tuple, Type, Union
 
+import cerberus
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-import cerberus
 from pytz import all_timezones
 
 from deck_chores.config import cfg
 from deck_chores.exceptions import ParsingError
+from deck_chores.services import ServiceIdentifier
 from deck_chores.utils import (
-    generate_id,
     parse_time_from_string_with_units,
     seconds_as_interval_tuple,
     split_string,
@@ -156,7 +147,7 @@ job_def_validator = JobConfigValidator(
 ####
 
 
-def labels(*args, **kwargs) -> Tuple[str, str, Mapping[str, Dict]]:
+def labels(*args, **kwargs) -> Tuple[ServiceIdentifier, str, Mapping[str, Dict]]:
     # don't call this from unittests
     try:
         return _parse_labels(*args, **kwargs)
@@ -174,14 +165,13 @@ def labels(*args, **kwargs) -> Tuple[str, str, Mapping[str, Dict]]:
                 log.error(line)
             elif isinstance(line, Exception):
                 log.exception(line)
-        return '', '', {}
-
-    except Exception as e:
-        raise e
+        return (), '', {}
 
 
 @lru_cache()
-def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
+def _parse_labels(
+    container_id: str
+) -> Tuple[ServiceIdentifier, str, Mapping[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
 
@@ -209,7 +199,6 @@ def _parse_labels(container_id: str) -> Tuple[str, str, Mapping[str, Dict]]:
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
         for job_definition in job_definitions.values():
-            # this is informative, not functional
             job_definition['service_id'] = service_id
     return service_id, flags, job_definitions
 
@@ -251,11 +240,11 @@ def _parse_flags(options: Optional[str]) -> str:
     return result_string
 
 
-def _parse_service_id(_labels: Dict[str, str]) -> str:
+def _parse_service_id(_labels: Dict[str, str]) -> ServiceIdentifier:
     filtered_labels = {k: v for k, v in _labels.items() if k in cfg.service_identifiers}
     log.debug(f'Considering labels for service id: {filtered_labels}')
     if not filtered_labels:
-        return ''
+        return ()
 
     if len(filtered_labels) != len(cfg.service_identifiers):
         log.critical(
@@ -263,10 +252,9 @@ def _parse_service_id(_labels: Dict[str, str]) -> str:
                 ', '.join(set(cfg.service_identifiers) - set(filtered_labels))
             )
         )
-        return ''
+        return ()
 
-    identifiers = tuple(filtered_labels[x] for x in cfg.service_identifiers)
-    return generate_id(*identifiers)
+    return tuple(f"{k}={v}" for k, v in filtered_labels.items())
 
 
 @lru_cache()

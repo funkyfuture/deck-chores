@@ -1,18 +1,17 @@
-from datetime import datetime, timedelta
 import logging
 import sys
+from datetime import datetime, timedelta
 from signal import signal, SIGINT, SIGTERM, SIGUSR1
+from typing import Optional
 
 from apscheduler.schedulers import SchedulerNotRunningError
 from fasteners import InterProcessLock
 
-from deck_chores import __version__  # noqa: F401  # used only in f-string
+import deck_chores.parsers as parse
+from deck_chores import __version__, jobs, services
 from deck_chores.config import cfg, generate_config
 from deck_chores.exceptions import ConfigurationError
-from deck_chores.indexes import locking_container_to_services_map
-from deck_chores import jobs
-import deck_chores.parsers as parse
-from deck_chores.utils import from_json, generate_id, log, log_handler
+from deck_chores.utils import from_json, log, log_handler
 
 
 ####
@@ -67,12 +66,16 @@ def process_started_container_labels(container_id: str, paused: bool = False) ->
         return
 
     if service_id and 'service' in flags:
-        if service_id in locking_container_to_services_map.values():
-            log.debug(f'Service id has a registered job: {service_id}')
+        other_container_id = services.service_id_to_container_id.get(service_id)
+        if other_container_id:
+            log.debug(
+                f'Service id {service_id} is locked by container {other_container_id}.'
+            )
+            if cfg.client.containers.get(other_container_id).status == "paused":
+                assert reassign_jobs(other_container_id, consider_paused=False)
             return
 
-        log.info(f'Locking service: {service_id}')
-        locking_container_to_services_map[container_id] = service_id
+        services.assign(service_id, container_id)
 
     jobs.add(container_id, definitions, paused=paused)
 
@@ -95,6 +98,39 @@ def inspect_running_containers() -> datetime:
 
     log.debug('Finished inspection of running containers.')
     return last_event_time
+
+
+def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
+    other_service_container = services.find_other_container_for_service(
+        container_id, consider_paused
+    )
+
+    if other_service_container is None:
+        return None
+
+    new_id = other_service_container.id
+    container_is_paused = other_service_container.status == "paused"
+    log.debug(f"Reassigning jobs from container {container_id} to {new_id}.")
+
+    for job in jobs.get_jobs_for_container(container_id):
+        log.debug(f"Handling job: {job.kwargs}")
+        job_is_paused = not bool(job.next_run_time)
+
+        if container_is_paused and not job_is_paused:
+            job.pause()
+            log.debug(f"Paused job.")
+        elif not container_is_paused and job_is_paused:
+            job.resume()
+            log.debug(f"Resumed job.")
+
+        job.modify(kwargs={**job.kwargs, "container_id": new_id})
+
+    services.reassign_container(container_id, new_id)
+
+    return new_id
+
+
+####
 
 
 def listen(since: datetime) -> None:
@@ -121,50 +157,49 @@ def listen(since: datetime) -> None:
             handle_unpause(event)
 
 
-def handle_start(event: dict) -> None:
-    log.debug('Handling start.')
+def handle_start(event: dict):
     container_id = event['Actor']['ID']
-    process_started_container_labels(container_id)
+    log.debug(f'Handling start of {container_id}.')
+    process_started_container_labels(container_id, paused=False)
 
 
-def handle_die(event: dict) -> None:
-    log.debug('Handling die.')
+def handle_die(event: dict):
     container_id = event['Actor']['ID']
-    service_id, flags, definitions = parse.labels(container_id)
-    if not definitions:
-        return
-
-    if service_id and 'service' in flags:
-        if container_id in locking_container_to_services_map:
-            log.info(f'Unlocking service id: {service_id}')
-            del locking_container_to_services_map[container_id]
-        else:
-            return
-
-    container_name = cfg.client.containers.get(container_id).name
-    for job_name in definitions:
-        log.info(f"Removing job '{job_name}' for {container_name}")
-        jobs.remove(generate_id(container_id, job_name))
+    log.debug(f'Handling die of {container_id}.')
+    if reassign_jobs(container_id, consider_paused=True) is None:
+        for job in jobs.get_jobs_for_container(container_id):
+            log.debug(f"Removing job: {job.kwargs}")
+            job.remove()
+        services.remove_by_container_id(container_id)
 
 
-def handle_pause(event: dict) -> None:
-    log.debug('Handling pause.')
+def handle_pause(event: dict):
     container_id = event['Actor']['ID']
+    log.debug(f'Handling pause of {container_id}.')
+
+    if reassign_jobs(container_id, consider_paused=False) is None:
+        for job in jobs.get_jobs_for_container(container_id):
+            job.pause()
+            log.debug(f"Paused job: {job.kwargs}")
+
+
+def handle_unpause(event: dict):
+    container_id = event['Actor']['ID']
+    log.debug(f'Handling unpause of {container_id}.')
+
+    if container_id not in services.container_id_to_service_id:
+        service_id, _, _ = parse.labels(container_id)
+        if service_id:
+            other_container_id = services.service_id_to_container_id.get(service_id)
+            if (
+                other_container_id is not None
+                and cfg.client.containers.get(other_container_id).status == "paused"
+            ):
+                container_id = reassign_jobs(other_container_id, consider_paused=False)
+
     for job in jobs.get_jobs_for_container(container_id):
-        log.info(
-            f'Pausing job {job.kwargs["job_name"]} for {job.kwargs["container_name"]}'
-        )
-        job.pause()
-
-
-def handle_unpause(event: dict) -> None:
-    log.debug('Handling unpause.')
-    container_id = event['Actor']['ID']
-    for job in jobs.get_jobs_for_container(container_id):
-        log.info(
-            f'Resuming job {job.kwargs["job_name"]} for {job.kwargs["container_name"]}'
-        )
         job.resume()
+        log.debug(f"Resumed job: {job.kwargs}")
 
 
 def shutdown() -> None:

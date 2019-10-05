@@ -26,18 +26,23 @@ _events = b'''{"status":"rename","id":"a84c8e16c1b1b2339bd276f725f08425935c51a5d
 def test_event_dispatching(cfg, mocker):
     cfg.client.events.return_value = (x for x in _events.splitlines() if x)
     container = mocker.MagicMock()
-    container.name = 'foo'
+    container.name = 'sojus_beep_1'
     cfg.client.containers.get.return_value = container
     definition = _parse_job_definitions(
-        {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '15'}
+        {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '15m'}
     )
     labels = mocker.patch(
-        'deck_chores.parsers.labels', return_value=('foo', 'service', definition)
+        'deck_chores.parsers.labels',
+        return_value=(
+            ("com.docker.compose.project=sojus", "com.docker.compose.service=beep"),
+            'service',
+            definition,
+        ),
     )
     add = mocker.patch('deck_chores.jobs.add')
 
     listen(datetime.utcnow())
-    assert labels.call_count == 2
+    assert labels.call_count == 1
     assert add.call_count == 1
 
 
