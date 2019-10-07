@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from docker.api import APIClient
 from docker.client import DockerClient
 import pytest
@@ -21,3 +23,8 @@ def cfg(mocker):
     )
     cfg.timezone = 'UTC'
     yield cfg
+
+
+@pytest.fixture
+def fixtures():
+    return Path(__file__).parent / "fixtures"

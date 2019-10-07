@@ -2,34 +2,20 @@ from datetime import datetime
 
 from pytest import mark
 
+from apscheduler.triggers.interval import IntervalTrigger
 from docker.models.containers import Container
 
 from deck_chores.main import listen, there_is_another_deck_chores_container
 from deck_chores.parsers import _parse_job_definitions
 
 
-_events = b'''{"status":"rename","id":"a84c8e16c1b1b2339bd276f725f08425935c51a5d2c68c5d28ec786c68155830","from":"sojus_beep","Type":"container","Action":"rename","Actor":{"ID":"a84c8e16c1b1b2339bd276f725f08425935c51a5d2c68c5d28ec786c68155830","Attributes":{"com.docker.compose.config-hash":"1319acc48e2ae136c2728263c594ddcf874dc7d1ea906236080ea6b37dc1851f","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"a84c8e16c1b1_sojus_beep_1","oldName":"/sojus_beep_1"}},"time":1481662806,"timeNano":1481662806327986727}\n
-{"status":"create","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"create","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1"}},"time":1481662807,"timeNano":1481662807469639050}\n
-{"Type":"network","Action":"disconnect","Actor":{"ID":"f3f85b06a56107f4358538d554df5ba0664f43e553585c66e5d4c0646daf752b","Attributes":{"container":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","name":"sojus_default","type":"bridge"}},"time":1481662807,"timeNano":1481662807584951463}\n
-{"Type":"network","Action":"connect","Actor":{"ID":"f3f85b06a56107f4358538d554df5ba0664f43e553585c66e5d4c0646daf752b","Attributes":{"container":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","name":"sojus_default","type":"bridge"}},"time":1481662807,"timeNano":1481662807944818738}\n
-{"status":"start","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"start","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1"}},"time":1481662808,"timeNano":1481662808694670749}\n
-{"status":"destroy","id":"a84c8e16c1b1b2339bd276f725f08425935c51a5d2c68c5d28ec786c68155830","from":"sojus_beep","Type":"container","Action":"destroy","Actor":{"ID":"a84c8e16c1b1b2339bd276f725f08425935c51a5d2c68c5d28ec786c68155830","Attributes":{"com.docker.compose.config-hash":"1319acc48e2ae136c2728263c594ddcf874dc7d1ea906236080ea6b37dc1851f","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"a84c8e16c1b1_sojus_beep_1"}},"time":1481662808,"timeNano":1481662808774228540}\n
-{"status":"pause","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"pause","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1"}},"time":1481662814,"timeNano":1481662814240938618}\n
-{"status":"unpause","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"unpause","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1"}},"time":1481662817,"timeNano":1481662817234268429}\n
-{"status":"kill","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"kill","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1","signal":"15"}},"time":1481662822,"timeNano":1481662822612737795}\n
-{"status":"kill","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"kill","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1","signal":"9"}},"time":1481662832,"timeNano":1481662832614494260}\n
-{"status":"die","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"die","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","exitCode":"137","image":"sojus_beep","name":"sojus_beep_1"}},"time":1481662832,"timeNano":1481662832668193924}\n
-{"Type":"network","Action":"disconnect","Actor":{"ID":"f3f85b06a56107f4358538d554df5ba0664f43e553585c66e5d4c0646daf752b","Attributes":{"container":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","name":"sojus_default","type":"bridge"}},"time":1481662833,"timeNano":1481662833259012276}\n
-{"status":"stop","id":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","from":"sojus_beep","Type":"container","Action":"stop","Actor":{"ID":"8c0ea93ef7145750d2a39b893977500810f065ccbf004b41ebd30b2224778d58","Attributes":{"com.docker.compose.config-hash":"e3d91116d5749958cb37be661e8e7717c9303c16fec89112753b645db4c960c6","com.docker.compose.container-number":"1","com.docker.compose.oneoff":"False","com.docker.compose.project":"sojus","com.docker.compose.service":"beep","com.docker.compose.version":"1.9.0","deck-chores.beep.command":"/beep.sh","deck-chores.beep.interval":"15","image":"sojus_beep","name":"sojus_beep_1"}},"time":1481662833,"timeNano":1481662833364283106}'''  # noqa: E501
+def test_event_dispatching(cfg, fixtures, mocker):
+    cfg.client.events.return_value = (
+        (fixtures / "events_00.txt").read_bytes().splitlines()
+    )
 
-
-def test_event_dispatching(cfg, mocker):
-    cfg.client.events.return_value = (x for x in _events.splitlines() if x)
-    container = mocker.MagicMock()
-    container.name = 'sojus_beep_1'
-    cfg.client.containers.get.return_value = container
     definition = _parse_job_definitions(
-        {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '15m'}
+        {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '10m'}
     )
     labels = mocker.patch(
         'deck_chores.parsers.labels',
@@ -39,11 +25,78 @@ def test_event_dispatching(cfg, mocker):
             definition,
         ),
     )
-    add = mocker.patch('deck_chores.jobs.add')
+
+    call_recorder = mocker.Mock()
+    call_recorder.attach_mock(labels, "label")
+    call_recorder.attach_mock(mocker.patch("deck_chores.jobs.add"), "add")
+    call_recorder.attach_mock(
+        mocker.patch("deck_chores.main.reassign_jobs"), "reassign_jobs"
+    )
 
     listen(datetime.utcnow())
-    assert labels.call_count == 1
-    assert add.call_count == 1
+
+    _ = mocker.call
+    expected_calls = [
+        # start A
+        _.label("cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed"),
+        _.add(
+            'cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed',
+            {
+                'beep': {
+                    'command': '/beep.sh',
+                    'name': 'beep',
+                    'environment': {},
+                    'jitter': None,
+                    'max': 1,
+                    'timezone': 'UTC',
+                    'trigger': (IntervalTrigger, (0, 0, 0, 10, 0)),
+                }
+            },
+            paused=False,
+        ),
+        # start B
+        _.label("278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91"),
+        # pause A
+        _.reassign_jobs(
+            "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed",
+            consider_paused=False,
+        ),
+        # unpause A
+        # stop B
+        _.reassign_jobs(
+            "278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91",
+            consider_paused=True,
+        ),
+        # start B
+        _.label("278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91"),
+        # stop A
+        _.reassign_jobs(
+            "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed",
+            consider_paused=True,
+        ),
+        # pause B
+        _.reassign_jobs(
+            "278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91",
+            consider_paused=False,
+        ),
+        # start A
+        _.label("cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed"),
+        # stop A
+        _.reassign_jobs(
+            "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed",
+            consider_paused=True,
+        ),
+    ]
+
+    # actual_calls = call_recorder.mock_calls
+    # for act, exp in zip(actual_calls, expected_calls):
+    #     assert act == exp
+    # if len(expected_calls) < len(actual_calls):
+    #     raise AssertionError(f"Unexpected call: {actual_calls[len(expected_calls)]}")
+    # elif len(actual_calls) < len(expected_calls):
+    #     raise AssertionError(f"Missed call: {expected_calls[len(actual_calls)]}")
+
+    assert call_recorder.mock_calls == expected_calls
 
 
 @mark.parametrize(
