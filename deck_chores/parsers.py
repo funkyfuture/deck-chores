@@ -8,7 +8,7 @@ from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from pytz import all_timezones
 
-from deck_chores.config import cfg
+from deck_chores.config import cfg, CONTAINER_CACHE_SIZE
 from deck_chores.utils import (
     log,
     parse_time_from_string_with_units,
@@ -138,8 +138,7 @@ job_config_validator = JobConfigValidator(
 ####
 
 
-# TODO make cache size configurable
-@lru_cache()
+@lru_cache(CONTAINER_CACHE_SIZE)
 def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
@@ -174,7 +173,7 @@ def _parse_options(_labels: Dict[str, str]) -> Tuple[str, str]:
     return flags, user
 
 
-@lru_cache(4)
+@lru_cache(16)
 def _parse_flags(options: str) -> str:
     result = set(cfg.default_flags)
     if options:

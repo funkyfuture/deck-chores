@@ -244,10 +244,10 @@ There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``ev
 
 .. note::
 
-    Though it uses the same units of measurement, an interval is different from a point in time of
-    a specific calendar system, it describes the time *between* two events. Hence you should
-    expect a job that is defined with this type of trigger to run the defined time *after* the job
-    has been registered. To define a point in time, see cron_.
+    Though it uses the same units of measurement, an interval is different from recurring a point
+    in time of a specific calendar system, it describes the time *between* two events. Hence you
+    should expect a job that is defined with this type of trigger to run the defined time *after*
+    the job has been registered. To define a recurring point in time, see the cron_ trigger.
 
 .. caution::
 
@@ -313,6 +313,14 @@ deck-chore's behaviour is defined by these environment variables:
 
     The timeout for responses from the Docker daemon in seconds without unit indicator. The
     default is imported from *docker-py*.
+
+.. envvar:: CONTAINER_CACHE_SIZE
+
+    default: ``128``
+
+    The size of caches that save immutable container properties, like the parsed and possibly
+    absent job definitions. Since memory is cheap and so are the stored objects, increase this when
+    you have a lot of containers floating around to reduce latency.
 
 .. envvar:: DOCKER_HOST
 

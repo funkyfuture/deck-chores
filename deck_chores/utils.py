@@ -16,7 +16,7 @@ TIME_UNIT_MULTIPLIERS = {
 UUID_NAMESPACE = uuid5(NAMESPACE_DNS, "deck-chores.readthedocs.io")
 
 
-@lru_cache(128)
+@lru_cache(64)
 def generate_id(*args) -> str:
     return str(uuid5(UUID_NAMESPACE, ''.join(args)))
 
@@ -64,7 +64,6 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
     return weeks, days, hours, minutes, value
 
 
-@lru_cache(4)
 def split_string(
     value: str, delimiter: str = ',', sort: bool = False
 ) -> Tuple[str, ...]:

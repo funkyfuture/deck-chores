@@ -22,6 +22,9 @@ getenv = local_environment.get
 ####
 
 
+CONTAINER_CACHE_SIZE = int(getenv("CONTAINER_CACHE_SIZE", "128"))
+
+
 class ConfigurationError(Exception):
     pass
 
