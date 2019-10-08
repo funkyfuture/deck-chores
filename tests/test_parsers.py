@@ -188,23 +188,6 @@ def test_interval_trigger():
 
 
 @mark.parametrize(
-    'labels',
-    (
-        {'deck-chores.options': 'noimage'},  # deprecated form
-        {'deck-chores.options.flags': 'noimage'},
-    ),
-)
-def test_options_parsing(cfg, labels, mocker):
-    container = mocker.MagicMock(Container)
-    container.labels = labels
-    container.image.labels = {}
-    cfg.client.containers.get.return_value = container
-
-    _, options, _ = parse_labels('test_option_parsing')
-    assert options == 'service'
-
-
-@mark.parametrize(
     'default,value,result',
     (
         (('image', 'service'), '', 'image,service'),

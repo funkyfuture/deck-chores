@@ -136,7 +136,7 @@ job_def_validator = JobConfigValidator(
 
 # TODO make cache size configurable
 @lru_cache()
-def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Mapping[str, Dict]]:
+def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
 
@@ -169,25 +169,8 @@ def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Mapping[str, Dict]]
 
 
 def _parse_options(_labels: Dict[str, str]) -> Tuple[str, Optional[str]]:
-    label_ns = cfg.label_ns
-
-    # backward compatibility
-    deprecated_flags_key = label_ns + 'options'
-    flags_key = label_ns + 'options.flags'
-    if deprecated_flags_key in _labels:
-        log.warning(
-            'The `options` name in a label is now itself a namespace. It contains its '
-            'replacement `options.flags` with the same semantics.'
-        )
-        if flags_key in _labels:
-            log.critical('Container flags are set redundantly.')
-        _labels[flags_key] = _labels.pop(deprecated_flags_key)
-
-    flags = _parse_flags(_labels.pop(flags_key, None))
-
-    user_key = label_ns + 'options.user'
-    user = _labels.pop(user_key, None)
-
+    flags = _parse_flags(_labels.pop("options.flags", None))
+    user = _labels.pop(cfg.label_ns + "options.user", None)
     return flags, user
 
 

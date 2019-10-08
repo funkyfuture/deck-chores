@@ -26,15 +26,6 @@ class ConfigurationError(Exception):
     pass
 
 
-def _handle_deprecated():
-    if 'DEFAULT_OPTIONS' in environ:
-        environ['DEFAULT_FLAGS'] = environ.pop('DEFAULT_OPTIONS')
-        log.warning(
-            'The environment variable `DEFAULT_OPTIONS` was renamed to '
-            '`DEFAULT_FLAGS`'
-        )
-
-
 def _resolve_tls_version(version: str) -> int:
     return getattr(ssl, 'PROTOCOL_' + version.replace('.', '_'))
 
@@ -50,7 +41,6 @@ def _test_daemon_socket(url: str) -> str:
 
 
 def generate_config() -> None:
-    _handle_deprecated()
     cfg.__dict__.clear()
     cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
     cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
