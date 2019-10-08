@@ -100,7 +100,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
     return cfg.client.containers.get(container_id).exec_run(
         cmd=definition['command'],
-        user=definition.get('user', ''),
+        user=definition['user'],
         environment=definition['environment'],
         workdir=definition.get('workdir'),
     )

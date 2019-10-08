@@ -15,7 +15,8 @@ def test_event_dispatching(cfg, fixtures, mocker):
     )
 
     definition = _parse_job_definitions(
-        {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '10m'}
+        {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '10m'},
+        user="",
     )
     labels = mocker.patch(
         'deck_chores.parsers.labels',
@@ -50,6 +51,7 @@ def test_event_dispatching(cfg, fixtures, mocker):
                     'max': 1,
                     'timezone': 'UTC',
                     'trigger': (IntervalTrigger, (0, 0, 0, 10, 0)),
+                    'user': '',
                 }
             },
             paused=False,

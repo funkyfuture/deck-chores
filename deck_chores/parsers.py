@@ -124,7 +124,7 @@ job_def_validator = JobConfigValidator(
             'allowed': all_timezones,
             'required': True,
         },
-        'user': {'regex': r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]*'},
+        'user': {"empty": True, 'regex': r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]*'},
         'workdir': {'regex': r'/.*'},
     }
 )
@@ -155,11 +155,7 @@ def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
     else:
         jobs_labels = filtered_labels
 
-    job_definitions = _parse_job_definitions(jobs_labels)
-
-    if user:
-        for job_definition in job_definitions.values():
-            job_definition.setdefault('user', user)
+    job_definitions = _parse_job_definitions(jobs_labels, user)
 
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
@@ -168,14 +164,14 @@ def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
     return service_id, flags, job_definitions
 
 
-def _parse_options(_labels: Dict[str, str]) -> Tuple[str, Optional[str]]:
-    flags = _parse_flags(_labels.pop("options.flags", None))
-    user = _labels.pop(cfg.label_ns + "options.user", None)
+def _parse_options(_labels: Dict[str, str]) -> Tuple[str, str]:
+    flags = _parse_flags(_labels.pop("options.flags", ""))
+    user = _labels.pop(cfg.label_ns + "options.user", "")
     return flags, user
 
 
 @lru_cache(4)
-def _parse_flags(options: Optional[str]) -> str:
+def _parse_flags(options: str) -> str:
     result = set(cfg.default_flags)
     if options:
         for option in split_string(options):
@@ -210,7 +206,7 @@ def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
-def _parse_job_definitions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
+def _parse_job_definitions(_labels: Mapping[str, str], user: str) -> Dict[str, Dict]:
     log.debug(f'Considering labels for job definitions: {dict(_labels)}')
 
     name_grouped_definitions: DefaultDict[
@@ -235,6 +231,7 @@ def _parse_job_definitions(_labels: Mapping[str, str]) -> Dict[str, Dict]:
     for name, definition in name_grouped_definitions.items():
         log.debug(f'Processing {name}')
         definition['name'] = name
+        definition.setdefault("user", user)
 
         job = job_def_validator.validated(definition)
         if job is None:
