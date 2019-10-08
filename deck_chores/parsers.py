@@ -9,19 +9,12 @@ from apscheduler.triggers.interval import IntervalTrigger
 from pytz import all_timezones
 
 from deck_chores.config import cfg
-from deck_chores.services import ServiceIdentifier
 from deck_chores.utils import (
     log,
     parse_time_from_string_with_units,
     seconds_as_interval_tuple,
     split_string,
 )
-
-
-####
-
-
-Trigger = Union[CronTrigger, DateTrigger, IntervalTrigger]
 
 
 ####
@@ -143,7 +136,7 @@ job_def_validator = JobConfigValidator(
 
 # TODO make cache size configurable
 @lru_cache()
-def labels(container_id: str) -> Tuple[ServiceIdentifier, str, Mapping[str, Dict]]:
+def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Mapping[str, Dict]]:
     _labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {_labels}')
 
@@ -212,7 +205,7 @@ def _parse_flags(options: Optional[str]) -> str:
     return result_string
 
 
-def _parse_service_id(_labels: Dict[str, str]) -> ServiceIdentifier:
+def _parse_service_id(_labels: Dict[str, str]) -> Tuple[str, ...]:
     filtered_labels = {k: v for k, v in _labels.items() if k in cfg.service_identifiers}
     log.debug(f'Considering labels for service id: {filtered_labels}')
     if not filtered_labels:

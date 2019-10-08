@@ -1,9 +1,8 @@
 import logging
-import json
 import os
 import sys
 from functools import lru_cache
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 from uuid import NAMESPACE_DNS, uuid5
 
 
@@ -15,12 +14,6 @@ TIME_UNIT_MULTIPLIERS = {
     'w': 1 * 60 * 60 * 24 * 7,
 }
 UUID_NAMESPACE = uuid5(NAMESPACE_DNS, "deck-chores.readthedocs.io")
-
-
-def from_json(s: Union[bytes, str]) -> dict:
-    if isinstance(s, bytes):
-        s = s.decode()
-    return json.loads(s)
 
 
 @lru_cache(128)
@@ -73,16 +66,11 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
 
 @lru_cache(4)
 def split_string(
-    value: str, delimiter: str = ',', strip: bool = True, sort: bool = False
+    value: str, delimiter: str = ',', sort: bool = False
 ) -> Tuple[str, ...]:
-    result = value.split(delimiter)
-
-    if strip:
-        result = [x.strip() for x in result]
-
+    result = [x.strip() for x in value.split(delimiter)]
     if sort:
         result.sort()
-
     return tuple(result)
 
 
@@ -99,7 +87,6 @@ log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INF
 # TODO remove ignore when this issue is solved:
 #      https://github.com/python/mypy/issues/1317
 __all__ = (
-    from_json.__name__,
     'log',
     'log_handler',
     parse_time_from_string_with_units.__name__,  # type: ignore

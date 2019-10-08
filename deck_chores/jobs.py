@@ -7,14 +7,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.util import undefined as undefined_runtime
 
 from deck_chores.config import cfg
+from deck_chores.indexes import container_name
 from deck_chores.utils import generate_id, log
-
-
-####
-
-CAPTURED_OPENER = '== BEGIN of captured stdout & stderr =='
-CAPTURED_CLOSER = '== END of captured stdout & stderr ===='
-CAPTURED_SURROUNDING_LENGTH = len(CAPTURED_OPENER)
 
 
 ####
@@ -37,13 +31,12 @@ def start_scheduler():
 
 
 def on_max_instances(event: events.JobSubmissionEvent) -> None:
-    job = scheduler.get_job(event.job_id)
-    job_name = job.kwargs['job_name']
-    container_name = job.kwargs['container_name']
-    max_inst = job.max_instances
+    job = scheduler.get_job(event.job_id).kwargs
+    definition = job.kwargs
     log.info(
-        f'Not running {job_name} in {container_name}, '
-        f'maximum instances of {max_inst} are still running.'
+        f"{container_name(definition['container_id'])}: "
+        f"Not running {definition['job_name']},  "
+        f"maximum instances of {job.max_instances} are still running."
     )
 
 
@@ -58,22 +51,21 @@ def on_executed(event: events.JobExecutionEvent) -> None:
 
     log.log(
         logging.INFO if exit_code == 0 else logging.CRITICAL,
-        f'Command {definition["command"]} in {definition["container_name"]} '
-        f'finished with exit code {exit_code}',
+        f'Command {definition["command"]} in container {definition["container_id"]} '
+        f'finished with exit code {exit_code}.',
     )
     if response_lines:
-        longest_line = max(len(x) for x in response_lines)
-        log.info(CAPTURED_OPENER + '=' * (longest_line - CAPTURED_SURROUNDING_LENGTH))
+        log.info("== BEGIN of captured stdout & stderr ==")
         for line in response_lines:
             log.info(line)
-        log.info(CAPTURED_CLOSER + '=' * (longest_line - CAPTURED_SURROUNDING_LENGTH))
+        log.info("== END of captured stdout & stderr ====")
 
 
 def on_error(event: events.JobExecutionEvent) -> None:
     definition = scheduler.get_job(event.job_id).kwargs
     log.critical(
         f'An exception in deck-chores occured while executing {definition["job_name"]} '
-        f'in {definition["container_name"]}:'
+        f'in container {definition["container_id"]}:'
     )
     log.exception(event.exception)
 
@@ -81,8 +73,8 @@ def on_error(event: events.JobExecutionEvent) -> None:
 def on_missed(event: events.JobExecutionEvent) -> None:
     definition = scheduler.get_job(event.job_id).kwargs
     log.warning(
-        f'Missed execution of {definition["job_name"]} in '
-        f'{definition["container_name"]} at {event.scheduled_run_time}'
+        f'Missed execution of {definition["job_name"]} in container '
+        f'{definition["container_id"]} at {event.scheduled_run_time}.'
     )
 
 
@@ -92,7 +84,7 @@ def on_missed(event: events.JobExecutionEvent) -> None:
 def exec_job(**definition) -> Tuple[int, bytes]:
     job_id = definition['job_id']
     container_id = definition['container_id']
-    log.info(f"Executing '{definition['job_name']}' in {definition['container_name']}")
+    log.info(f"{container_name(container_id)}: Executing '{definition['job_name']}'.")
 
     # some sanity checks, to be removed eventually
     assert scheduler.get_job(job_id) is not None
@@ -120,20 +112,13 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 def add(
     container_id: str, definitions: Mapping[str, Dict], paused: bool = False
 ) -> None:
-    container = cfg.client.containers.get(container_id)
-    container_name = container.name
-    log.debug(f'Adding jobs for {container_name}.')
+    log.debug(f'Adding jobs to container {container_id}.')
 
     for job_name, definition in definitions.items():
         job_id = generate_id(*definition.get("service_id") or (container_id,), job_name)
 
         definition.update(
-            {
-                'job_name': job_name,
-                'job_id': job_id,
-                'container_id': container_id,
-                'container_name': container_name,
-            }
+            {'job_name': job_name, 'job_id': job_id, 'container_id': container_id}
         )
 
         trigger_class, trigger_config = definition['trigger']
@@ -152,9 +137,9 @@ def add(
             replace_existing=True,
         )
         log.info(
-            "Added "
+            f"{container_name(container_id)}: Added "
             + ("paused " if paused else "")
-            + f"'{job_name}' for {container_name} with id {job_id}"
+            + f"'{job_name}' ({job_id})."
         )
 
 

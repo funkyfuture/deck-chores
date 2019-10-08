@@ -1,3 +1,4 @@
+import json
 import logging
 import sys
 from datetime import datetime, timedelta
@@ -5,12 +6,21 @@ from signal import signal, SIGINT, SIGTERM, SIGUSR1
 from typing import Optional
 
 from apscheduler.schedulers import SchedulerNotRunningError
+from docker.models.containers import Container
 from fasteners import InterProcessLock
 
 import deck_chores.parsers as parse
-from deck_chores import __version__, jobs, services
+from deck_chores import __version__, jobs
 from deck_chores.config import cfg, generate_config, ConfigurationError
-from deck_chores.utils import from_json, log, log_handler
+from deck_chores.indexes import (
+    container_name,
+    lock_service,
+    reassign_service_lock,
+    unlock_service,
+    service_locks_by_service_id,
+    service_locks_by_container_id,
+)
+from deck_chores.utils import log, log_handler
 
 
 ####
@@ -34,19 +44,19 @@ def there_is_another_deck_chores_container() -> bool:
 
 
 def sigint_handler(signum, frame):
-    log.info('Keyboard interrupt.')
+    log.info("Keyboard interrupt.")
     raise SystemExit(0)
 
 
 def sigterm_handler(signum, frame):
-    log.info('Received SIGTERM.')
+    log.info("Received SIGTERM.")
     raise SystemExit(0)
 
 
 def sigusr1_handler(signum, frame):
-    log.info('SIGUSR1 received, echoing all jobs.')
+    log.info("SIGUSR1 received, echoing all jobs.")
     for job in jobs.scheduler.get_jobs():
-        log.info(f'ID: {job.id}   Next execution: {job.next_run_time}   Configuration:')
+        log.info(f"ID: {job.id}   Next execution: {job.next_run_time}   Configuration:")
         log.info(job.kwargs)
 
 
@@ -65,7 +75,7 @@ def process_started_container_labels(container_id: str, paused: bool = False) ->
         return
 
     if service_id and 'service' in flags:
-        other_container_id = services.service_id_to_container_id.get(service_id)
+        other_container_id = service_locks_by_service_id.get(service_id)
         if other_container_id:
             log.debug(
                 f'Service id {service_id} is locked by container {other_container_id}.'
@@ -74,13 +84,13 @@ def process_started_container_labels(container_id: str, paused: bool = False) ->
                 assert reassign_jobs(other_container_id, consider_paused=False)
             return
 
-        services.assign(service_id, container_id)
+        lock_service(service_id, container_id)
 
     jobs.add(container_id, definitions, paused=paused)
 
 
 def inspect_running_containers() -> datetime:
-    log.info('Inspecting running containers.')
+    log.info("Inspecting running containers.")
     last_event_time = datetime.utcnow()
     containers = cfg.client.containers.list(ignore_removed=True, sparse=True)
 
@@ -100,7 +110,7 @@ def inspect_running_containers() -> datetime:
 
 
 def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
-    other_service_container = services.find_other_container_for_service(
+    other_service_container = find_other_container_for_service(
         container_id, consider_paused
     )
 
@@ -109,7 +119,7 @@ def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
 
     new_id = other_service_container.id
     container_is_paused = other_service_container.status == "paused"
-    log.debug(f"Reassigning jobs from container {container_id} to {new_id}.")
+    log.info(f"{container_name(container_id)}: Reassigning jobs to {new_id}.")
 
     for job in jobs.get_jobs_for_container(container_id):
         log.debug(f"Handling job: {job.kwargs}")
@@ -124,16 +134,46 @@ def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
 
         job.modify(kwargs={**job.kwargs, "container_id": new_id})
 
-    services.reassign_container(container_id, new_id)
+    reassign_service_lock(container_id, new_id)
 
     return new_id
+
+
+def find_other_container_for_service(
+    container_id: str, consider_paused: bool
+) -> Optional[Container]:
+    service_id = service_locks_by_container_id.get(container_id)
+    if service_id is None:
+        return None
+
+    for status in (
+        ("running", "restarting", "paused", "created")  # type: ignore
+        if consider_paused
+        else ("running", "restarting")
+    ):
+        candidates = [
+            c
+            for c in cfg.client.containers.list(
+                all=True,
+                ignore_removed=True,
+                # TODO don't cast service_id to list when this patch is incorporated:
+                #      https://github.com/docker/docker-py/pull/2445
+                filters={"status": status, "label": list(service_id)},
+            )
+            if c.id != container_id
+        ]
+
+        if len(candidates):
+            return candidates[0]
+
+    return None
 
 
 ####
 
 
 def listen(since: datetime) -> None:
-    log.info('Listening to events.')
+    log.info("Listening to events.")
     for event_json in cfg.client.events(since=since):
         if b'container' not in event_json:
             continue
@@ -141,7 +181,7 @@ def listen(since: datetime) -> None:
         if not any((x in event_json) for x in (b'start', b'die', b'pause', b'unpause')):
             continue
 
-        event = from_json(event_json)
+        event = json.loads(event_json)
         log.debug(f'Daemon event: {event}')
         if event['Type'] != 'container':
             continue
@@ -168,9 +208,15 @@ def handle_die(event: dict):
     log.debug(f'Handling die of {container_id}.')
     if reassign_jobs(container_id, consider_paused=True) is None:
         for job in jobs.get_jobs_for_container(container_id):
-            log.debug(f"Removing job: {job.kwargs}")
+            definition = job.kwargs
+            log.debug(f"Removing job: {definition}")
             job.remove()
-        services.remove_by_container_id(container_id)
+            log.info(
+                f"{container_name(container_id)}: Removed '"
+                + definition["job_name"]
+                + "'."
+            )
+        unlock_service(container_id)
 
 
 def handle_pause(event: dict):
@@ -178,28 +224,36 @@ def handle_pause(event: dict):
     log.debug(f'Handling pause of {container_id}.')
 
     if reassign_jobs(container_id, consider_paused=False) is None:
-        for job in jobs.get_jobs_for_container(container_id):
+        counter = 0
+        for counter, job in enumerate(
+            jobs.get_jobs_for_container(container_id), start=1
+        ):
             job.pause()
             log.debug(f"Paused job: {job.kwargs}")
+        if counter:
+            log.info(f"{container_name(container_id)}: Paused {counter} jobs.")
 
 
 def handle_unpause(event: dict):
     container_id = event['Actor']['ID']
     log.debug(f'Handling unpause of {container_id}.')
 
-    if container_id not in services.container_id_to_service_id:
+    if container_id not in service_locks_by_container_id:
         service_id, _, _ = parse.labels(container_id)
         if service_id:
-            other_container_id = services.service_id_to_container_id.get(service_id)
+            other_container_id = service_locks_by_service_id.get(service_id)
             if (
                 other_container_id is not None
                 and cfg.client.containers.get(other_container_id).status == "paused"
             ):
                 container_id = reassign_jobs(other_container_id, consider_paused=False)
 
-    for job in jobs.get_jobs_for_container(container_id):
+    counter = 0
+    for counter, job in enumerate(jobs.get_jobs_for_container(container_id), start=1):
         job.resume()
         log.debug(f"Resumed job: {job.kwargs}")
+    if counter:
+        log.info(f"{container_name(container_id)}: Resumed {counter} jobs.")
 
 
 def shutdown() -> None:
