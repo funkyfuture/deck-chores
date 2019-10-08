@@ -20,6 +20,7 @@ from deck_chores.indexes import (
     service_locks_by_service_id,
     service_locks_by_container_id,
 )
+from deck_chores.parsers import job_config_validator
 from deck_chores.utils import log, log_handler
 
 
@@ -278,12 +279,15 @@ def main() -> None:
         generate_config()
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
         log.debug(f'Config: {cfg.__dict__}')
+
         if there_is_another_deck_chores_container():
             log.error(
                 "There's another container running deck-chores, maybe paused or "
                 "restarting."
             )
             raise SystemExit(1)
+
+        job_config_validator.set_defaults(cfg)
 
         last_event_time = inspect_running_containers()
         jobs.start_scheduler()

@@ -4,6 +4,7 @@ from docker.api import APIClient
 from docker.client import DockerClient
 import pytest
 
+from deck_chores.parsers import job_config_validator
 from deck_chores.utils import split_string
 
 
@@ -22,6 +23,9 @@ def cfg(mocker):
         'com.docker.compose.project,com.docker.compose.service'
     )
     cfg.timezone = 'UTC'
+
+    job_config_validator.set_defaults(cfg)
+
     yield cfg
 
 

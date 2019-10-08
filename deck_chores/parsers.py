@@ -34,6 +34,12 @@ NAME_INTERVAL_MAP = {
 
 
 class JobConfigValidator(cerberus.Validator):
+    def set_defaults(self, cfg):
+        schema = self.schema
+        schema["max"]["default"] = cfg.default_max
+        schema["timezone"]["default"] = cfg.timezone
+        schema.validate()
+
     @staticmethod
     @lru_cache(128)
     def _fill_args(value: str, length: int, filling: str) -> Tuple[str, ...]:
@@ -87,7 +93,7 @@ class JobConfigValidator(cerberus.Validator):
             self._error(field, message)
 
 
-job_def_validator = JobConfigValidator(
+job_config_validator = JobConfigValidator(
     {
         'command': {'required': True},
         'cron': {
@@ -101,7 +107,6 @@ job_def_validator = JobConfigValidator(
             'check_with': 'trigger',
             'required': True,
             'excludes': ['cron', 'interval'],
-            'dependencies': {'jitter': None},
         },
         'environment': {'type': 'dict', 'default': {}},
         'interval': {
@@ -117,18 +122,17 @@ job_def_validator = JobConfigValidator(
             'default': None,
             'min': 0,
         },
-        'max': {'coerce': int, 'default_setter': lambda x: cfg.default_max},
-        'name': {'regex': r'[a-z0-9.-]+'},
-        'timezone': {
-            'default_setter': lambda x: cfg.timezone,
-            'allowed': all_timezones,
-            'required': True,
+        'max': {'coerce': int},  # default is set later
+        'name': {'regex': r'[a-z0-9.-]+', "required": True},
+        'timezone': {'allowed': all_timezones},  # default is set later
+        'user': {
+            "empty": True,
+            'regex': r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]*',
+            "required": True,
         },
-        'user': {"empty": True, 'regex': r'[a-zA-Z0-9_.][a-zA-Z0-9_.-]*'},
         'workdir': {'regex': r'/.*'},
     }
 )
-# TODO rather update the schema when the config was parsed than using lambdas
 
 
 ####
@@ -233,10 +237,10 @@ def _parse_job_definitions(_labels: Mapping[str, str], user: str) -> Dict[str, D
         definition['name'] = name
         definition.setdefault("user", user)
 
-        job = job_def_validator.validated(definition)
+        job = job_config_validator.validated(definition)
         if job is None:
             log.error(f'Misconfigured job definition: {definition}')
-            log.error(f'Errors: {job_def_validator.errors}')
+            log.error(f'Errors: {job_config_validator.errors}')
             continue
 
         for trigger_name in ('cron', 'date', 'interval'):
