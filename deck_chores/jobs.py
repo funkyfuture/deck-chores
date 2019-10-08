@@ -67,7 +67,7 @@ def on_error(event: events.JobExecutionEvent) -> None:
         f'An exception in deck-chores occured while executing {definition["job_name"]} '
         f'in container {definition["container_id"]}:'
     )
-    log.exception(event.exception)
+    log.error(str(event.exception))
 
 
 def on_missed(event: events.JobExecutionEvent) -> None:

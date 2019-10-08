@@ -294,9 +294,8 @@ def main() -> None:
     except ConfigurationError as e:
         log.error(str(e))
         exit_code = 1
-    except Exception as e:
-        log.error('Caught unhandled exception:')
-        log.exception(e)
+    except Exception:
+        log.exception('Caught unhandled exception:')
         exit_code = 3
     else:
         exit_code = 0
