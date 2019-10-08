@@ -79,5 +79,16 @@ def generate_config() -> None:
         environment=local_environment,
     )
 
+    try:
+        if not cfg.client.ping():
+            log.error(
+                "The Docker daemon replied unexpected content on the /ping endpoint."
+            )
+            raise SystemExit(1)
+    except docker.errors.APIError as e:
+        log.error("Docker daemon error:")
+        log.error(str(e))
+        raise SystemExit(1)
+
 
 __all__ = ('cfg', generate_config.__name__, ConfigurationError.__name__)
