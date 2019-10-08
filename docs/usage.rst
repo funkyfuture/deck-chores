@@ -249,6 +249,13 @@ There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``ev
     expect a job that is defined with this type of trigger to run the defined time *after* the job
     has been registered. To define a point in time, see cron_.
 
+.. caution::
+
+    Mind that ``deck-chores`` doesn't track jobs' status when they are removed from the scheduler
+    and doesn't persist any data between its invocations. Any such event would therefore reset the
+    next scheduled run time of a job. Depending on a system's usage this is more or less likely
+    to happen. For longer intervals, a cron_ trigger would therefore be preferable.
+
 
 .. _options:
 
