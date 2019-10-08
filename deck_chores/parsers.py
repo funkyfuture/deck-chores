@@ -139,26 +139,26 @@ job_config_validator = JobConfigValidator(
 
 
 @lru_cache(CONTAINER_CACHE_SIZE)
-def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
-    _labels = cfg.client.containers.get(container_id).labels
-    log.debug(f'Parsing labels: {_labels}')
+def parse_labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
+    labels = cfg.client.containers.get(container_id).labels
+    log.debug(f'Parsing labels: {labels}')
 
-    service_id = _parse_service_id(_labels)
+    service_id = parse_service_id(labels)
 
-    filtered_labels = {k: v for k, v in _labels.items() if k.startswith(cfg.label_ns)}
-    flags, user = _parse_options(filtered_labels)
+    filtered_labels = {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
+    flags, user = parse_options(filtered_labels)
 
     jobs_labels: Mapping[str, str]
 
     if 'image' in flags:
-        image_labels = _image_definition_labels_of_container(container_id)
-        _, image_options_user = _parse_options(image_labels)
+        image_labels = image_definition_labels_of_container(container_id)
+        _, image_options_user = parse_options(image_labels)
         user = user or image_options_user
         jobs_labels = ChainMap(filtered_labels, image_labels)
     else:
         jobs_labels = filtered_labels
 
-    job_definitions = _parse_job_definitions(jobs_labels, user)
+    job_definitions = parse_job_definitions(jobs_labels, user)
 
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
@@ -167,14 +167,14 @@ def labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
     return service_id, flags, job_definitions
 
 
-def _parse_options(_labels: Dict[str, str]) -> Tuple[str, str]:
-    flags = _parse_flags(_labels.pop("options.flags", ""))
-    user = _labels.pop(cfg.label_ns + "options.user", "")
+def parse_options(labels: Dict[str, str]) -> Tuple[str, str]:
+    flags = parse_flags(labels.pop("options.flags", ""))
+    user = labels.pop(cfg.label_ns + "options.user", "")
     return flags, user
 
 
 @lru_cache(16)
-def _parse_flags(options: str) -> str:
+def parse_flags(options: str) -> str:
     result = set(cfg.default_flags)
     if options:
         for option in split_string(options):
@@ -187,8 +187,8 @@ def _parse_flags(options: str) -> str:
     return result_string
 
 
-def _parse_service_id(_labels: Dict[str, str]) -> Tuple[str, ...]:
-    filtered_labels = {k: v for k, v in _labels.items() if k in cfg.service_identifiers}
+def parse_service_id(labels: Dict[str, str]) -> Tuple[str, ...]:
+    filtered_labels = {k: v for k, v in labels.items() if k in cfg.service_identifiers}
     log.debug(f'Considering labels for service id: {filtered_labels}')
     if not filtered_labels:
         return ()
@@ -204,19 +204,19 @@ def _parse_service_id(_labels: Dict[str, str]) -> Tuple[str, ...]:
     return tuple(f"{k}={v}" for k, v in filtered_labels.items())
 
 
-def _image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
+def image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
     labels = cfg.client.containers.get(container_id).image.labels
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
-def _parse_job_definitions(_labels: Mapping[str, str], user: str) -> Dict[str, Dict]:
-    log.debug(f'Considering labels for job definitions: {dict(_labels)}')
+def parse_job_definitions(labels: Mapping[str, str], user: str) -> Dict[str, Dict]:
+    log.debug(f'Considering labels for job definitions: {dict(labels)}')
 
     name_grouped_definitions: DefaultDict[
         str, Dict[str, Union[str, Dict]]
     ] = defaultdict(dict)
 
-    for key, value in _labels.items():
+    for key, value in labels.items():
         key = key[len(cfg.label_ns) :]  # noqa: E203
         if '.env.' in key:
             name, _, variable = key.split('.', 2)
@@ -260,4 +260,4 @@ def _parse_job_definitions(_labels: Mapping[str, str], user: str) -> Dict[str, D
 
 # TODO remove ignore when this issue is solved:
 #      https://github.com/python/mypy/issues/1317
-__all__ = (labels.__name__,)  # type: ignore
+__all__ = (parse_labels.__name__,)  # type: ignore

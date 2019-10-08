@@ -2,9 +2,9 @@ from pytest import mark
 
 from docker.models.containers import Container
 
-from deck_chores.parsers import labels as parse_labels
 from deck_chores.parsers import (
-    _parse_flags,
+    parse_flags,
+    parse_labels,
     CronTrigger,
     DateTrigger,
     IntervalTrigger,
@@ -204,4 +204,4 @@ def test_flags(cfg, mocker, default, value, result):
     container = mocker.MagicMock(Container)
     container.labels = {'deck-chores.options.flags': value}
     cfg.client.containers.get.return_value = container
-    assert _parse_flags(value) == result
+    assert parse_flags(value) == result

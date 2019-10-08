@@ -9,7 +9,6 @@ from apscheduler.schedulers import SchedulerNotRunningError
 from docker.models.containers import Container
 from fasteners import InterProcessLock
 
-import deck_chores.parsers as parse
 from deck_chores import __version__, jobs
 from deck_chores.config import cfg, generate_config, ConfigurationError
 from deck_chores.indexes import (
@@ -20,7 +19,7 @@ from deck_chores.indexes import (
     service_locks_by_service_id,
     service_locks_by_container_id,
 )
-from deck_chores.parsers import job_config_validator
+from deck_chores.parsers import job_config_validator, parse_labels
 from deck_chores.utils import log, log_handler
 
 
@@ -70,7 +69,7 @@ signal(SIGUSR1, sigusr1_handler)
 
 
 def process_started_container_labels(container_id: str, paused: bool = False) -> None:
-    service_id, flags, definitions = parse.labels(container_id)
+    service_id, flags, definitions = parse_labels(container_id)
 
     if not definitions:
         return
@@ -240,7 +239,7 @@ def handle_unpause(event: dict):
     log.debug(f'Handling unpause of {container_id}.')
 
     if container_id not in service_locks_by_container_id:
-        service_id, _, _ = parse.labels(container_id)
+        service_id, _, _ = parse_labels(container_id)
         if service_id:
             other_container_id = service_locks_by_service_id.get(service_id)
             if (

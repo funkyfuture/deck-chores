@@ -6,7 +6,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from docker.models.containers import Container
 
 from deck_chores.main import listen, there_is_another_deck_chores_container
-from deck_chores.parsers import _parse_job_definitions
+from deck_chores.parsers import parse_job_definitions
 
 
 def test_event_dispatching(cfg, fixtures, mocker):
@@ -14,12 +14,12 @@ def test_event_dispatching(cfg, fixtures, mocker):
         (fixtures / "events_00.txt").read_bytes().splitlines()
     )
 
-    definition = _parse_job_definitions(
+    definition = parse_job_definitions(
         {'deck-chores.beep.command': '/beep.sh', 'deck-chores.beep.interval': '10m'},
         user="",
     )
-    labels = mocker.patch(
-        'deck_chores.parsers.labels',
+    parse_labels = mocker.patch(
+        'deck_chores.main.parse_labels',
         return_value=(
             ("com.docker.compose.project=sojus", "com.docker.compose.service=beep"),
             'service',
@@ -28,7 +28,7 @@ def test_event_dispatching(cfg, fixtures, mocker):
     )
 
     call_recorder = mocker.Mock()
-    call_recorder.attach_mock(labels, "label")
+    call_recorder.attach_mock(parse_labels, "parse_labels")
     call_recorder.attach_mock(mocker.patch("deck_chores.jobs.add"), "add")
     call_recorder.attach_mock(
         mocker.patch("deck_chores.main.reassign_jobs"), "reassign_jobs"
@@ -39,7 +39,9 @@ def test_event_dispatching(cfg, fixtures, mocker):
     _ = mocker.call
     expected_calls = [
         # start A
-        _.label("cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed"),
+        _.parse_labels(
+            "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed"
+        ),
         _.add(
             'cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed',
             {
@@ -57,7 +59,9 @@ def test_event_dispatching(cfg, fixtures, mocker):
             paused=False,
         ),
         # start B
-        _.label("278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91"),
+        _.parse_labels(
+            "278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91"
+        ),
         # pause A
         _.reassign_jobs(
             "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed",
@@ -70,7 +74,9 @@ def test_event_dispatching(cfg, fixtures, mocker):
             consider_paused=True,
         ),
         # start B
-        _.label("278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91"),
+        _.parse_labels(
+            "278ed6f4ebac945e50fda4266d3d6bafef47a09fd874127902a20684e9c57b91"
+        ),
         # stop A
         _.reassign_jobs(
             "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed",
@@ -82,7 +88,9 @@ def test_event_dispatching(cfg, fixtures, mocker):
             consider_paused=False,
         ),
         # start A
-        _.label("cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed"),
+        _.parse_labels(
+            "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed"
+        ),
         # stop A
         _.reassign_jobs(
             "cbac46d62ceec9e1d920ed4eb2dcb18f7426ab7ae8e5e8f7b7b0a01cacdce5ed",
@@ -91,8 +99,8 @@ def test_event_dispatching(cfg, fixtures, mocker):
     ]
 
     # actual_calls = call_recorder.mock_calls
-    # for act, exp in zip(actual_calls, expected_calls):
-    #     assert act == exp
+    # for i, (act, exp) in enumerate(zip(actual_calls, expected_calls)):
+    #     assert act == exp, (i, act, exp)
     # if len(expected_calls) < len(actual_calls):
     #     raise AssertionError(f"Unexpected call: {actual_calls[len(expected_calls)]}")
     # elif len(actual_calls) < len(expected_calls):
