@@ -14,8 +14,8 @@ from deck_chores.parsers import (
 
 def test_parse_labels(cfg, mocker):
     labels = {
-        'com.docker.compose.project': 'test_project',
-        'com.docker.compose.service': 'ham_machine',
+        'project_id': 'test_project',
+        'service_id': 'ham_machine',
         'deck-chores.backup.interval': 'daily',
         'deck-chores.backup.command': '/usr/local/bin/backup.sh',
         'deck-chores.backup.user': 'www-data',
@@ -74,8 +74,8 @@ def test_parse_labels(cfg, mocker):
 
 def test_parse_labels_with_time_units(cfg, mocker):
     labels = {
-        'com.docker.compose.project': 'test_project',
-        'com.docker.compose.service': 'time_machine',
+        'project_id': 'test_project',
+        'service_id': 'time_machine',
         'deck-chores.backup.interval': '2 weeks',
         'deck-chores.backup.jitter': '0.5 day',
         'deck-chores.backup.command': '/usr/local/bin/backup.sh',

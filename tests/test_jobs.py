@@ -20,13 +20,9 @@ def test_job_execution(capsys, cfg, mocker):
         if filters['status'] == 'running':
             return [container]
 
-    def docker_exec_start(id):
-        sleep(2)
-
     start_scheduler()
 
     cfg.client.containers.list = docker_containers
-    cfg.client.api.exec_start = docker_exec_start
 
     definitions = {
         'foo': {

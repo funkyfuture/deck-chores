@@ -33,7 +33,7 @@ def _resolve_tls_version(version: str) -> int:
     return getattr(ssl, 'PROTOCOL_' + version.replace('.', '_'))
 
 
-def _test_daemon_socket(url: str) -> str:
+def _test_daemon_socket(url: str) -> str:  # pragma: nocover
     if url.startswith('unix:') and not exists(url[len('unix:/') :]):  # noqa: E203
         raise ConfigurationError(f'Docker socket file not found: {url}')
 
@@ -72,13 +72,13 @@ def generate_config() -> None:
         environment=local_environment,
     )
 
-    try:
+    try:  # pragma: nocover
         if not cfg.client.ping():
             log.error(
                 "The Docker daemon replied unexpected content on the /ping endpoint."
             )
             raise SystemExit(1)
-    except docker.errors.APIError as e:
+    except docker.errors.APIError as e:  # pragma: nocover
         log.error("Docker daemon error:")
         log.error(str(e))
         raise SystemExit(1)

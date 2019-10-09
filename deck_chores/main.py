@@ -43,12 +43,12 @@ def there_is_another_deck_chores_container() -> bool:
 ####
 
 
-def sigint_handler(signum, frame):
+def sigint_handler(signum, frame):  # pragma: nocover
     log.info("Keyboard interrupt.")
     raise SystemExit(0)
 
 
-def sigterm_handler(signum, frame):
+def sigterm_handler(signum, frame):  # pragma: nocover
     log.info("Received SIGTERM.")
     raise SystemExit(0)
 
@@ -95,14 +95,15 @@ def inspect_running_containers() -> datetime:
     containers = cfg.client.containers.list(ignore_removed=True, sparse=True)
 
     for container in containers:
-        data = cfg.client.api.inspect_container(container.id)
+        container_id = container.id
+        data = cfg.client.api.inspect_container(container_id)
         last_event_time = max(
             last_event_time,
             # not sure why mypy doesn't know about this method:
             datetime.fromisoformat(data['State']['StartedAt'][:26]),  # type: ignore
         )
         process_started_container_labels(
-            container.id, paused=container.status == 'paused'
+            container_id, paused=container.status == 'paused'
         )
 
     log.debug('Finished inspection of running containers.')
@@ -256,7 +257,7 @@ def handle_unpause(event: dict):
         log.info(f"{container_name(container_id)}: Resumed {counter} jobs.")
 
 
-def shutdown() -> None:
+def shutdown() -> None:  # pragma: nocover
     try:
         jobs.scheduler.shutdown()
     except SchedulerNotRunningError:
@@ -269,7 +270,7 @@ def shutdown() -> None:
 ####
 
 
-def main() -> None:
+def main() -> None:  # pragma: nocover
     if not lock.acquire(blocking=False):
         log.error(f"Couldn't acquire lock file at {lock.path}, exiting.")
         sys.exit(1)
