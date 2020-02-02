@@ -1,4 +1,4 @@
-FROM python:alpine3.9
+FROM python:3.7-alpine
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["deck-chores"]
@@ -12,4 +12,4 @@ RUN apk add --no-cache build-base libffi-dev openssl-dev tini tzdata \
 COPY . /src
 WORKDIR /src
 
-RUN python setup.py install
+RUN pip install --no-cache-dir /src

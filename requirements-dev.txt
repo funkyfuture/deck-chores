@@ -1,9 +1,0 @@
-black
-flake8
-mypy
-pytest
-pytest-cov
-pytest-mock
-Sphinx
-sphinx_rtd_theme
-tox

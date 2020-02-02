@@ -1,12 +1,17 @@
-dist: xenial
+dist: bionic
 language: python
 python: 3.7
 cache: pip
+
 env:
-  - TOX_ENV=black
-  - TOX_ENV=docslinks
-  - TOX_ENV=flake8
-  - TOX_ENV=mypy
-  - TOX_ENV=py37
-install: travis_retry pip install tox
-script: tox -e $TOX_ENV
+  - TARGET=lint
+  - TARGET=mypy
+  - TARGET=pytest
+  - TARGET=doclinks
+
+before_install:
+  - pip install poetry
+install:
+  - travis_retry poetry install -v
+script:
+  - poetry run make $TARGET

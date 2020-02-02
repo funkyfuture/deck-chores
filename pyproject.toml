@@ -1,4 +1,47 @@
-[tool.black]
+[build-system]
+requires = ["poetry>=1"]
+build-backend = "poetry.masonry.api"
 
+[tool.black]
 safe = true
 skip-string-normalization = true
+
+[tool.poetry]
+name = "deck-chores"
+version = "1.0.b0"
+description = "Job scheduler for Docker containers, configured via container labels."
+readme = "README.rst"
+documentation = "https://deck-chores.readthedocs.org/"
+repository = "https://github.com/funkyfuture/deck-chores"
+license = "ISC license"
+keywords = ["docker", "cron", "scheduler", "jobs", "labels", "metadata"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: ISC License (ISCL)",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: Implementation :: CPython"
+]
+authors = ["Frank Sachsenheim <funkyfuture@riseup.net>"]
+
+[tool.poetry.scripts]
+deck-chores = "deck_chores.main:main"
+
+[tool.poetry.dependencies]
+# the Dockerfile-dev has these values too
+python = "3.7"
+apscheduler = "^3.6"
+cerberus = "^1.3"
+docker = {version = "^4.0", extras = ["ssh", "tls"]}
+fasteners = "^0.14"
+
+[tool.poetry.dev-dependencies]
+black = {version = "*", allow-prereleases = true }
+flake8 = "*"
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+Sphinx = "^2"
+sphinx_rtd_theme = "*"
