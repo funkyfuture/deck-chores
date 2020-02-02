@@ -244,7 +244,7 @@ There are also the convenience shortcuts ``weekly``, ``daily``, ``hourly``, ``ev
 
 .. note::
 
-    Though it uses the same units of measurement, an interval is different from recurring a point
+    Though it uses the same units of measurement, an interval is different from a recurring point
     in time of a specific calendar system, it describes the time *between* two events. Hence you
     should expect a job that is defined with this type of trigger to run the defined time *after*
     the job has been registered. To define a recurring point in time, see the cron_ trigger.
