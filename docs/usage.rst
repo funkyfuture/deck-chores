@@ -4,7 +4,10 @@ Usage
 Invocation
 ----------
 
-Usually you would run `deck-chores` in a container::
+On a single host
+~~~~~~~~~~~~~~~~
+
+Usually you would run ``deck-chores`` in a container::
 
     $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock funkyfuture/deck-chores
 
@@ -19,7 +22,7 @@ Likewise, docker-compose_ can be used with such configuration:
 
 .. code-block:: yaml
 
-    version: '2'
+    version: "3.7"
 
     services:
       officer:
@@ -31,7 +34,7 @@ Likewise, docker-compose_ can be used with such configuration:
           - /var/run/docker.sock:/var/run/docker.sock
 
 
-You could also install `deck-chores` from the Python Package Index with ``pip`` or ``pipx``
+You could also install ``deck-chores`` from the Python Package Index with ``pip`` or ``pipx``
 (recommended)::
 
     $ pipx install deck-chores
@@ -41,8 +44,41 @@ and then run it::
     $ deck-chores
 
 
-Now one instance of `deck-chores` is running and will handle all job definitions that it discovers
+Now one instance of ``deck-chores`` is running and will handle all job definitions that it discovers
 on containers that run on the Docker host.
+
+In a Docker Swarm
+~~~~~~~~~~~~~~~~~
+
+``deck-chores`` can be run in a Docker Swarm cluster, but it must be deployed on all nodes and it
+cannot restrict jobs to be run in one of the containers that manifest a service. This would be a
+suitable stack definition:
+
+.. code-block:: yaml
+
+    version: "3.7"
+
+    services:
+      officer:
+        image: funkyfuture/deck-chores
+        deploy:
+          mode: global
+        environment:
+          TIMEZONE: Europe/Berlin
+          # it isn't guaranteed that service or job options don't override this:
+          DEFAULT_FLAGS: noservice
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+
+It can be deployed with::
+
+    $ docker stack deploy --compose-file docker-compose.yml deck-chores
+
+
+Now one instance of ``deck-chores`` is running on each Swarm node and each will handle all job
+definitions that it discovers on containers that run on the same Swarm node. No instance is aware
+of the events and containers on other nodes.
 
 Caveats & Tips
 --------------
