@@ -58,9 +58,10 @@ It is however recommended to use scripts with a proper shebang for such actions.
 Limitations
 -----------
 
-At the moment *deck-chores* is designed to run on a single Docker node, not
-within a cluster of these. Code and documentation contribution covering this
-are highly encouraged.
+When running on a cluster of `Docker Swarm <https://docs.docker.com/engine/swarm/>`_
+nodes, each ``deck-chores`` instance can only observe the containers on the
+node it's running on, and hence only restrict to run one job per service within
+the node's context.
 
 
 Acknowledgements
