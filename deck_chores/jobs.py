@@ -2,6 +2,7 @@ import logging
 from typing import Dict, Iterator, Mapping, Tuple
 
 from apscheduler import events
+from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.job import Job
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.util import undefined as undefined_runtime
@@ -18,8 +19,9 @@ scheduler = BackgroundScheduler()
 
 
 def start_scheduler():
+    job_executors = {"default": ThreadPoolExecutor(cfg.job_executor_pool_size)}
     logger = log if cfg.debug else None
-    scheduler.configure(logger=logger, timezone=cfg.timezone)
+    scheduler.configure(executors=job_executors, logger=logger, timezone=cfg.timezone)
     scheduler.add_listener(on_error, events.EVENT_JOB_ERROR)
     scheduler.add_listener(on_executed, events.EVENT_JOB_EXECUTED)
     scheduler.add_listener(on_max_instances, events.EVENT_JOB_MAX_INSTANCES)

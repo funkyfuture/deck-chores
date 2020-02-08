@@ -54,7 +54,8 @@ def generate_config() -> None:
         getenv('DOCKER_HOST', 'unix://var/run/docker.sock')
     )
     cfg.debug = trueish(getenv('DEBUG', 'no'))
-    cfg.default_max = int(getenv('DEFAULT_MAX', '1'))
+    cfg.default_max = int(getenv('DEFAULT_MAX', 1))
+    cfg.job_executor_pool_size = int(getenv('JOB_POOL_SIZE', 10))
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
     cfg.logformat = getenv('LOG_FORMAT', '{asctime}|{levelname:8}|{message}')
     cfg.service_identifiers = split_string(

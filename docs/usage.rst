@@ -382,6 +382,13 @@ deck-chore's behaviour is defined by these environment variables:
 
     The default for a job's ``max`` attribute.
 
+.. envvar:: JOB_POOL_SIZE
+
+    default: ``10``
+
+    The pool size of job executors defines the maximum number of jobs that can
+    run at the same time.
+
 .. envvar:: LABEL_NAMESPACE
 
     default: ``deck-chores``
