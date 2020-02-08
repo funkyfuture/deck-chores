@@ -79,9 +79,8 @@ def generate_config() -> None:
                 "The Docker daemon replied unexpected content on the /ping endpoint."
             )
             raise SystemExit(1)
-    except docker.errors.APIError as e:  # pragma: nocover
-        log.error("Docker daemon error:")
-        log.error(str(e))
+    except docker.errors.APIError:  # pragma: nocover
+        log.exception("Docker daemon error:")
         raise SystemExit(1)
 
 
