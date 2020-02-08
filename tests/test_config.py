@@ -32,6 +32,7 @@ def test_default_config(monkeypatch):
         'debug': False,
         'default_max': 1,
         'default_flags': ('image', 'service'),
+        'job_executor_pool_size': 10,
         'label_ns': 'deck-chores.',
         'logformat': '{asctime}|{levelname:8}|{message}',
         'service_identifiers': (
