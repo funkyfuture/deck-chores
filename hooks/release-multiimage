@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -ex
 
 IMAGE=$1
 VERSION=$2
@@ -15,7 +15,7 @@ while ! docker pull ${ARM64_IMAGE} ; do sleep 10 ; done
 while ! docker pull ${ARMV7L_IMAGE} ; do sleep 10 ; done
 while ! docker pull ${AMD64_IMAGE} ; do sleep 10 ; done
 
-docker manifest create "${MANIFEST}" "${AARCH64_IMAGE}" "${AMD64_IMAGE}" "${ARMV7L_IMAGE}"
+docker manifest create "${MANIFEST}" "${AMD64_IMAGE}" "${ARM64_IMAGE}" "${ARMV7L_IMAGE}"
 docker manifest annotate --os linux --arch "amd64" "${MANIFEST}" "${AMD64_IMAGE}"
 docker manifest annotate --os linux --arch "arm64" "${MANIFEST}" "${ARM64_IMAGE}"
 docker manifest annotate --os linux --arch "arm" --variant "v7" "${MANIFEST}" "${ARMV7L_IMAGE}"
