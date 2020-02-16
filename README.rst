@@ -27,7 +27,8 @@ Features
 - use date, interval and cron-like triggers
 - set a maximum of simultaneously running instances per job
 - restrict job scheduling to one container per service
-- multi-architecture image supports ``amd64`` and ``armv7l`` platforms, no emulator involved
+- multi-architecture image supports ``amd64``, ``arm64`` and ``armv7l`` platforms, no emulator
+  involved
 
 
 Example
@@ -38,7 +39,7 @@ that defines a job that will be handled by *deck-chores*:
 
 .. code-block:: yaml
 
-    version: '2'
+    version: "3.7"
 
     services:
       wordpress:

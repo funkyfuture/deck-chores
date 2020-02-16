@@ -1,6 +1,21 @@
 History
 -------
 
+1.0-rc1 (2020-02-16)
+~~~~~~~~~~~~~~~~~~~~
+
+This release candidate for the final version brings improved documentation, logging, a lot of code
+cleanup and these notable changes:
+
+* *new*: jobs' container assignments and states are properly adjusted with regards to other
+  instances of a service's state
+* *new*: ``deck-chores``' cache sizes for container properties can be controlled with
+  ``CONTAINER_CACHE_SIZE``
+* *new*: the environment variable ``JOB_POOL_SIZE`` can be used to adapt the job executors pool size
+* *new*: images are build for ``arm64`` (aka ``aarch64``) architectures
+
+All previously deprecated options have been removed.
+
 0.3.1 (2019-03-02)
 ~~~~~~~~~~~~~~~~~~
 

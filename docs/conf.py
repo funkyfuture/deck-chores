@@ -19,7 +19,7 @@ import deck_chores
 # -- Project information -----------------------------------------------------
 
 project = 'deck-chores'
-copyright = '2016-2019, Frank Sachsenheim'
+copyright = '2016-2020, Frank Sachsenheim'
 author = 'Frank Sachsenheim'
 
 # The full version, including alpha/beta/rc tags.
