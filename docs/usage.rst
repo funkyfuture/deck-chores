@@ -13,8 +13,8 @@ Usually you would run ``deck-chores`` in a container::
 
 .. note::
 
-    There's a manifest on the Docker Hub that maps images to builds targeting ``amd64`` and ``arm``
-    architectures.
+    There's a manifest on the Docker Hub that maps images to builds targeting ``amd64``, ``amd64``
+    and ``armv7l`` architectures.
     Thus you don't need to specify any platform indicator, the Docker client will figure out which
     one is the proper image to pull.
 
