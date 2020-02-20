@@ -5,8 +5,6 @@ set -ex
 IMAGE=$1
 VERSION=$2
 
-MANIFEST="${IMAGE}:${VERSION}"
-
 AMD64_IMAGE="${IMAGE}:${VERSION}-amd64"
 ARM64_IMAGE="${IMAGE}:${VERSION}-arm64"
 ARMV7L_IMAGE="${IMAGE}:${VERSION}-armv7l"
@@ -15,10 +13,20 @@ while ! docker pull ${ARM64_IMAGE} ; do sleep 10 ; done
 while ! docker pull ${ARMV7L_IMAGE} ; do sleep 10 ; done
 while ! docker pull ${AMD64_IMAGE} ; do sleep 10 ; done
 
-docker manifest create "${MANIFEST}" "${AMD64_IMAGE}" "${ARM64_IMAGE}" "${ARMV7L_IMAGE}"
-docker manifest annotate --os linux --arch "amd64" "${MANIFEST}" "${AMD64_IMAGE}"
-docker manifest annotate --os linux --arch "arm64" "${MANIFEST}" "${ARM64_IMAGE}"
-docker manifest annotate --os linux --arch "arm" --variant "v7" "${MANIFEST}" "${ARMV7L_IMAGE}"
+MAJOR=$(echo $VERSION | cut -d . -f 1)
+MINOR=$(echo $VERSION | cut -d . -f 2)
+PATCH=$(echo $VERSION | cut -d . -f 3)
 
-docker manifest inspect "${MANIFEST}"
-docker manifest push "${MANIFEST}"
+for TAG in ${MAJOR}.${MINOR}.${PATCH} ${MAJOR}.${MINOR} ${MAJOR} ; do
+
+    MANIFEST="${IMAGE}:${TAG}"
+
+    docker manifest create "${MANIFEST}" "${AMD64_IMAGE}" "${ARM64_IMAGE}" "${ARMV7L_IMAGE}"
+    docker manifest annotate --os linux --arch "amd64" "${MANIFEST}" "${AMD64_IMAGE}"
+    docker manifest annotate --os linux --arch "arm64" "${MANIFEST}" "${ARM64_IMAGE}"
+    docker manifest annotate --os linux --arch "arm" --variant "v7" "${MANIFEST}" "${ARMV7L_IMAGE}"
+
+    docker manifest inspect "${MANIFEST}"
+    docker manifest push "${MANIFEST}"
+
+done
