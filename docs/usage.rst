@@ -26,7 +26,7 @@ Likewise, docker-compose_ can be used with such configuration:
 
     services:
       officer:
-        image: funkyfuture/deck-chores
+        image: funkyfuture/deck-chores:1
         restart: unless-stopped
         environment:
           TIMEZONE: Asia/Tel Aviv
@@ -60,7 +60,7 @@ suitable stack definition:
 
     services:
       officer:
-        image: funkyfuture/deck-chores
+        image: funkyfuture/deck-chores:1
         deploy:
           mode: global
         environment:
