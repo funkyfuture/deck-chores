@@ -77,10 +77,13 @@ def trueish(value: str) -> bool:
     return value.strip().lower() in ('1', 'on', 'true', 'yes')
 
 
+DEBUG = trueish(os.getenv('DEBUG', 'no'))
+
+
 log = logging.getLogger('deck_chores')
 log_handler = logging.StreamHandler(sys.stdout)
 log.addHandler(log_handler)
-log.setLevel(logging.DEBUG if trueish(os.getenv('DEBUG', 'no')) else logging.INFO)
+log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 
 
 # TODO remove ignore when this issue is solved:

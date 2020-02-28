@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import sys
 from datetime import datetime, timedelta
 from signal import signal, SIGINT, SIGTERM, SIGUSR1
@@ -20,7 +21,7 @@ from deck_chores.indexes import (
     service_locks_by_container_id,
 )
 from deck_chores.parsers import job_config_validator, parse_labels
-from deck_chores.utils import log, log_handler
+from deck_chores.utils import DEBUG, log, log_handler
 
 
 ####
@@ -271,10 +272,17 @@ def shutdown() -> None:  # pragma: nocover
 
 
 def main() -> None:  # pragma: nocover
+    if DEBUG and not __debug__:
+        log.debug("Replacing process with Python's optimizations off.")
+        sys.stdout.flush()
+        os.execlpe("deck-chores", "deck-chores", {**os.environ, "PYTHONOPTIMIZE": ""})
+
     if not lock.acquire(blocking=False):
         log.error(f"Couldn't acquire lock file at {lock.path}, exiting.")
         sys.exit(1)
+
     log.info(f'Deck Chores {__version__} started.')
+
     try:
         generate_config()
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
@@ -296,7 +304,7 @@ def main() -> None:  # pragma: nocover
     except SystemExit as e:
         exit_code = e.code
     except ConfigurationError as e:
-        log.error(str(e))
+        log.error(e)
         exit_code = 1
     except Exception:
         log.exception('Caught unhandled exception:')

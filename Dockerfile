@@ -16,6 +16,8 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["deck-chores"]
+ENV PYTHONOPTIMIZE=1
+# could be 2 with Cerberus 2
 
 COPY . /src
 
