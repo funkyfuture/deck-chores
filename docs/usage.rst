@@ -9,7 +9,7 @@ On a single host
 
 Usually you would run ``deck-chores`` in a container::
 
-    $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock funkyfuture/deck-chores
+    $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock funkyfuture/deck-chores:1
 
 .. note::
 
@@ -51,8 +51,8 @@ In a Docker Swarm
 ~~~~~~~~~~~~~~~~~
 
 ``deck-chores`` can be run in a Docker Swarm cluster, but it must be deployed on all nodes and it
-cannot restrict jobs to be run in one of the containers that manifest a service. This would be a
-suitable stack definition:
+cannot restrict jobs to be run in only one of the containers that manifest a service. This would be
+a suitable stack definition:
 
 .. code-block:: yaml
 
@@ -91,7 +91,9 @@ Caveats & Tips
     that define jobs.
     It would possibly trigger these jobs, which might lead to a corrupted build.
     You can avoid this risk by building images on a host that is not observed by `deck-chores` or
-    by pausing it during image builds.
+    by pausing it during image builds. Another alternative could be using Podman_ to build images.
+
+.. _Podman: https://podman.io/
 
 
 Containers without an enduring main process
@@ -105,15 +107,14 @@ non-stopping no-op command as main process like in this snippet of a ``docker-co
     services:
       neverending:
         # …
-        command: >
-          tail -f /dev/null
+        command: tail -f /dev/null
         labels:
-          deck-chores.short.command: daily_command …
-          deck-chores.short.interval: daily
+          deck-chores.daily_job.command: daily_command …
+          deck-chores.daily_job.interval: daily
 
 
-Making jobs' output available to ``docker logs``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Making jobs' output available to ``docker logs`` of the executing container
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Docker captures the output of the first process in a container as logged data. In order to capture
 the output of a job's command as well, its output needs to be redirected to the main process'
@@ -138,7 +139,7 @@ Job definitions
 
 Job definitions are parsed from a container's metadata aka labels. A label's key must be in the
 namespace defined by :envvar:`LABEL_NAMESPACE` (default: ``deck-chores``) to be considered. A job
-has an own namespace that holds all its attributes. Thus an attribute's key has usually this
+has its own namespace that holds all its attributes. Thus an attribute's key has usually this
 schema::
 
     $LABEL_NAMESPACE.<job name>.<job attribute>
@@ -158,7 +159,7 @@ command    the command to run
 cron       a :ref:`cron` definition
 date       a :ref:`date` definition
 env        this namespace holds environment variables that are set on the
-           command's context
+           command's execution context
 interval   an :ref:`interval` definition
 jitter     the maximum length of a random delay before each job's execution (in
            conjunction with a :ref:`cron` or :ref:`interval` trigger); can be
