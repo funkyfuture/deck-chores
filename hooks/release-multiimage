@@ -9,9 +9,7 @@ AMD64_IMAGE="${IMAGE}:${VERSION}-amd64"
 ARM64_IMAGE="${IMAGE}:${VERSION}-arm64"
 ARMV7L_IMAGE="${IMAGE}:${VERSION}-armv7l"
 
-while ! docker pull ${ARM64_IMAGE} ; do sleep 10 ; done
-while ! docker pull ${ARMV7L_IMAGE} ; do sleep 10 ; done
-while ! docker pull ${AMD64_IMAGE} ; do sleep 10 ; done
+while ! docker pull ${AMD64_IMAGE} ; do sleep 20 ; done
 
 MAJOR=$(echo $VERSION | cut -d . -f 1)
 MINOR=$(echo $VERSION | cut -d . -f 2)
@@ -27,6 +25,6 @@ for TAG in ${MAJOR}.${MINOR}.${PATCH} ${MAJOR}.${MINOR} ${MAJOR} ; do
     docker manifest annotate --os linux --arch "arm" --variant "v7" "${MANIFEST}" "${ARMV7L_IMAGE}"
 
     docker manifest inspect "${MANIFEST}"
-    docker manifest push "${MANIFEST}"
+    docker manifest push --purge "${MANIFEST}"
 
 done
