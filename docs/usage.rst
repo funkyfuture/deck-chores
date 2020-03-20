@@ -271,7 +271,7 @@ Examples
 ::
 
     28 Days       # run every 4 weeks
-    4 wookies     # run every 4 weeks
+    4 weeks     # run every 4 weeks
     42s 0.5d      # run every twelve hours and 42 seconds
     42:00:00      # run every fourty-two hours
     100/00:00:00  # run every one hundred days
