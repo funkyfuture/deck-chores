@@ -76,6 +76,11 @@ help: ## print make targets help
 lint: black ## check style with flake8
 	poetry run flake8 --max-complexity=10 --max-line-length=89 deck_chores tests
 
+.PHONY: maintenance-release
+maintenance-release:
+	bash ./maintenance-updates.sh
+	$(MAKE) release
+
 .PHONY: mypy
 mypy:
 	poetry run mypy --ignore-missing-imports deck_chores
