@@ -56,6 +56,19 @@ It is however recommended to use scripts with a proper shebang for such actions.
 ``stdout`` and ``stderr`` as well as their exit code will be logged by *deck-chores*.
 
 
+Maintenance
+-----------
+
+The final release is supposed to receive monthly updates that includes updates
+of all updateable dependencies. If one is skipped, don't worry. When a second
+maintenance release is skipped, feel free to open an issue to ask what the
+status is.
+
+You can always build images upon an up-to-date base image with
+
+    make build
+
+
 Limitations
 -----------
 
