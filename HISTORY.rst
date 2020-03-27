@@ -1,6 +1,14 @@
 History
 -------
 
+Maintenance releases are not mentioned here, they update all dependencies and
+trigger complete rebuilds of the container images.
+
+1.0 (2020-03-27)
+~~~~~~~~~~~~~~~~
+
+* *new*: maintenance release automation
+
 1.0-rc1 (2020-02-16)
 ~~~~~~~~~~~~~~~~~~~~
 
