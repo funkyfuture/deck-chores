@@ -64,7 +64,7 @@ of all updateable dependencies. If one is skipped, don't worry. When a second
 maintenance release is skipped, feel free to open an issue to ask what the
 status is.
 
-You can always build images upon an up-to-date base image with
+You can always build images upon an up-to-date base image with::
 
     make build
 
