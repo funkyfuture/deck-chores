@@ -33,7 +33,7 @@ def start_scheduler():
 
 
 def on_max_instances(event: events.JobSubmissionEvent) -> None:
-    job = scheduler.get_job(event.job_id).kwargs
+    job = scheduler.get_job(event.job_id)
     definition = job.kwargs
     log.info(
         f"{container_name(definition['container_id'])}: "
@@ -66,8 +66,8 @@ def on_executed(event: events.JobExecutionEvent) -> None:
 def on_error(event: events.JobExecutionEvent) -> None:
     definition = scheduler.get_job(event.job_id).kwargs
     log.critical(
-        f'An exception in deck-chores occured while executing {definition["job_name"]} '
-        f'in container {definition["container_id"]}:'
+        f'An exception in deck-chores occurred while executing'
+        f' {definition["job_name"]} in container {definition["container_id"]}:'
     )
     log.error(str(event.exception))
 
