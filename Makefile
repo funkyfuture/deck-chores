@@ -77,16 +77,16 @@ lint: black ## check style with flake8
 	poetry run flake8 --max-complexity=10 --max-line-length=89 deck_chores tests
 
 .PHONY: maintenance-release
-maintenance-release:
+maintenance-release: ## publish a maintenance with updated dependencies
 	bash ./maintenance-updates.sh
 	$(MAKE) release
 
 .PHONY: mypy
-mypy:
+mypy:  ## check types with mypy
 	poetry run mypy --ignore-missing-imports deck_chores
 
-.PHONY: pytest ## run pytest
-pytest:
+.PHONY: pytest
+pytest: ## run tests with pytest
 	poetry run pytest --cov=deck_chores --cov-report term-missing --cov-fail-under 90
 
 .PHONY: test
