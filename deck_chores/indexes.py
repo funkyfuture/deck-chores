@@ -1,6 +1,7 @@
-from functools import lru_cache
 from types import MappingProxyType
 from typing import Dict, Tuple
+
+from fastcache import lru_cache
 
 from deck_chores.config import cfg, CONTAINER_CACHE_SIZE
 from deck_chores.utils import log
@@ -9,7 +10,7 @@ from deck_chores.utils import log
 ####
 
 
-@lru_cache(CONTAINER_CACHE_SIZE)
+@lru_cache(maxsize=CONTAINER_CACHE_SIZE)
 def container_name(container_id: str) -> str:
     return cfg.client.containers.get(container_id).name
 

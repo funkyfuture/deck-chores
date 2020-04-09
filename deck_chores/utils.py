@@ -1,9 +1,10 @@
 import logging
 import os
 import sys
-from functools import lru_cache
 from typing import Optional, Tuple
 from uuid import NAMESPACE_DNS, uuid5
+
+from fastcache import lru_cache
 
 
 TIME_UNIT_MULTIPLIERS = {
@@ -16,12 +17,12 @@ TIME_UNIT_MULTIPLIERS = {
 UUID_NAMESPACE = uuid5(NAMESPACE_DNS, "deck-chores.readthedocs.io")
 
 
-@lru_cache(64)
+@lru_cache(maxsize=64)
 def generate_id(*args) -> str:
     return str(uuid5(UUID_NAMESPACE, ''.join(args)))
 
 
-@lru_cache(64)
+@lru_cache(maxsize=64)
 def parse_time_from_string_with_units(value: str) -> Optional[int]:
     digits: str = ''
     result: float = 0
@@ -55,7 +56,7 @@ def parse_time_from_string_with_units(value: str) -> Optional[int]:
     return int(result)
 
 
-@lru_cache(64)
+@lru_cache(maxsize=64)
 def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
     weeks, value = divmod(value, TIME_UNIT_MULTIPLIERS['w'])
     days, value = divmod(value, TIME_UNIT_MULTIPLIERS['d'])

@@ -250,6 +250,14 @@ version = "0.3"
 
 [[package]]
 category = "main"
+description = "C implementation of Python 3 functools.lru_cache"
+name = "fastcache"
+optional = false
+python-versions = "*"
+version = "1.1.0"
+
+[[package]]
+category = "main"
 description = "A python package that provides useful locks."
 name = "fasteners"
 optional = false
@@ -831,7 +839,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "1176d0277a9ebdb8bca9d16982435f688b7113a33b68e3a97194482b5c862629"
+content-hash = "66a1385a2e8e76db119408197cbeb230a86a91cbf105b3c51d9c127b0c485b4f"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -999,6 +1007,9 @@ docutils = [
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
+]
+fastcache = [
+    {file = "fastcache-1.1.0.tar.gz", hash = "sha256:6de1b16e70335b7bde266707eb401a3aaec220fb66c5d13b02abf0eab8be782b"},
 ]
 fasteners = [
     {file = "fasteners-0.14.1-py2.py3-none-any.whl", hash = "sha256:564a115ff9698767df401efca29620cbb1a1c2146b7095ebd304b79cc5807a7c"},

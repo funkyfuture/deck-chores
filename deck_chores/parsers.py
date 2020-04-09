@@ -1,4 +1,3 @@
-from functools import lru_cache
 from collections import defaultdict, ChainMap
 from typing import DefaultDict, Dict, Mapping, Optional, Tuple, Type, Union
 
@@ -6,6 +5,7 @@ import cerberus
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from fastcache import lru_cache
 from pytz import all_timezones
 
 from deck_chores.config import cfg, CONTAINER_CACHE_SIZE
@@ -138,7 +138,7 @@ job_config_validator = JobConfigValidator(
 ####
 
 
-@lru_cache(CONTAINER_CACHE_SIZE)
+@lru_cache(maxsize=CONTAINER_CACHE_SIZE)
 def parse_labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
     labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {labels}')
@@ -173,7 +173,7 @@ def parse_options(labels: Dict[str, str]) -> Tuple[str, str]:
     return flags, user
 
 
-@lru_cache(16)
+@lru_cache(maxsize=16)
 def parse_flags(options: str) -> str:
     result = set(cfg.default_flags)
     if options:
