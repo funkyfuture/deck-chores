@@ -123,7 +123,7 @@ job_config_validator = JobConfigValidator(
             'min': 0,
         },
         'max': {'coerce': int},  # default is set later
-        'name': {'regex': r'[a-z0-9.-]+', "required": True},
+        'name': {'regex': r'[a-z0-9-]+', "required": True},
         'timezone': {'allowed': all_timezones},  # default is set later
         'user': {
             "empty": True,

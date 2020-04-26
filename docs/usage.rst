@@ -150,6 +150,8 @@ An exception is a job's ``env`` namespace that is structured like this::
 
 The *job name* ``options`` cannot be used as it is reserved for setting :ref:`options`.
 
+A job name can consist of lower-case letters, digits and dashes.
+
 The following attributes are available:
 
 =========  ====================================================================
