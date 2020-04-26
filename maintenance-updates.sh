@@ -8,6 +8,6 @@ if git status --porcelain | grep "M poetry.lock" ; then
     git commit -m "Updates dependencies"
 fi
 
-poetry version minor
+poetry version patch
 git add pyproject.toml
 git commit -m "Bumps version to $(poetry version | cut -d ' ' -f 2) (maintenance build)"
