@@ -129,10 +129,10 @@ def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
 
         if container_is_paused and not job_is_paused:
             job.pause()
-            log.debug(f"Paused job.")
+            log.debug("Paused job.")
         elif not container_is_paused and job_is_paused:
             job.resume()
-            log.debug(f"Resumed job.")
+            log.debug("Resumed job.")
 
         job.modify(kwargs={**job.kwargs, "container_id": new_id})
 
