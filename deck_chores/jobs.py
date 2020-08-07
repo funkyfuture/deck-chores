@@ -134,7 +134,7 @@ def add(
             ),
             kwargs=definition,
             id=job_id,
-            name=container_id,
+            name=job_name,
             max_instances=definition['max'],
             next_run_time=None if paused else undefined_runtime,
             replace_existing=True,
