@@ -1,6 +1,6 @@
 dist: focal
 language: python
-python: 3.9
+python: 3.9-dev
 cache: pip
 
 env:
