@@ -31,7 +31,7 @@ deck-chores = "deck_chores.main:main"
 [tool.poetry.dependencies]
 # the Dockerfile-dev has these values too
 # .readthedocs.yml must be in parity with the Python version
-python = "^3.8"
+python = "^3.9"
 apscheduler = "^3.6"
 cerberus = "^1.3"
 docker = {version = "^4.0", extras = ["ssh", "tls"]}

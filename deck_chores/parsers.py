@@ -1,4 +1,4 @@
-from collections import defaultdict, ChainMap
+from collections import defaultdict
 from typing import DefaultDict, Dict, Mapping, Optional, Tuple, Type, Union
 
 import cerberus
@@ -148,17 +148,15 @@ def parse_labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dic
     filtered_labels = {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
     flags, user = parse_options(filtered_labels)
 
-    jobs_labels: Mapping[str, str]
-
     if 'image' in flags:
         image_labels = image_definition_labels_of_container(container_id)
-        _, image_options_user = parse_options(image_labels)
-        user = user or image_options_user
-        jobs_labels = ChainMap(filtered_labels, image_labels)
+        user = user or parse_options(image_labels)[1]
     else:
-        jobs_labels = filtered_labels
+        image_labels = {}
 
-    job_definitions = parse_job_definitions(jobs_labels, user)
+    job_definitions = parse_job_definitions(
+        image_labels | filtered_labels, user  # type: ignore  # TODO remove eventually
+    )
 
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
@@ -178,8 +176,8 @@ def parse_flags(options: str) -> str:
     result = set(cfg.default_flags)
     if options:
         for option in split_string(options):
-            if option.startswith('no'):
-                result.discard(option[2:])
+            if option.startswith("no"):
+                result.discard(option.removeprefix("no"))
             else:
                 result.add(option)
     result_string = ','.join(sorted(result))
@@ -217,7 +215,7 @@ def parse_job_definitions(labels: Mapping[str, str], user: str) -> Dict[str, Dic
     ] = defaultdict(dict)
 
     for key, value in labels.items():
-        key = key[len(cfg.label_ns) :]  # noqa: E203
+        key = key.removeprefix(cfg.label_ns)
         if '.env.' in key:
             name, _, variable = key.split('.', 2)
             name_grouped_definitions[name].setdefault('environment', {})
