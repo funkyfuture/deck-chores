@@ -3,6 +3,7 @@ import ssl
 from os import environ
 from os.path import exists
 from types import SimpleNamespace
+import re
 
 import docker
 from docker.constants import DEFAULT_TIMEOUT_SECONDS
@@ -72,6 +73,19 @@ def generate_config() -> None:
         assert_hostname=cfg.assert_hostname,
         environment=local_environment,
     )
+
+    tmp_job_name_regex = getenv('JOB_NAME_REGEX', '[a-z0-9-]+')
+
+    try:
+        re.compile(tmp_job_name_regex)
+        is_valid = True
+    except re.error:
+        is_valid = False
+
+    if not is_valid:
+        tmp_job_name_regex = '[a-z0-9-]+'
+    
+    cfg.job_name_regex = fr'{tmp_job_name_regex}'
 
     try:  # pragma: nocover
         if not cfg.client.ping():

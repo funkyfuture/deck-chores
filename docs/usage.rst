@@ -367,6 +367,12 @@ deck-chore's behaviour is defined by these environment variables:
 
     The URL of the Docker daemon to connect to.
 
+.. envvar:: REDIRECT_STDERR
+
+    default: ``no``
+
+    Redirect any deck-chores-internal log above level WARNING to STDERR, enabled by ``on``, ``true`` or ``yes``.
+
 .. envvar:: DEBUG
 
     default: ``no``
@@ -384,6 +390,12 @@ deck-chore's behaviour is defined by these environment variables:
     default: ``1``
 
     The default for a job's ``max`` attribute.
+
+.. envvar:: JOB_NAME_REGEX
+
+    default: ``[a-z0-9-]+``
+
+    The allowed characters for customized job names.
 
 .. envvar:: JOB_POOL_SIZE
 

@@ -80,10 +80,16 @@ def trueish(value: str) -> bool:
 
 DEBUG = trueish(os.getenv('DEBUG', 'no'))
 
-
 log = logging.getLogger('deck_chores')
 log_handler = logging.StreamHandler(sys.stdout)
 log.addHandler(log_handler)
+
+if trueish(os.environ.get('REDIRECT_STDERR', 'no')):
+    log_err = logging.getLogger('deck_chores_stderr')
+    err_handler = logging.StreamHandler(sys.stderr)
+    log_err.addHandler(err_handler)
+    log_err.setLevel(logging.WARNING)
+    
 log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 
 
