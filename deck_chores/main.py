@@ -267,6 +267,7 @@ def shutdown() -> None:  # pragma: nocover
     if hasattr(cfg, "client"):
         cfg.client.close()
 
+
 ####
 
 
