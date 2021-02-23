@@ -369,9 +369,10 @@ deck-chore's behaviour is defined by these environment variables:
 
 .. envvar:: STDERR_LEVEL
 
-    default: ``WARNING``
+    default: ``NOTSET``
 
     Redirect any deck-chores-internal log above level STDERR_LEVEL to STDERR, string or integer required.
+    The default ``NOTSET`` implies that the STDERR is not in use and any logging is done over STDOUT.
 
 .. envvar:: DEBUG
 

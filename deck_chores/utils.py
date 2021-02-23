@@ -88,7 +88,6 @@ log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 class ExcludeErrorsFilter(logging.Filter):
     level = logging.getLevelName(os.getenv('STDERR_LEVEL'))
     def filter(self, record):
-        """Only returns log messages with log level below ERROR (numeric value: 40)."""
         return record.levelno < self.level
 
 
