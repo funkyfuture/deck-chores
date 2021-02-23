@@ -21,7 +21,7 @@ from deck_chores.indexes import (
     service_locks_by_container_id,
 )
 from deck_chores.parsers import job_config_validator, parse_labels
-from deck_chores.utils import DEBUG, log, log_handler
+from deck_chores.utils import DEBUG, log, log_handler, ExcludeErrorsFilter
 
 
 ####
@@ -267,7 +267,6 @@ def shutdown() -> None:  # pragma: nocover
     if hasattr(cfg, "client"):
         cfg.client.close()
 
-
 ####
 
 
@@ -287,6 +286,14 @@ def main() -> None:  # pragma: nocover
         generate_config()
         log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
         log.debug(f'Config: {cfg.__dict__}')
+
+        if cfg.stderr_lvl != 'NOTSET':
+            level = logging.getLevelName(cfg.stderr_lvl)
+            log_err = logging.StreamHandler(sys.stderr)
+            log_err.setLevel(level)
+            log_err.setFormatter(logging.Formatter(cfg.logformat, style='{'))
+            log.addHandler(log_err)
+            log_handler.addFilter(ExcludeErrorsFilter())
 
         if there_is_another_deck_chores_container():
             log.error(

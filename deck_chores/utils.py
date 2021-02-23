@@ -83,14 +83,13 @@ DEBUG = trueish(os.getenv('DEBUG', 'no'))
 log = logging.getLogger('deck_chores')
 log_handler = logging.StreamHandler(sys.stdout)
 log.addHandler(log_handler)
-
-if trueish(os.environ.get('REDIRECT_STDERR', 'no')):
-    log_err = logging.getLogger('deck_chores_stderr')
-    err_handler = logging.StreamHandler(sys.stderr)
-    log_err.addHandler(err_handler)
-    log_err.setLevel(logging.WARNING)
-    
 log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
+
+class ExcludeErrorsFilter(logging.Filter):
+    level = logging.getLevelName(os.getenv('STDERR_LEVEL'))
+    def filter(self, record):
+        """Only returns log messages with log level below ERROR (numeric value: 40)."""
+        return record.levelno < self.level
 
 
 # TODO remove ignore when this issue is solved:
@@ -98,6 +97,7 @@ log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 __all__ = (
     'log',
     'log_handler',
+    ExcludeErrorsFilter,
     parse_time_from_string_with_units.__name__,  # type: ignore
     seconds_as_interval_tuple.__name__,  # type: ignore
     split_string.__name__,  # type: ignore

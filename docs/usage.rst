@@ -367,11 +367,11 @@ deck-chore's behaviour is defined by these environment variables:
 
     The URL of the Docker daemon to connect to.
 
-.. envvar:: REDIRECT_STDERR
+.. envvar:: STDERR_LEVEL
 
-    default: ``no``
+    default: ``WARNING``
 
-    Redirect any deck-chores-internal log above level WARNING to STDERR, enabled by ``on``, ``true`` or ``yes``.
+    Redirect any deck-chores-internal log above level STDERR_LEVEL to STDERR, string or integer required.
 
 .. envvar:: DEBUG
 

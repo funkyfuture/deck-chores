@@ -54,6 +54,7 @@ def generate_config() -> None:
     cfg.docker_host = _test_daemon_socket(
         getenv('DOCKER_HOST', 'unix://var/run/docker.sock')
     )
+    cfg.stderr_lvl = getenv('STDERR_LEVEL', 'NOTSET')
     cfg.debug = trueish(getenv('DEBUG', 'no'))
     cfg.default_max = int(getenv('DEFAULT_MAX', 1))
     cfg.job_executor_pool_size = int(getenv('JOB_POOL_SIZE', 10))
@@ -75,6 +76,10 @@ def generate_config() -> None:
     )
 
     tmp_job_name_regex = getenv('JOB_NAME_REGEX', '[a-z0-9-]+')
+    
+    # import warnings
+    # with warnings.catch_warnings(): 
+    #     warnings.filterwarnings("ignore", category=FutureWarning)
 
     try:
         re.compile(tmp_job_name_regex)
