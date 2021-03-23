@@ -37,6 +37,7 @@ class JobConfigValidator(cerberus.Validator):
     def set_defaults(self, cfg):
         schema = self.schema
         schema["max"]["default"] = cfg.default_max
+        schema["name"]["regex"] = cfg.job_name_regex
         schema["timezone"]["default"] = cfg.timezone
         schema.validate()
 
@@ -123,7 +124,7 @@ job_config_validator = JobConfigValidator(
             'min': 0,
         },
         'max': {'coerce': int},  # default is set later
-        'name': {'regex': r'[a-z0-9-]+', "required": True},
+        'name': {"required": True}, # regex is set later
         'timezone': {'allowed': all_timezones},  # default is set later
         'user': {
             "empty": True,

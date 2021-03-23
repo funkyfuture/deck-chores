@@ -1,4 +1,5 @@
 import logging
+import re
 import ssl
 from os import environ
 from os.path import exists
@@ -43,6 +44,7 @@ def _test_daemon_socket(url: str) -> str:  # pragma: nocover
 ####
 
 
+
 def generate_config() -> None:
     cfg.__dict__.clear()
     cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
@@ -72,6 +74,24 @@ def generate_config() -> None:
         assert_hostname=cfg.assert_hostname,
         environment=local_environment,
     )
+
+    tmp_job_name_regex = getenv('JOB_NAME_REGEX', '[a-z0-9-]+')
+
+    print(tmp_job_name_regex)
+
+    try:
+        re.compile(tmp_job_name_regex)
+        if any ( match in tmp_job_name_regex for match in ["\.", "."]):
+            raise ConfigurationError("The supplied JOB_NAME_REGEX contains dots.")
+    except re.error:
+        log.error(
+            "The supplied JOB_NAME_REGEX is not valid."
+        )
+        raise SystemExit(1)
+
+    log.info(f'JOB_NAME_REGEX: {tmp_job_name_regex}')
+
+    cfg.job_name_regex = fr'{tmp_job_name_regex}'
 
     try:  # pragma: nocover
         if not cfg.client.ping():

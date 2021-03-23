@@ -385,6 +385,12 @@ deck-chore's behaviour is defined by these environment variables:
 
     The default for a job's ``max`` attribute.
 
+.. envvar:: JOB_NAME_REGEX
+
+    default: ``[a-z0-9-]+``
+
+    The allowed regex for customized job names.
+
 .. envvar:: JOB_POOL_SIZE
 
     default: ``10``
