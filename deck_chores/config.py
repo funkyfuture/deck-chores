@@ -73,6 +73,13 @@ def generate_config() -> None:
         environment=local_environment,
     )
 
+    _job_name_pattern = getenv('JOB_NAME_REGEX', '[a-z0-9-]+')
+
+    if r"\." not in _job_name_pattern:
+        cfg.job_name_regex = _job_name_pattern
+    else:
+        raise ConfigurationError("The supplied JOB_NAME_REGEX contains dots.")
+
     try:  # pragma: nocover
         if not cfg.client.ping():
             log.error(
