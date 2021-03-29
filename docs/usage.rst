@@ -122,8 +122,10 @@ the output of a job's command as well, its output needs to be redirected to the 
 
     deck-chores.a_job.command: sh -c "/usr/local/bin/job_script.sh > /proc/1/fd/1 2> /proc/1/fd/2"
 
-It is important to redirect both ``stdout`` (``>``) AND ``stderr`` (``2>``) separately so 
-``docker logs`` will also separate the streams as normal.
+The normal behaviour of ``docker logs`` is that it separates ``stdout`` and ``stderr`` into 
+different streams for output. If you want to retain this behaviour, you must redirect 
+both ``stdout`` (``>``) and ``stderr`` (``2>``) separately as shown.
+
 
 
 Listing all registered jobs
