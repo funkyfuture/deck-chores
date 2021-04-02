@@ -95,7 +95,7 @@ test: lint mypy pytest ## run all tests
 .PHONY: release
 release: test doclinks build ## release the current version on github, the PyPI and the Docker hub
 	git tag -f $(VERSION)
-	git push origin master
+	git push origin main
 	git push -f origin $(VERSION)
 	poetry publish --build
 	$(MAKE) release-multiimage
