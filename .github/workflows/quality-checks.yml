@@ -1,0 +1,38 @@
+---
+
+name: quality-checks
+on:
+  - pull_request
+  - push
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: lint
+          - target: mypy
+          - target: pytest
+          - target: doclinks
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - run: python -m pip install --upgrade pip setuptools wheel
+      - uses: abatilo/actions-poetry@v2.1.0
+      - run: poetry install -v
+      - run: poetry run make ${{ matrix.target }}
+
+  docker-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/build-push-action@v2
+
+...

@@ -32,4 +32,3 @@ docs/_build/
 /hooks/
 Makefile
 .readthedocs.yml
-.travis.yml
