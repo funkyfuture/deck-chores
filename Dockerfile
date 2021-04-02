@@ -14,7 +14,6 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.title="deck-chores" \
       org.opencontainers.image.version=$VERSION
 
-ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["deck-chores"]
 ENV PYTHONOPTIMIZE=1
 # could be 2 with Cerberus 2
@@ -22,8 +21,8 @@ ENV PYTHONOPTIMIZE=1
 COPY . /src
 
 RUN apk upgrade --no-cache \
- && apk add --no-cache --virtual .build-deps build-base ca-certificates libffi-dev openssl-dev \
- && apk add --no-cache tini tzdata \
+ && apk add --no-cache --virtual .build-deps build-base cargo ca-certificates libffi-dev musl-dev openssl-dev python3-dev \
+ && apk add --no-cache tzdata \
  && echo "UTC" > /etc/timezone \
  && cd /src \
  && pip install --no-cache-dir /src \
