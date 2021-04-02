@@ -118,9 +118,14 @@ Making jobs' output available to ``docker logs`` of the executing container
 
 Docker captures the output of the first process in a container as logged data. In order to capture
 the output of a job's command as well, its output needs to be redirected to the main process'
-``stdout`` or ``stderr``, e.g. with by redirecting a command's output with a shell::
+``stdout`` and ``stderr``, e.g. by redirecting a command's output with a shell::
 
-    deck-chores.a_job.command: sh -c "/usr/local/bin/job_script.sh &> /proc/1/fd/1"
+    deck-chores.a_job.command: sh -c "/usr/local/bin/job_script.sh > /proc/1/fd/1 2> /proc/1/fd/2"
+
+The normal behaviour of ``docker logs`` is that it separates ``stdout`` and ``stderr`` into 
+different streams for output. If you want to retain this behaviour, you must redirect 
+both ``stdout`` (``>``) and ``stderr`` (``2>``) separately as shown.
+
 
 
 Listing all registered jobs
