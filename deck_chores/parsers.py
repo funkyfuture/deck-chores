@@ -154,9 +154,7 @@ def parse_labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dic
     else:
         image_labels = {}
 
-    job_definitions = parse_job_definitions(
-        image_labels | filtered_labels, user
-    )
+    job_definitions = parse_job_definitions(image_labels | filtered_labels, user)
 
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
