@@ -1,11 +1,11 @@
 from collections import defaultdict
+from functools import lru_cache
 from typing import DefaultDict, Dict, Mapping, Optional, Tuple, Type, Union
 
 import cerberus
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-from fastcache import lru_cache
 from pytz import all_timezones
 
 from deck_chores.config import cfg, CONTAINER_CACHE_SIZE

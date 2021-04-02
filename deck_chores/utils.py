@@ -1,10 +1,9 @@
 import logging
 import os
 import sys
+from functools import lru_cache
 from typing import Optional, Tuple
 from uuid import NAMESPACE_DNS, uuid5
-
-from fastcache import lru_cache
 
 
 TIME_UNIT_MULTIPLIERS = {

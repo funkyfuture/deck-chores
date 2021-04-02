@@ -1,7 +1,6 @@
+from functools import lru_cache
 from types import MappingProxyType
 from typing import Dict, Tuple
-
-from fastcache import lru_cache
 
 from deck_chores.config import cfg, CONTAINER_CACHE_SIZE
 from deck_chores.utils import log

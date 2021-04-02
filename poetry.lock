@@ -194,7 +194,7 @@ test = ["pytest (>=3.6.0,!=3.9.0,!=3.9.1,!=3.9.2)", "pretend", "iso8601", "pytz"
 
 [[package]]
 name = "docker"
-version = "4.3.1"
+version = "4.4.4"
 description = "A Python library for the Docker Engine API."
 category = "main"
 optional = false
@@ -221,14 +221,6 @@ description = "Docutils -- Python Documentation Utilities"
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[[package]]
-name = "fastcache"
-version = "1.1.0"
-description = "C implementation of Python 3 functools.lru_cache"
-category = "main"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "fasteners"
@@ -757,7 +749,7 @@ six = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "dd5718bad538aa109583858967385088e603c131327d829f6fb39bad4757b019"
+content-hash = "509a6e892669f9eac02df132290613f0ace5d851658012bd8a11fb1d6ca8493f"
 
 [metadata.files]
 alabaster = [
@@ -915,15 +907,12 @@ cryptography = [
     {file = "cryptography-3.1.1.tar.gz", hash = "sha256:9d9fc6a16357965d282dd4ab6531013935425d0dc4950df2e0cf2a1b1ac1017d"},
 ]
 docker = [
-    {file = "docker-4.3.1-py2.py3-none-any.whl", hash = "sha256:13966471e8bc23b36bfb3a6fb4ab75043a5ef1dac86516274777576bed3b9828"},
-    {file = "docker-4.3.1.tar.gz", hash = "sha256:bad94b8dd001a8a4af19ce4becc17f41b09f228173ffe6a4e0355389eef142f2"},
+    {file = "docker-4.4.4-py2.py3-none-any.whl", hash = "sha256:f3607d5695be025fa405a12aca2e5df702a57db63790c73b927eb6a94aac60af"},
+    {file = "docker-4.4.4.tar.gz", hash = "sha256:d3393c878f575d3a9ca3b94471a3c89a6d960b35feb92f033c0de36cc9d934db"},
 ]
 docutils = [
     {file = "docutils-0.16-py2.py3-none-any.whl", hash = "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af"},
     {file = "docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"},
-]
-fastcache = [
-    {file = "fastcache-1.1.0.tar.gz", hash = "sha256:6de1b16e70335b7bde266707eb401a3aaec220fb66c5d13b02abf0eab8be782b"},
 ]
 fasteners = [
     {file = "fasteners-0.14.1-py2.py3-none-any.whl", hash = "sha256:564a115ff9698767df401efca29620cbb1a1c2146b7095ebd304b79cc5807a7c"},
