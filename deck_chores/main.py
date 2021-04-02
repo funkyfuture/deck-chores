@@ -150,7 +150,7 @@ def find_other_container_for_service(
         return None
 
     for status in (
-        ("running", "restarting", "paused", "created")  # type: ignore
+        ("running", "restarting", "paused", "created")
         if consider_paused
         else ("running", "restarting")
     ):

@@ -155,7 +155,7 @@ def parse_labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dic
         image_labels = {}
 
     job_definitions = parse_job_definitions(
-        image_labels | filtered_labels, user  # type: ignore  # TODO remove eventually
+        image_labels | filtered_labels, user
     )
 
     if service_id:
