@@ -65,6 +65,13 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
     return weeks, days, hours, minutes, value
 
 
+def setup_stderr_logging(log: logging.Logger, formatter: logging.Formatter, stderr_level: int) -> None:
+    log_err = logging.StreamHandler(sys.stderr)
+    log_err.setLevel(stderr_level)
+    log_err.setFormatter(formatter)
+    log.addHandler(log_err)
+
+
 def split_string(
     value: str, delimiter: str = ',', sort: bool = False
 ) -> Tuple[str, ...]:
@@ -94,6 +101,7 @@ __all__ = (
     'log_handler',
     parse_time_from_string_with_units.__name__,  # type: ignore
     seconds_as_interval_tuple.__name__,  # type: ignore
+    setup_stderr_logging.__name__,
     split_string.__name__,  # type: ignore
     trueish.__name__,
 )

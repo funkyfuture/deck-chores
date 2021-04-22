@@ -66,6 +66,7 @@ def generate_config() -> None:
         )
     )
     cfg.ssl_version = _resolve_tls_version(getenv('SSL_VERSION', 'TLS'))
+    cfg.stderr_level = logging.getLevelName(getenv('STDERR_LEVEL', 'NOTSET'))
     cfg.timezone = getenv('TIMEZONE', 'UTC').replace(' ', '_')
     cfg.client = docker.from_env(
         version='auto',
