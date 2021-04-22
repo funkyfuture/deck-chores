@@ -22,7 +22,12 @@ from deck_chores.indexes import (
     service_locks_by_container_id,
 )
 from deck_chores.parsers import job_config_validator, parse_labels
-from deck_chores.utils import DEBUG, log, log_handler
+from deck_chores.utils import (
+    DEBUG, 
+    log, 
+    stdout_log_handler, 
+    setup_stderr_logging
+)
 
 
 ####
@@ -290,8 +295,12 @@ def main() -> None:  # pragma: nocover
 
     try:
         generate_config()
-        log_handler.setFormatter(logging.Formatter(cfg.logformat, style='{'))
+
+        log_formatter = logging.Formatter(cfg.logformat, style='{')
+        stdout_log_handler.setFormatter(log_formatter)
         log.debug(f'Config: {cfg.__dict__}')
+
+        setup_stderr_logging(log_formatter, cfg.stderr_level)
 
         if there_is_another_deck_chores_container():
             log.error(

@@ -372,6 +372,15 @@ deck-chore's behaviour is defined by these environment variables:
 
     The URL of the Docker daemon to connect to.
 
+.. envvar:: STDERR_LEVEL
+
+    default: ``NOTSET``
+
+    Redirect any not job-related log message above the given level to ``stderr``, 
+    valid level strings comply to the python logging documentation.
+
+    The default ``NOTSET`` implies that all log messages are emitted to ``stdout``.
+
 .. envvar:: DEBUG
 
     default: ``no``
