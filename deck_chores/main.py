@@ -276,7 +276,7 @@ def main() -> None:  # pragma: nocover
     if DEBUG and not __debug__:
         log.debug("Replacing process with Python's optimizations off.")
         sys.stdout.flush()
-        os.execlpe("deck-chores", "deck-chores", {**os.environ, "PYTHONOPTIMIZE": ""})
+        os.execlpe("deck-chores", "deck-chores", {**os.environ, "PYTHONOPTIMIZE": "1"})
 
     if not lock.acquire(blocking=False):
         log.error(f"Couldn't acquire lock file at {lock.path}, exiting.")
