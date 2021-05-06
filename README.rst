@@ -98,3 +98,4 @@ Authors
 - aeri4list
 - alpine-digger
 - Brynjar Smári Bjarnason
+- Garret Hohmann
