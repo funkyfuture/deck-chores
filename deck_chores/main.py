@@ -100,7 +100,7 @@ def inspect_running_containers() -> datetime:
         started_at = cfg.client.api.inspect_container(container_id)['State'][
             'StartedAt'
         ]
-        date_string = (started_at[: 23 if len(started_at) < 26 else 26]).replace('Z', '00+00')
+        date_string = (started_at[: 23 if len(started_at) < 26 else 26]).replace('Z', '+00:00')
         last_event_time = max(
             last_event_time,
             datetime.fromisoformat(date_string),
