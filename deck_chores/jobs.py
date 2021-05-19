@@ -53,7 +53,7 @@ def on_executed(event: events.JobExecutionEvent) -> None:
 
     log.log(
         logging.INFO if exit_code == 0 else logging.CRITICAL,
-        f'Command {definition["command"]} in container {definition["container_id"]} '
+        f'Command `{definition["command"]}` in container {definition["container_id"]} '
         f'finished with exit code {exit_code}.',
     )
     if response_lines:
