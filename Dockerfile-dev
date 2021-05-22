@@ -5,7 +5,7 @@ LABEL org.label-schema.name="deck-chores"
 ENV DEBUG=true
 
 RUN apk add --no-cache build-base cargo ca-certificates libffi-dev musl-dev openssl-dev python3-dev \
- && pip install cerberus~=1.3 docker[ssh,tls]~=4.0 fasteners~=0.14 APScheduler~=3.6 \
+ && pip install cerberus~=1.3 docker[ssh,tls]~=4.0 fasteners~=0.14 python-dateutil~=2.8 APScheduler~=3.6 \
  && echo "UTC" > /etc/timezone
 
 COPY . /src

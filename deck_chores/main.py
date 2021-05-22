@@ -7,6 +7,7 @@ from signal import signal, SIGINT, SIGTERM, SIGUSR1
 from typing import Optional
 
 from apscheduler.schedulers import SchedulerNotRunningError
+from dateutil.parser import isoparse as parse_iso_timestamp
 from docker.models.containers import Container
 from fasteners import InterProcessLock
 
@@ -97,12 +98,11 @@ def inspect_running_containers() -> datetime:
 
     for container in containers:
         container_id = container.id
-        started_at = cfg.client.api.inspect_container(container_id)['State'][
-            'StartedAt'
-        ]
         last_event_time = max(
             last_event_time,
-            datetime.fromisoformat(started_at[: 23 if len(started_at) < 26 else 26]),
+            parse_iso_timestamp(
+                cfg.client.api.inspect_container(container_id)['State']['StartedAt']
+            ),
         )
         process_started_container_labels(
             container_id, paused=container.status == 'paused'

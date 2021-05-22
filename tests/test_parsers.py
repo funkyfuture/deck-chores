@@ -1,7 +1,9 @@
-from pytest import mark
+from datetime import datetime
 
 from docker.models.containers import Container
+from pytest import mark
 
+from deck_chores.main import parse_iso_timestamp
 from deck_chores.parsers import (
     parse_flags,
     parse_labels,
@@ -10,6 +12,20 @@ from deck_chores.parsers import (
     IntervalTrigger,
     JobConfigValidator,
 )
+
+
+@mark.parametrize(
+    "sample",
+    (
+        "2021-05-05T16:42:18.488227566+00:00",
+        "2021-05-17T20:07:58.54095Z",
+        "2021-05-19T19:07:31.118260683Z",
+    ),
+)
+def test_from_iso_timetamp(sample):
+    """This test is to be used to test concrete manifestations of timestamps that Docker
+    daemons produced in the wild."""
+    assert isinstance(parse_iso_timestamp(sample), datetime)
 
 
 def test_parse_labels(cfg, mocker):
