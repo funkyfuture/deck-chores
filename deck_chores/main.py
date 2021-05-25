@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from signal import signal, SIGINT, SIGTERM, SIGUSR1
 from typing import Optional
 
@@ -93,7 +93,7 @@ def process_started_container_labels(container_id: str, paused: bool = False) ->
 
 def inspect_running_containers() -> datetime:
     log.info("Inspecting running containers.")
-    last_event_time = datetime.utcnow()
+    last_event_time = datetime.now(timezone.utc)
     containers = cfg.client.containers.list(ignore_removed=True, sparse=True)
 
     for container in containers:
@@ -109,7 +109,11 @@ def inspect_running_containers() -> datetime:
         )
 
     log.debug('Finished inspection of running containers.')
-    return last_event_time
+
+    # the timezone info is removed here, because the object will be fed to docker-py
+    # (version 4.4.4 at the time of writing) which cannot process timezone aware
+    # datetime objects
+    return last_event_time.replace(tzinfo=None)
 
 
 def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
@@ -308,7 +312,7 @@ def main() -> None:  # pragma: nocover
         log.error(e)
         exit_code = 1
     except Exception:
-        log.exception('Caught unhandled exception:')
+        log.exception('Caught an unhandled exception:')
         exit_code = 3
     else:
         exit_code = 0

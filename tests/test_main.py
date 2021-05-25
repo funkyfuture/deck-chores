@@ -227,7 +227,7 @@ def test_inspect_running_containers(cfg, mocker):
     container = SimpleNamespace(id="a", status="running")
     cfg.client.containers.list.return_value = [container]
     cfg.client.api.inspect_container.return_value = {
-        "State": {"StartedAt": "3000-01-02T01:02:03.456789"}
+        "State": {"StartedAt": "3000-01-02T01:02:03.456789Z"}
     }
 
     process_started_container_labels = mocker.MagicMock()
