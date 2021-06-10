@@ -65,11 +65,19 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
     return weeks, days, hours, minutes, value
 
 
-def setup_stderr_logging(log: logging.Logger, formatter: logging.Formatter, stderr_level: int) -> None:
-    log_err = logging.StreamHandler(sys.stderr)
-    log_err.setLevel(stderr_level)
-    log_err.setFormatter(formatter)
-    log.addHandler(log_err)
+
+
+def setup_stderr_logging(formatter: logging.Formatter, stderr_level: int) -> None:
+    stderr_log_handler = logging.StreamHandler(sys.stderr)
+    stderr_log_handler.setLevel(stderr_level)
+    stderr_log_handler.setFormatter(formatter)
+    log.addHandler(stderr_log_handler)
+    if stderr_level > 0:
+        class ExcludeErrorsFilter(logging.Filter):
+            def filter(self, record):
+                return record.levelno < stderr_level
+
+        stdout_log_handler.addFilter(ExcludeErrorsFilter())
 
 
 def split_string(
@@ -87,10 +95,12 @@ def trueish(value: str) -> bool:
 
 DEBUG = trueish(os.getenv('DEBUG', 'no'))
 
+global log
+global stdout_log_handler
 
 log = logging.getLogger('deck_chores')
-log_handler = logging.StreamHandler(sys.stdout)
-log.addHandler(log_handler)
+stdout_log_handler = logging.StreamHandler(sys.stdout)
+log.addHandler(stdout_log_handler)
 log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 
 
@@ -98,7 +108,7 @@ log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 #      https://github.com/python/mypy/issues/1317
 __all__ = (
     'log',
-    'log_handler',
+    'stdout_log_handler',
     parse_time_from_string_with_units.__name__,  # type: ignore
     seconds_as_interval_tuple.__name__,  # type: ignore
     setup_stderr_logging.__name__,
