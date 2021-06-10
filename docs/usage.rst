@@ -372,7 +372,7 @@ deck-chore's behaviour is defined by these environment variables:
     default: ``NOTSET``
 
     Redirect any not job-related log message above the given level to ``stderr``, 
-    valid level strings comply to the python logging documentation.
+    valid level strings must comply with the Python `logging module's names`_.
 
     The default ``NOTSET`` implies that all log messages are emitted to ``stdout``.
 
@@ -398,7 +398,7 @@ deck-chore's behaviour is defined by these environment variables:
 
     default: ``[a-z0-9-]+``
 
-    The allowed regex for customized job names.
+    The regex pattern for allowed job names.
 
 .. envvar:: JOB_POOL_SIZE
 
@@ -454,4 +454,5 @@ Authentication related files are expected to be available at ``/config/ca.pem``,
 .. _docker-issue-15211: https://github.com/moby/moby/issues/15211
 .. _docker-compose: https://docs.docker.com/compose/
 .. _log record attributes: https://docs.python.org/3/library/logging.html#logrecord-attributes
+.. _logging module's names: https://docs.python.org/library/logging.html#logging-levels
 .. _ssl: https://docs.python.org/3/library/ssl.html#ssl.PROTOCOL_TLS
