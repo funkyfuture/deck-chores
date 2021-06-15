@@ -1,5 +1,4 @@
 import logging
-import re
 import ssl
 from os import environ
 from os.path import exists
