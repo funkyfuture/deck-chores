@@ -33,6 +33,7 @@ def test_default_config(monkeypatch):
         'default_max': 1,
         'default_flags': ('image', 'service'),
         'job_executor_pool_size': 10,
+        'job_name_regex': '[a-z0-9-]+',
         'label_ns': 'deck-chores.',
         'logformat': '{asctime}|{levelname:8}|{message}',
         'service_identifiers': (
@@ -40,5 +41,6 @@ def test_default_config(monkeypatch):
             'com.docker.compose.service',
         ),
         'ssl_version': ssl.PROTOCOL_TLS,
+        'stderr_level': 0,
         'timezone': 'UTC',
     }
