@@ -122,8 +122,8 @@ the output of a job's command as well, its output needs to be redirected to the 
 
     deck-chores.a_job.command: sh -c "/usr/local/bin/job_script.sh > /proc/1/fd/1 2> /proc/1/fd/2"
 
-The normal behaviour of ``docker logs`` is that it separates ``stdout`` and ``stderr`` into 
-different streams for output. If you want to retain this behaviour, you must redirect 
+The normal behaviour of ``docker logs`` is that it separates ``stdout`` and ``stderr`` into
+different streams for output. If you want to retain this behaviour, you must redirect
 both ``stdout`` (``>``) and ``stderr`` (``2>``) separately as shown.
 
 
@@ -376,8 +376,8 @@ deck-chore's behaviour is defined by these environment variables:
 
     default: ``NOTSET``
 
-    Redirect any not job-related log message above the given level to ``stderr``, 
-    valid level strings comply to the python logging documentation.
+    Redirect any not job-related log message above the given level to ``stderr``,
+    valid level strings must comply with the Python `logging module's names`_.
 
     The default ``NOTSET`` implies that all log messages are emitted to ``stdout``.
 
@@ -459,4 +459,5 @@ Authentication related files are expected to be available at ``/config/ca.pem``,
 .. _docker-issue-15211: https://github.com/moby/moby/issues/15211
 .. _docker-compose: https://docs.docker.com/compose/
 .. _log record attributes: https://docs.python.org/3/library/logging.html#logrecord-attributes
+.. _logging module's names: https://docs.python.org/library/logging.html#logging-levels
 .. _ssl: https://docs.python.org/3/library/ssl.html#ssl.PROTOCOL_TLS

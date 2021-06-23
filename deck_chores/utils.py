@@ -16,6 +16,14 @@ TIME_UNIT_MULTIPLIERS = {
 UUID_NAMESPACE = uuid5(NAMESPACE_DNS, "deck-chores.readthedocs.io")
 
 
+class ExcludeErrorsFilter(logging.Filter):
+    def __init__(self, stderr_level: int):
+        self.threshold = stderr_level
+
+    def filter(self, record):
+        return record.levelno < self.threshold
+
+
 @lru_cache(maxsize=64)
 def generate_id(*args) -> str:
     return str(uuid5(UUID_NAMESPACE, ''.join(args)))
@@ -64,19 +72,16 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
     return weeks, days, hours, minutes, value
 
 
-
-
-def setup_stderr_logging(formatter: logging.Formatter, stderr_level: int) -> None:
+def setup_stderr_logging(
+    formatter: logging.Formatter, stderr_level: int
+) -> None:  # pragma: nocover
     stderr_log_handler = logging.StreamHandler(sys.stderr)
     stderr_log_handler.setLevel(stderr_level)
     stderr_log_handler.setFormatter(formatter)
     log.addHandler(stderr_log_handler)
-    if stderr_level > 0:
-        class ExcludeErrorsFilter(logging.Filter):
-            def filter(self, record):
-                return record.levelno < stderr_level
 
-        stdout_log_handler.addFilter(ExcludeErrorsFilter())
+    if stderr_level > 0:
+        stdout_log_handler.addFilter(ExcludeErrorsFilter(stderr_level))
 
 
 def split_string(
@@ -93,9 +98,6 @@ def trueish(value: str) -> bool:
 
 
 DEBUG = trueish(os.getenv('DEBUG', 'no'))
-
-global log
-global stdout_log_handler
 
 log = logging.getLogger('deck_chores')
 stdout_log_handler = logging.StreamHandler(sys.stdout)
