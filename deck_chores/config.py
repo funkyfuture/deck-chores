@@ -29,6 +29,20 @@ class ConfigurationError(Exception):
     pass
 
 
+def _check_docker_api(client: docker.DockerClient) -> docker.DockerClient:
+    try:  # pragma: nocover
+        if not client.ping():
+            log.error(
+                "The Docker daemon replied unexpected content on the /ping endpoint."
+            )
+            raise SystemExit(1)
+    except docker.errors.APIError:  # pragma: nocover
+        log.exception("Docker daemon error:")
+        raise SystemExit(1)
+
+    return client
+
+
 def _resolve_tls_version(version: str) -> int:
     return getattr(ssl, 'PROTOCOL_' + version.replace('.', '_'))
 
@@ -67,23 +81,15 @@ def generate_config() -> None:
     cfg.ssl_version = _resolve_tls_version(getenv('SSL_VERSION', 'TLS'))
     cfg.stderr_level = logging.getLevelName(getenv('STDERR_LEVEL', 'NOTSET'))
     cfg.timezone = getenv('TIMEZONE', 'UTC').replace(' ', '_')
-    cfg.client = docker.from_env(
-        version='auto',
-        timeout=cfg.client_timeout,
-        ssl_version=cfg.ssl_version,
-        assert_hostname=cfg.assert_hostname,
-        environment=local_environment,
+    cfg.client = _check_docker_api(
+        docker.from_env(
+            version='auto',
+            timeout=cfg.client_timeout,
+            ssl_version=cfg.ssl_version,
+            assert_hostname=cfg.assert_hostname,
+            environment=local_environment,
+        )
     )
-
-    try:  # pragma: nocover
-        if not cfg.client.ping():
-            log.error(
-                "The Docker daemon replied unexpected content on the /ping endpoint."
-            )
-            raise SystemExit(1)
-    except docker.errors.APIError:  # pragma: nocover
-        log.exception("Docker daemon error:")
-        raise SystemExit(1)
 
 
 __all__ = ('cfg', generate_config.__name__, ConfigurationError.__name__)
