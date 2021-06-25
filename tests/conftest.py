@@ -22,6 +22,8 @@ def cfg(mocker):
     cfg.default_max = 1
     cfg.default_flags = split_string('image,service', sort=True)
     cfg.default_user = 'root'
+    cfg.job_executor_namespace = 10
+    cfg.job_name_regex = "[a-z0-9-]+"
     cfg.label_ns = 'deck-chores.'
     cfg.service_identifiers = split_string('project_id,service_id')
     cfg.timezone = 'UTC'

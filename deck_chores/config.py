@@ -56,6 +56,7 @@ def generate_config() -> None:
     cfg.debug = trueish(getenv('DEBUG', 'no'))
     cfg.default_max = int(getenv('DEFAULT_MAX', 1))
     cfg.job_executor_pool_size = int(getenv('JOB_POOL_SIZE', 10))
+    cfg.job_name_regex = getenv("JOB_NAME_REGEX", "[a-z0-9-]+")
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
     cfg.logformat = getenv('LOG_FORMAT', '{asctime}|{levelname:8}|{message}')
     cfg.service_identifiers = split_string(
@@ -73,13 +74,6 @@ def generate_config() -> None:
         assert_hostname=cfg.assert_hostname,
         environment=local_environment,
     )
-
-    _job_name_pattern = getenv('JOB_NAME_REGEX', '[a-z0-9-]+')
-
-    if r"\." not in _job_name_pattern:
-        cfg.job_name_regex = _job_name_pattern
-    else:
-        raise ConfigurationError("The supplied JOB_NAME_REGEX contains dots.")
 
     try:  # pragma: nocover
         if not cfg.client.ping():

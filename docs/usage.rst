@@ -403,7 +403,7 @@ deck-chore's behaviour is defined by these environment variables:
 
     default: ``[a-z0-9-]+``
 
-    The allowed regex for customized job names.
+    The regex pattern for allowed job names. *It must not allow dots in a name!*
 
 .. envvar:: JOB_POOL_SIZE
 
