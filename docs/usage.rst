@@ -127,7 +127,6 @@ different streams for output. If you want to retain this behaviour, you must red
 both ``stdout`` (``>``) and ``stderr`` (``2>``) separately as shown.
 
 
-
 Listing all registered jobs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -137,6 +136,9 @@ in a container::
 
     docker kill --signal USR1 <CONTAINER>
 
+
+The output appears in ``deck-chores``' log target, that are the container's logs when it runs within
+one.
 
 
 Job definitions
