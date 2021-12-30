@@ -109,8 +109,8 @@ non-stopping no-op command as main process like in this snippet of a ``docker-co
         # …
         command: tail -f /dev/null
         labels:
-          deck-chores.daily_job.command: daily_command …
-          deck-chores.daily_job.interval: daily
+          deck-chores.daily-job.command: daily_command …
+          deck-chores.daily-job.interval: daily
 
 
 Making jobs' output available to ``docker logs`` of the executing container
