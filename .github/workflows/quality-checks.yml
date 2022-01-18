@@ -2,8 +2,10 @@
 
 name: quality-checks
 on:
-  - pull_request
-  - push
+  pull_request:
+  push:
+      branches:
+        - main
 jobs:
   python-tests:
     runs-on: ubuntu-latest
