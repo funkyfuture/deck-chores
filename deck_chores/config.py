@@ -69,6 +69,9 @@ def generate_config() -> None:
     )
     cfg.debug = trueish(getenv('DEBUG', 'no'))
     cfg.default_max = int(getenv('DEFAULT_MAX', 1))
+    cfg.exit_on_unexpected_container_states = trueish(
+        getenv('EXIT_ON_UNEXPECTED_CONTAINER_STATES', 'no')
+    )
     cfg.job_executor_pool_size = int(getenv('JOB_POOL_SIZE', 10))
     cfg.job_name_regex = getenv("JOB_NAME_REGEX", "[a-z0-9-]+")
     cfg.label_ns = getenv('LABEL_NAMESPACE', 'deck-chores') + '.'
