@@ -1,0 +1,123 @@
+name: Build & publish deck-chores
+on:
+  push:
+    tags: ["*"]
+  workflow_call:
+
+env:
+    VERSION: ${{ ( gihub.ref ) }}
+
+jobs:
+  version:
+    outputs:
+      version: ${{ steps.echo-version.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: abatilo/actions-poetry@v2.1.0
+
+      - id: echo-version
+        run: echo "::set-ouput name=version::$(poetry version --short)"
+
+      - if: ${{ github.event_name == "push" }}
+        run: "[ ${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]"
+
+
+  cheeseshop:
+    name: Build & publish to the cheeseshop
+    needs: [version]
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+      - uses: abatilo/actions-poetry@v2.1.0
+
+      - run: poetry build
+      - run: poetry publish --username __token__ --password ${{ secrets.PYPI_AUTH_TOKEN }}
+
+  container-image:
+    name: Build & push multi-architecture image
+    needs: [version]
+    env:
+      IMAGE_NAME: deck-chores
+      DOCKER_IO_USER: funkyfuture
+      VERSION: ${{ needs.version.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - uses: redhat-actions/podman-login@v1
+        with:
+          registry: docker.io
+          username: ${{ env.DOCKER_IO_USER }}
+          password: ${{ secrets.DOCKER_AUTH_TOKEN }}
+
+      - uses: actions/checkout@v2
+
+      - run: >
+          echo "PRERELEASE=${{ (
+             contains('a', env.VERSION)  || contains('b', env.VERSION)
+          || contains('rc', env.VERSION) || contains('pre', env.VERSION)
+          ) }}" >> $GITHUB_ENV
+      - name: echo version related variables
+        run: |
+          echo 'VERSION: ${{ env.VERSION }}'
+          echo 'PRERELEASE: ${{ env.PRERELEASE }}'
+      - id: docker-metadata
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          flavor: latest=false
+          labels: |
+            org.opencontainers.image.documentation=https://deck-chores.readthedocs.org/
+            org.opencontainers.image.url=https://deck-chores.readthedocs.org/
+          tags: |
+            type=sha,prefix=src-commit-
+            type=pep440,pattern={{version}},value=${{ env.VERSION }}
+            type=pep440,pattern={{major}},value=${{ env.VERSION }},enable=${{ env.PRERELEASE == 'false' }}
+            type=pep440,pattern={{major}}.{{minor}},value=${{ env.VERSION }},enable=${{ env.PRERELEASE == 'false' }}
+      - name: prepare push tag value
+        id: push-tags-value
+        run: echo "::set-output name=tags::${{ steps.docker-metadata.outputs.tags }}" | tr "\n" " " | sed "s/${{ env.IMAGE_NAME }}://g"
+
+      - name: install dependency for multi-platform builds
+        run: |
+          sudo apt update
+          sudo apt install -y qemu-user-static
+      - id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./Dockerfile
+          image: ${{ env.IMAGE_NAME }}
+          labels: ${{ steps.docker-metadata.outputs.labels }}
+          platforms: linux/amd64,linux/arm,linux/arm64
+          tags: ${{ steps.docker-metadata.outputs.tags }}
+
+      - name: echo build outputs
+        run: |
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Tags: ${{ steps.build-image.outputs.tags }}"
+          echo "Tagged Image: ${{ steps.build-image.outputs.image-with-tag }}"
+      - name: echo created images
+        run: buildah images | grep '${{ env.IMAGE_NAME }}'
+      - name: echo image metadata
+        run: buildah inspect ${{ steps.build-image.outputs.image-with-tag }}
+
+      - name: push to ghcr.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          registry: ghcr.io/${{ github.actor }}
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.push-tags-value.outputs.tags }}
+
+      - name: push to docker.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          registry: docker.io/${{ env.DOCKER_IO_USER }}
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.push-tags-value.outputs.tags }}

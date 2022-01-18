@@ -1,12 +1,8 @@
 .DEFAULT_GOAL := build-dev
 
 REPO_NAME = funkyfuture/deck-chores
-VERSION = $(shell grep -oP "^version = \K.+" pyproject.toml | tr -d '"')
+VERSION = $(shell poetry version --short)
 IMAGE_NAME = $(REPO_NAME):$(VERSION)
-GIT_SHA1 = $(shell git rev-parse HEAD)
-
-export IMAGE_NAME
-export GIT_SHA1
 
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -21,11 +17,11 @@ export PRINT_HELP_PYSCRIPT
 
 .PHONY: black
 black: ## code-formatting with black
-	 poetry run black deck_chores tests
+	poetry run black deck_chores tests
 
 .PHONY: build
 build: ## builds the Docker image
-	hooks/build
+	docker build --tag $(IMAGE_NAME) .
 
 .PHONY: build-dev
 build-dev: ## builds the Docker image for debugging
@@ -76,11 +72,6 @@ help: ## print make targets help
 lint: black ## check style with flake8
 	poetry run flake8 --max-complexity=10 --max-line-length=89 deck_chores tests
 
-.PHONY: maintenance-release
-maintenance-release: ## publish a maintenance with updated dependencies
-	bash ./maintenance-updates.sh
-	$(MAKE) release
-
 .PHONY: mypy
 mypy:  ## check types with mypy
 	poetry run mypy --ignore-missing-imports deck_chores
@@ -94,19 +85,8 @@ test: lint mypy pytest ## run all tests
 
 .PHONY: release
 release: test doclinks build ## release the current version on github, the PyPI and the Docker hub
-	git tag -f $(VERSION)
-	git push origin main
-	git push -f origin $(VERSION)
-	poetry publish --build
-	$(MAKE) release-multiimage
-
-.PHONY: release-arm
-release-arm: ## release the arm build on the Docker hub
-	hooks/release-arm $(IMAGE_NAME) $(GIT_SHA1)
-
-.PHONY: release-multiimage
-release-multiimage: release-arm ## release the multi-arch manifest on the Docker hub
-	hooks/release-multiimage $(REPO_NAME) $(VERSION)
+	git tag $(VERSION)
+	git push origin refs/tags/$(VERSION)
 
 .PHONY: run
 run: build ## runs deck-chores in a temporary container
