@@ -1,6 +1,5 @@
 from functools import lru_cache
 from types import MappingProxyType
-from typing import Dict, Tuple
 
 from deck_chores.config import cfg, CONTAINER_CACHE_SIZE
 from deck_chores.utils import log
@@ -17,13 +16,13 @@ def container_name(container_id: str) -> str:
 ####
 
 
-_service_locks_by_container_id: Dict[str, Tuple[str, ...]] = {}
+_service_locks_by_container_id: dict[str, tuple[str, ...]] = {}
 service_locks_by_container_id = MappingProxyType(_service_locks_by_container_id)
-_service_locks_by_service_id: Dict[Tuple[str, ...], str] = {}
+_service_locks_by_service_id: dict[tuple[str, ...], str] = {}
 service_locks_by_service_id = MappingProxyType(_service_locks_by_service_id)
 
 
-def lock_service(service_id: Tuple[str, ...], container_id: str):
+def lock_service(service_id: tuple[str, ...], container_id: str):
     assert service_id not in service_locks_by_service_id
     _service_locks_by_service_id[service_id] = container_id
     assert container_id not in service_locks_by_container_id

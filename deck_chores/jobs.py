@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Iterator, Mapping, Tuple
+from collections.abc import Iterator, Mapping
 
 from apscheduler import events
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -83,7 +83,7 @@ def on_missed(event: events.JobExecutionEvent) -> None:
 ####
 
 
-def exec_job(**definition) -> Tuple[int, bytes]:
+def exec_job(**definition) -> tuple[int, bytes]:
     job_id = definition['job_id']
     container_id = definition['container_id']
     log.info(f"{container_name(container_id)}: Executing '{definition['job_name']}'.")
@@ -112,7 +112,7 @@ def exec_job(**definition) -> Tuple[int, bytes]:
 
 
 def add(
-    container_id: str, definitions: Mapping[str, Dict], paused: bool = False
+    container_id: str, definitions: Mapping[str, dict], paused: bool = False
 ) -> None:
     log.debug(f'Adding jobs to container {container_id}.')
 

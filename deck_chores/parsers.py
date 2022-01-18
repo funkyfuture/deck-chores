@@ -1,6 +1,7 @@
 from collections import defaultdict
+from collections.abc import Mapping
 from functools import lru_cache
-from typing import DefaultDict, Dict, Mapping, Optional, Tuple, Type, Union
+from typing import Optional, Type, Union
 
 import cerberus
 from apscheduler.triggers.cron import CronTrigger
@@ -43,23 +44,23 @@ class JobConfigValidator(cerberus.Validator):
 
     @staticmethod
     @lru_cache(128)
-    def _fill_args(value: str, length: int, filling: str) -> Tuple[str, ...]:
+    def _fill_args(value: str, length: int, filling: str) -> tuple[str, ...]:
         value = value.strip()
         while '  ' in value:
             value = value.replace('  ', ' ')
         tokens = value.split(' ')
         return tuple([filling] * (length - len(tokens)) + tokens)
 
-    def _normalize_coerce_cron(self, value: str) -> Tuple[Type, Tuple[str, ...]]:
+    def _normalize_coerce_cron(self, value: str) -> tuple[Type, tuple[str, ...]]:
         args = self._fill_args(value, CRON_TRIGGER_FIELDS_COUNT, '*')
         return CronTrigger, args
 
-    def _normalize_coerce_date(self, value: str) -> Tuple[Type, Tuple[str]]:
+    def _normalize_coerce_date(self, value: str) -> tuple[Type, tuple[str]]:
         return DateTrigger, (value,)
 
     def _normalize_coerce_interval(
         self, value: str
-    ) -> Tuple[Type, Optional[Tuple[int, int, int, int, int]]]:
+    ) -> tuple[Type, Optional[tuple[int, int, int, int, int]]]:
         args = NAME_INTERVAL_MAP.get(value)
         if args is None:
             if any(x.isalpha() for x in value):
@@ -140,7 +141,7 @@ job_config_validator = JobConfigValidator(
 
 
 @lru_cache(maxsize=CONTAINER_CACHE_SIZE)
-def parse_labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dict]]:
+def parse_labels(container_id: str) -> tuple[tuple[str, ...], str, dict[str, dict]]:
     labels = cfg.client.containers.get(container_id).labels
     log.debug(f'Parsing labels: {labels}')
 
@@ -164,7 +165,7 @@ def parse_labels(container_id: str) -> Tuple[Tuple[str, ...], str, Dict[str, Dic
     return service_id, flags, job_definitions
 
 
-def parse_options(labels: Dict[str, str]) -> Tuple[str, str]:
+def parse_options(labels: dict[str, str]) -> tuple[str, str]:
     flags = parse_flags(labels.pop("options.flags", ""))
     user = labels.pop(cfg.label_ns + "options.user", "")
     return flags, user
@@ -184,7 +185,7 @@ def parse_flags(options: str) -> str:
     return result_string
 
 
-def parse_service_id(labels: Dict[str, str]) -> Tuple[str, ...]:
+def parse_service_id(labels: dict[str, str]) -> tuple[str, ...]:
     filtered_labels = {k: v for k, v in labels.items() if k in cfg.service_identifiers}
     log.debug(f'Considering labels for service id: {filtered_labels}')
     if not filtered_labels:
@@ -201,16 +202,16 @@ def parse_service_id(labels: Dict[str, str]) -> Tuple[str, ...]:
     return tuple(f"{k}={v}" for k, v in filtered_labels.items())
 
 
-def image_definition_labels_of_container(container_id: str) -> Dict[str, str]:
+def image_definition_labels_of_container(container_id: str) -> dict[str, str]:
     labels = cfg.client.containers.get(container_id).image.labels
     return {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
 
 
-def parse_job_definitions(labels: Mapping[str, str], user: str) -> Dict[str, Dict]:
+def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dict]:
     log.debug(f'Considering labels for job definitions: {dict(labels)}')
 
-    name_grouped_definitions: DefaultDict[
-        str, Dict[str, Union[str, Dict]]
+    name_grouped_definitions: defaultdict[
+        str, dict[str, Union[str, dict]]
     ] = defaultdict(dict)
 
     for key, value in labels.items():
