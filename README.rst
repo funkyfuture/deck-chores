@@ -13,7 +13,9 @@ deck-chores
 **A job scheduler for Docker containers, configured via container labels.**
 
 * Documentation: https://deck-chores.readthedocs.io
-* Image repository: https://hub.docker.com/r/funkyfuture/deck-chores
+* Image repositories:
+    * https://github.com/funkyfuture/deck-chores/pkgs/container/deck-chores
+    * https://hub.docker.com/r/funkyfuture/deck-chores
 * Code repository: https://github.com/funkyfuture/deck-chores
 * Issue tracker: https://github.com/funkyfuture/deck-chores/issues
 * Free software: ISC license
@@ -27,8 +29,7 @@ Features
 - use date, interval and cron-like triggers
 - set a maximum of simultaneously running instances per job
 - restrict job scheduling to one container per service
-- multi-architecture image supports ``amd64``, ``arm64`` and ``armv7l`` platforms, no emulator
-  involved
+- multi-architecture image supports ``amd64``, ``arm64`` and ``arm`` platforms
 
 
 Example

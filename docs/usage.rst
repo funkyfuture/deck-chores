@@ -9,7 +9,7 @@ On a single host
 
 Usually you would run ``deck-chores`` in a container::
 
-    $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock funkyfuture/deck-chores:1
+    $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/funkyfuture/deck-chores:1
 
 .. note::
 
@@ -26,7 +26,7 @@ Likewise, docker-compose_ can be used with such configuration:
 
     services:
       officer:
-        image: funkyfuture/deck-chores:1
+        image: ghcr.io/funkyfuture/deck-chores:1
         restart: unless-stopped
         environment:
           TIMEZONE: Asia/Tel Aviv
@@ -60,7 +60,7 @@ a suitable stack definition:
 
     services:
       officer:
-        image: funkyfuture/deck-chores:1
+        image: ghcr.io/funkyfuture/deck-chores:1
         deploy:
           mode: global
         environment:
