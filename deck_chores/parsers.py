@@ -22,6 +22,7 @@ from deck_chores.utils import (
 
 
 CRON_TRIGGER_FIELDS_COUNT = len(CronTrigger.FIELD_NAMES)
+INTERVAL_SEPARATOR_TRANSLATION_TABLE = str.maketrans('.:/', '   ')
 NAME_INTERVAL_MAP = {
     'weekly': (1, 0, 0, 0, 0),
     'daily': (0, 1, 0, 0, 0),
@@ -68,8 +69,7 @@ class JobConfigValidator(cerberus.Validator):
                 if parsed_value:
                     args = seconds_as_interval_tuple(parsed_value)
             else:
-                for c in '.:/':
-                    value = value.replace(c, ' ')
+                value = value.translate(INTERVAL_SEPARATOR_TRANSLATION_TABLE)
                 filled_args = self._fill_args(value, 5, '0')
                 args = tuple(int(x) for x in filled_args)  # type: ignore
         return IntervalTrigger, args
