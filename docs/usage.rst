@@ -91,8 +91,9 @@ Caveats & Tips
     that define jobs.
     It would possibly trigger these jobs, which might lead to a corrupted build.
     You can avoid this risk by building images on a host that is not observed by `deck-chores` or
-    by pausing it during image builds. Another alternative could be using Podman_ to build images.
+    by pausing it during image builds. An alternative  using Buildah_ or Podman_ to build images.
 
+.. _Buildah: https://buildah.io/
 .. _Podman: https://podman.io/
 
 
