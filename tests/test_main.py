@@ -264,6 +264,11 @@ def test_reassign_jobs(
     )
 
     job = mocker.MagicMock(spec_set=Job)
+
+    # that is to detect dict unions on the mock's kwargs attribute:
+    job_kwargs_union = job.kwargs.__or__
+    job_kwargs_union.return_value = mocker.MagicMock()
+
     job.next_run_time = job_next_run_time
     get_jobs_for_container = mocker.Mock(return_value=(job,))
     mocker.patch("deck_chores.jobs.get_jobs_for_container", get_jobs_for_container)
@@ -276,4 +281,6 @@ def test_reassign_jobs(
     get_jobs_for_container.assert_called_once_with("a")
     if expected_job_call:
         getattr(job, expected_job_call).assert_called_once()
-    job.modify.assert_called_once_with(kwargs={"container_id": "b"})
+
+    job_kwargs_union.assert_called_once_with({"container_id": "b"})
+    job.modify.assert_called_once_with(kwargs=job_kwargs_union.return_value)

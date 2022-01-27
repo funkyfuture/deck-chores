@@ -142,7 +142,8 @@ def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
             job.resume()
             log.debug("Resumed job.")
 
-        job.modify(kwargs={**job.kwargs, "container_id": new_id})
+        # job.modify(kwargs={**job.kwargs, "container_id": new_id})
+        job.modify(kwargs=(job.kwargs | {"container_id": new_id}))
 
     reassign_service_lock(container_id, new_id)
 
@@ -292,7 +293,7 @@ def main() -> None:  # pragma: nocover
             "to evaluate assert statements."
         )
         sys.stdout.flush()
-        os.execlpe("deck-chores", "deck-chores", {**os.environ, "PYTHONOPTIMIZE": "1"})
+        os.execlpe("deck-chores", "deck-chores", os.environ | {"PYTHONOPTIMIZE": "1"})
 
     if not lock.acquire(blocking=False):
         log.error(f"Couldn't acquire lock file at {lock.path}, exiting.")
