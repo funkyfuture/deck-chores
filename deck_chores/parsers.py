@@ -108,7 +108,7 @@ job_config_validator = JobConfigValidator(
             'coerce': 'date',
             'check_with': 'trigger',
             'required': True,
-            'excludes': ['cron', 'interval'],
+            'excludes': ['cron', 'interval', 'jitter'],
         },
         'environment': {'type': 'dict', 'default': {}},
         'interval': {
@@ -121,7 +121,6 @@ job_config_validator = JobConfigValidator(
             'type': 'integer',
             'coerce': 'timeunits',
             'nullable': True,
-            'default': None,
             'min': 0,
         },
         'max': {'coerce': int},  # default is set later

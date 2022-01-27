@@ -124,13 +124,15 @@ def add(
         )
 
         trigger_class, trigger_config = definition['trigger']
+        trigger_kwargs = {'timezone': definition['timezone']}
+        if jitter_value := definition.get('jitter') is not None:
+            trigger_kwargs['jitter'] = jitter_value
 
         scheduler.add_job(
             func=exec_job,
             trigger=trigger_class(
                 *trigger_config,
-                timezone=definition['timezone'],
-                jitter=definition['jitter'],
+                **trigger_kwargs,
             ),
             kwargs=definition,
             id=job_id,

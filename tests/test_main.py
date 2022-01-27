@@ -75,7 +75,6 @@ def test_event_dispatching(cfg, fixtures, mocker):
                     'command': '/beep.sh',
                     'name': 'beep',
                     'environment': {},
-                    'jitter': None,
                     'max': 1,
                     'timezone': 'UTC',
                     'trigger': (IntervalTrigger, (0, 0, 0, 10, 0)),
