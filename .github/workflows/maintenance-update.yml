@@ -18,7 +18,7 @@ jobs:
         with:
           commit_message: Updates dependencies
 
-      - if: ${{ steps.commit-and-push.outputs.changed }} == "false"
+      - if: ${{ steps.commit-and-push.outputs.changed == false }}
         run: gh run cancel ${{ github.run_id }} && tail -f /dev/null
         env:
           GITHUB_TOKEN: ${{ github.token }}

@@ -4,9 +4,6 @@ on:
     tags: ["*"]
   workflow_call:
 
-env:
-    VERSION: ${{ ( gihub.ref ) }}
-
 jobs:
   version:
     outputs:
@@ -19,7 +16,7 @@ jobs:
       - id: echo-version
         run: echo "::set-ouput name=version::$(poetry version --short)"
 
-      - if: ${{ github.event_name == "push" }}
+      - if: ${{ github.event_name == 'push' }}
         run: "[ ${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]"
 
 
