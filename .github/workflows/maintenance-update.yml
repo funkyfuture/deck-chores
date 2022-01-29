@@ -1,7 +1,7 @@
 name: Update dependencies & create a maintence release
 on:
   schedule:
-    - 35 10 12 * *
+    - cron: "35 10 12 * *"
   workflow_dispatch:
 
 jobs:
