@@ -1,4 +1,4 @@
-name: Update dependencies & create a maintence release
+name: Maintenance release (update dependence and create releases)
 on:
   schedule:
     - cron: "35 10 12 * *"
@@ -47,7 +47,7 @@ jobs:
       - id: bump
         run: | 
           poetry version patch
-          echo "set-output:: name=version::$(poetry version --short)"
+          echo "::set-output name=version::$(poetry version --short)"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:

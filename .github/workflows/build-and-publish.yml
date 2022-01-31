@@ -28,7 +28,7 @@ jobs:
       - uses: abatilo/actions-poetry@v2.1.4
 
       - id: echo-version
-        run: echo "::set-ouput name=version::$(poetry version --short)"
+        run: echo "::set-output name=version::$(poetry version --short)"
 
       - if: ${{ github.event_name == 'push' }}
         run: "[ ${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]"
