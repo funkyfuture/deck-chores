@@ -86,7 +86,7 @@ jobs:
           echo 'VERSION: ${{ env.VERSION }}'
           echo 'PRERELEASE: ${{ env.PRERELEASE }}'
       - id: docker-metadata
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: ${{ env.IMAGE_NAME }}
           flavor: latest=false
