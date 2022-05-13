@@ -277,7 +277,7 @@ def shutdown() -> None:  # pragma: nocover
 
 
 def main() -> None:  # pragma: nocover
-    if DEBUG and not __debug__:
+    if not DEBUG and __debug__:
         log.debug("Replacing process with Python's optimizations off.")
         sys.stdout.flush()
         os.execlpe("deck-chores", "deck-chores", {**os.environ, "PYTHONOPTIMIZE": "1"})
