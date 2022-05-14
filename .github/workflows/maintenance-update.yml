@@ -1,7 +1,7 @@
 name: Maintenance release (update dependence and create releases)
 on:
   schedule:
-    - cron: "35 10 12 * *"
+    - cron: "35 10 15 * *"
   workflow_dispatch:
 
 jobs:
