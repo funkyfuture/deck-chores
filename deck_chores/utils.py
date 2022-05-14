@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 from functools import lru_cache
+from types import SimpleNamespace
 from typing import Optional, Tuple
 from uuid import NAMESPACE_DNS, uuid5
 
@@ -72,16 +73,18 @@ def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
     return weeks, days, hours, minutes, value
 
 
-def setup_stderr_logging(
-    formatter: logging.Formatter, stderr_level: int
-) -> None:  # pragma: nocover
-    stderr_log_handler = logging.StreamHandler(sys.stderr)
-    stderr_log_handler.setLevel(stderr_level)
-    stderr_log_handler.setFormatter(formatter)
-    log.addHandler(stderr_log_handler)
+def configure_logging(cfg: SimpleNamespace):  # pragma: nocover
+    log_formatter = logging.Formatter(cfg.logformat, style='{')
+    stdout_log_handler.setFormatter(log_formatter)
 
-    if stderr_level > 0:
-        stdout_log_handler.addFilter(ExcludeErrorsFilter(stderr_level))
+    if not cfg.stderr_level:
+        return
+
+    stderr_log_handler = logging.StreamHandler(sys.stderr)
+    stderr_log_handler.setLevel(cfg.stderr_level)
+    stderr_log_handler.setFormatter(log_formatter)
+    log.addHandler(stderr_log_handler)
+    stdout_log_handler.addFilter(ExcludeErrorsFilter(cfg.stderr_level))
 
 
 def split_string(
@@ -109,10 +112,8 @@ log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 #      https://github.com/python/mypy/issues/1317
 __all__ = (
     'log',
-    'stdout_log_handler',
     parse_time_from_string_with_units.__name__,  # type: ignore
     seconds_as_interval_tuple.__name__,  # type: ignore
-    setup_stderr_logging.__name__,
     split_string.__name__,  # type: ignore
     trueish.__name__,
 )

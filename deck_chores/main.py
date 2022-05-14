@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import sys
 from datetime import datetime, timedelta, timezone
@@ -22,7 +21,11 @@ from deck_chores.indexes import (
     service_locks_by_container_id,
 )
 from deck_chores.parsers import job_config_validator, parse_labels
-from deck_chores.utils import DEBUG, log, setup_stderr_logging, stdout_log_handler
+from deck_chores.utils import (
+    DEBUG,
+    log,
+    configure_logging,
+)
 
 
 ####
@@ -299,11 +302,7 @@ def main() -> None:  # pragma: nocover
 
     try:
         generate_config()
-
-        log_formatter = logging.Formatter(cfg.logformat, style='{')
-        stdout_log_handler.setFormatter(log_formatter)
-        setup_stderr_logging(log_formatter, cfg.stderr_level)
-
+        configure_logging(cfg)
         log.debug(f'Config: {cfg.__dict__}')
 
         if there_is_another_deck_chores_container():
