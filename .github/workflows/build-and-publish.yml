@@ -113,7 +113,8 @@ jobs:
             ./Dockerfile
           image: ${{ env.IMAGE_NAME }}
           labels: ${{ steps.docker-metadata.outputs.labels }}
-          platforms: linux/amd64,linux/arm,linux/arm64
+          # platforms: linux/amd64,linux/arm,linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.docker-metadata.outputs.tags }}
 
       - name: echo build outputs

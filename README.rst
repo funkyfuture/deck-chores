@@ -30,6 +30,7 @@ Features
 - set a maximum of simultaneously running instances per job
 - restrict job scheduling to one container per service
 - multi-architecture image supports ``amd64``, ``arm64`` and ``arm`` platforms
+  (the latter are currently not provided for download)
 
 
 Example

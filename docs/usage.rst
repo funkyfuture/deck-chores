@@ -11,6 +11,11 @@ Usually you would run ``deck-chores`` in a container::
 
     $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/funkyfuture/deck-chores:1
 
+.. warning::
+
+    The ``armv7l`` images are currently not available at the registries. They can be built on the
+    target platform with ``make build`` from the repository's root folder.
+
 .. note::
 
     There's a manifest on the Docker Hub that maps images to builds targeting ``amd64``, ``amd64``
