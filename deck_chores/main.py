@@ -197,15 +197,15 @@ def listen(since: datetime) -> None:
         if event['Type'] != 'container':
             continue
 
-        action = event['Action']
-        if action == 'start':
-            handle_start(event)
-        elif action == 'die':
-            handle_die(event)
-        elif action == 'pause':
-            handle_pause(event)
-        elif action == 'unpause':
-            handle_unpause(event)
+        match event["Action"]:
+            case "start":
+                handle_start(event)
+            case "die":
+                handle_die(event)
+            case "pause":
+                handle_pause(event)
+            case "unpause":
+                handle_unpause(event)
 
 
 def handle_start(event: dict):
