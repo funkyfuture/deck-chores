@@ -31,7 +31,7 @@ deck-chores = "deck_chores.main:main"
 # the Dockerfile-dev has these values too
 # .readthedocs.yml must be in parity with the Python version
 # it's also all over the Github workflows
-python = "^3.9"
+python = "^3.10"
 apscheduler = "^3.6"
 cerberus = "^1.3.4"
 docker = {version = "^5.0", extras = ["ssh", "tls"]}
