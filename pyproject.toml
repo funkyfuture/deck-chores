@@ -39,7 +39,7 @@ fasteners = "^0.14"
 python-dateutil = "^2.8.1"
 
 [tool.poetry.dev-dependencies]
-black = {version = "*", allow-prereleases = true }
+black = "*"
 flake8 = "*"
 mypy = "*"
 pytest = "*"
