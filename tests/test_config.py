@@ -1,5 +1,3 @@
-import ssl
-
 import docker.client
 from docker.constants import DEFAULT_TIMEOUT_SECONDS
 
@@ -40,7 +38,6 @@ def test_default_config(monkeypatch):
             'com.docker.compose.project',
             'com.docker.compose.service',
         ),
-        'ssl_version': ssl.PROTOCOL_TLS,
         'stderr_level': 0,
         'timezone': 'UTC',
     }

@@ -454,12 +454,6 @@ TLS options
 
     Enabled by ``on``, ``true`` or ``yes``.
 
-.. envvar:: SSL_VERSION
-
-    default: ``TLS`` (selects the highest version supported by the client and the daemon)
-
-    For other options see the names provided by Python's ssl_ library prefixed with ``PROTOCOL_``.
-
 Authentication related files are expected to be available at ``/config/ca.pem``,
 ``/config/cert.pem`` respectively ``/config/key.pem``.
 
@@ -468,4 +462,3 @@ Authentication related files are expected to be available at ``/config/ca.pem``,
 .. _docker-compose: https://docs.docker.com/compose/
 .. _log record attributes: https://docs.python.org/3/library/logging.html#logrecord-attributes
 .. _logging module's names: https://docs.python.org/library/logging.html#logging-levels
-.. _ssl: https://docs.python.org/3/library/ssl.html#ssl.PROTOCOL_TLS

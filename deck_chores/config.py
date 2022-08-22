@@ -43,6 +43,15 @@ def _check_docker_api(client: docker.DockerClient) -> docker.DockerClient:
     return client
 
 
+def _handle_deprecated():
+    if local_environment.pop("SSL_VERSION", None) is not None:
+        log.warning(
+            "The environment variable `SSL_VERSION` has no effect. "
+            "The used protocol is negotiated by the Docker client library. "
+            "In a future version this warning will disappear."
+        )
+
+
 def _resolve_tls_version(version: str) -> int:
     return getattr(ssl, 'PROTOCOL_' + version.replace('.', '_'))
 
@@ -59,6 +68,7 @@ def _test_daemon_socket(url: str) -> str:  # pragma: nocover
 
 def generate_config() -> None:
     cfg.__dict__.clear()
+    _handle_deprecated()
     cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
     cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
     cfg.default_flags = split_string(
@@ -78,14 +88,12 @@ def generate_config() -> None:
             'SERVICE_ID_LABELS', 'com.docker.compose.project,com.docker.compose.service'
         )
     )
-    cfg.ssl_version = _resolve_tls_version(getenv('SSL_VERSION', 'TLS'))
     cfg.stderr_level = logging.getLevelName(getenv('STDERR_LEVEL', 'NOTSET'))
     cfg.timezone = getenv('TIMEZONE', 'UTC').replace(' ', '_')
     cfg.client = _check_docker_api(
         docker.from_env(
             version='auto',
             timeout=cfg.client_timeout,
-            ssl_version=cfg.ssl_version,
             assert_hostname=cfg.assert_hostname,
             environment=local_environment,
         )
