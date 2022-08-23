@@ -4,6 +4,19 @@ History
 Maintenance releases are not mentioned here, they update all dependencies and
 trigger complete rebuilds of the container images.
 
+1.3 (2022-08-23)
+~~~~~~~~~~~~~~~~
+
+* *removed*: the environment variable ``SSL_VERSION`` has no effect and is marked as deprecated
+
+1.2 (2021-06-25)
+~~~~~~~~~~~~~~~~
+
+* *new*: the ``STDERR_LEVEL`` environment variable can define log levels whose messages are then
+  dumped to stderr instead of stdout
+* *new*: the environment variable ``JOB_NAME_REGEX`` can be used to define patterns that job names
+  must match
+
 1.0 (2020-03-27)
 ~~~~~~~~~~~~~~~~
 
