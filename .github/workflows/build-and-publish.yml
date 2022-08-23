@@ -31,8 +31,10 @@ jobs:
         run: echo "::set-output name=version::$(poetry version --short)"
 
       - if: ${{ github.event_name == 'push' }}
-        run: "[ ${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]"
-
+        run: >
+             [ ${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]
+             || [ refs/tags/${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]
+    
 
   cheeseshop:
     name: Build & publish to the cheeseshop
