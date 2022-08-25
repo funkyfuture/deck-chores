@@ -60,6 +60,4 @@ jobs:
     uses: funkyfuture/deck-chores/.github/workflows/build-and-publish.yml@main
     with:
       ref: main
-    secrets:
-      DOCKER_AUTH_TOKEN: ${{ secrets.DOCKER_AUTH_TOKEN }}
-      PYPI_AUTH_TOKEN: ${{ secrets.PYPI_AUTH_TOKEN }}
+    secrets: inherit
