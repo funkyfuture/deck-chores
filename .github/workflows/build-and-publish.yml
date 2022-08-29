@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-python@v4.2.0
         with:
           python-version: "3.10"
-      - uses: abatilo/actions-poetry@v2.1.5
+      - uses: abatilo/actions-poetry@v2.1.6
 
       - id: echo-version
         run: echo "::set-output name=version::$(poetry version --short)"
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/setup-python@v4.2.0
         with:
           python-version: "3.10"
-      - uses: abatilo/actions-poetry@v2.1.5
+      - uses: abatilo/actions-poetry@v2.1.6
 
       - run: poetry build
       - run: poetry publish --username __token__ --password ${{ secrets.PYPI_AUTH_TOKEN }}
