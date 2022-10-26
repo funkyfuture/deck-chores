@@ -1,4 +1,4 @@
-FROM docker.io/python:3.10-alpine
+FROM docker.io/python:3.11-alpine
 
 CMD ["deck-chores"]
 LABEL org.label-schema.name="deck-chores"

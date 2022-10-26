@@ -1,4 +1,4 @@
-FROM docker.io/python:3.10-alpine
+FROM docker.io/python:3.11-alpine
 
 MAINTAINER Frank Sachsenheim <funkyfuture@riseup.net>
 
