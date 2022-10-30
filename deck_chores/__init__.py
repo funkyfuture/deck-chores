@@ -1,3 +1,5 @@
-import pkg_resources
+from importlib import metadata
 
-__version__ = pkg_resources.get_distribution('deck-chores').version
+__version__ = metadata.version("deck-chores")
+
+__all__ = ("__version__",)
