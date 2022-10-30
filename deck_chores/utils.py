@@ -3,7 +3,7 @@ import os
 import sys
 from functools import lru_cache
 from types import SimpleNamespace
-from typing import Optional, Tuple
+from typing import Optional
 from uuid import NAMESPACE_DNS, uuid5
 
 
@@ -65,7 +65,7 @@ def parse_time_from_string_with_units(value: str) -> Optional[int]:
 
 
 @lru_cache(maxsize=64)
-def seconds_as_interval_tuple(value: int) -> Tuple[int, int, int, int, int]:
+def seconds_as_interval_tuple(value: int) -> tuple[int, int, int, int, int]:
     weeks, value = divmod(value, TIME_UNIT_MULTIPLIERS['w'])
     days, value = divmod(value, TIME_UNIT_MULTIPLIERS['d'])
     hours, value = divmod(value, TIME_UNIT_MULTIPLIERS['h'])
@@ -89,7 +89,7 @@ def configure_logging(cfg: SimpleNamespace):  # pragma: nocover
 
 def split_string(
     value: str, delimiter: str = ',', sort: bool = False
-) -> Tuple[str, ...]:
+) -> tuple[str, ...]:
     result = [x.strip() for x in value.split(delimiter)]
     if sort:
         result.sort()

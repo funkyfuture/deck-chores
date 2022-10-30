@@ -1,7 +1,7 @@
 from collections import defaultdict
 from collections.abc import Mapping
 from functools import lru_cache
-from typing import Optional, Type, Union
+from typing import Optional, Type
 
 import cerberus
 from apscheduler.triggers.cron import CronTrigger
@@ -209,9 +209,9 @@ def image_definition_labels_of_container(container_id: str) -> dict[str, str]:
 def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dict]:
     log.debug(f'Considering labels for job definitions: {dict(labels)}')
 
-    name_grouped_definitions: defaultdict[
-        str, dict[str, Union[str, dict]]
-    ] = defaultdict(dict)
+    name_grouped_definitions: defaultdict[str, dict[str, str | dict]] = defaultdict(
+        dict
+    )
 
     for key, value in labels.items():
         key = key.removeprefix(cfg.label_ns)
