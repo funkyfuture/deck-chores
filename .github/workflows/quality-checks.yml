@@ -41,7 +41,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - run: python -m pip install --upgrade pip setuptools wheel
-      - uses: abatilo/actions-poetry@v2.1.6
+      - uses: abatilo/actions-poetry@3.7.4
       - run: poetry install -v
       - run: poetry run make ${{ matrix.target }}
 
