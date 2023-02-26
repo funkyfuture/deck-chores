@@ -8,7 +8,7 @@ skip-string-normalization = true
 
 [tool.poetry]
 name = "deck-chores"
-version = "1.3.8"
+version = "1.3.9"
 description = "Job scheduler for Docker containers, configured via container labels."
 readme = "README.rst"
 documentation = "https://deck-chores.readthedocs.org/"
