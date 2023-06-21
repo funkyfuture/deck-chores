@@ -136,15 +136,15 @@ both ``stdout`` (``>``) and ``stderr`` (``2>``) separately as shown.
 Listing all registered jobs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Information, including the next scheduled execution, about the registered jobs of a deck-chores
-instance can be logged at once by sending ``SIGUSR1`` signal to the process, e.g. to one that runs
-in a container::
+Information about the registered jobs, including the next scheduled execution,
+of a *deck-chores* instance can be logged by sending ``SIGUSR1`` signal to the
+*deck-chores* process. For example, when invoked as a ``docker compose``
+project, one needs to call::
 
-    docker kill --signal USR1 <CONTAINER>
+    docker kill --signal USR1 deck-chores_officer_1
 
-
-The output appears in ``deck-chores``' log target, that are the container's logs when it runs within
-one.
+The output appears in *deck-chores*' log target, that are the container's logs
+when it runs within one.
 
 
 Job definitions
