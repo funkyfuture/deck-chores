@@ -137,14 +137,15 @@ Listing all registered jobs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Information, including the next scheduled execution, about the registered jobs of a deck-chores
-instance can be logged at once by sending ``SIGUSR1`` signal to the process, e.g. to one that runs
-in a container::
+instance can be logged by sending ``SIGUSR1`` signal to the *deck-chores*-process. For example,
+with a running *deck-chores* container named ``deck-chores_officer_1``, one needs to call::
 
-    docker kill --signal USR1 <CONTAINER>
+    docker kill --signal USR1 deck-chores_officer_1
 
-
-The output appears in ``deck-chores``' log target, that are the container's logs when it runs within
-one.
+In this case, output appears in ``deck-chores_officer_1`` log target, which are the container's logs
+accessible via ``docker logs deck-chores_officer_1``. The beginning of the output is marked by 
+``|SIGUSR1 received, echoing all jobs.``, followed by detailed information regarding every registered,
+active job.
 
 
 Job definitions
