@@ -47,7 +47,7 @@ jobs:
       - id: bump
         run: | 
           poetry version patch
-          echo "::set-output name=version::$(poetry version --short)"
+          echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:

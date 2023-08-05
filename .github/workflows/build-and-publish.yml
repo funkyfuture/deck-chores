@@ -28,7 +28,7 @@ jobs:
       - uses: abatilo/actions-poetry@v2.3.0
 
       - id: echo-version
-        run: echo "::set-output name=version::$(poetry version --short)"
+        run: echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
 
       - if: ${{ github.event_name == 'push' }}
         run: >
@@ -102,7 +102,7 @@ jobs:
             type=pep440,pattern={{major}}.{{minor}},value=${{ env.VERSION }},enable=${{ env.PRERELEASE == 'false' }}
       - name: prepare push tag value
         id: push-tags-value
-        run: echo "::set-output name=tags::${{ steps.docker-metadata.outputs.tags }}" | tr "\n" " " | sed "s/${{ env.IMAGE_NAME }}://g"
+        run: echo "tags=${{ steps.docker-metadata.outputs.tags }}" | tr "\n" " " | sed "s/${{ env.IMAGE_NAME }}://g" >> $GITHUB_OUTPUT
 
       - name: install dependency for multi-platform builds
         run: |
