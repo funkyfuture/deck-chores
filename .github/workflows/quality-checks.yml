@@ -28,7 +28,7 @@ jobs:
           - target: pytest
           - target: doclinks
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.sha }}
       - uses: actions/setup-python@v4.7.0
@@ -48,7 +48,7 @@ jobs:
   image-build-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.sha }}
       - uses: redhat-actions/buildah-build@v2

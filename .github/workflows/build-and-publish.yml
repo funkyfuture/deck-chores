@@ -19,7 +19,7 @@ jobs:
       version: ${{ steps.echo-version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.ref }}
       - uses: actions/setup-python@v4.7.0
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.ref }}
       - uses: actions/setup-python@v4.7.0
@@ -74,7 +74,7 @@ jobs:
           username: ${{ env.DOCKER_IO_USER }}
           password: ${{ secrets.DOCKER_AUTH_TOKEN }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.ref }}
 
