@@ -218,6 +218,9 @@ def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dic
     )
 
     for key, value in labels.items():
+        if value == "":
+            continue
+
         key = key.removeprefix(cfg.label_ns)
         if '.env.' in key:
             name, _, variable = key.split('.', 2)
