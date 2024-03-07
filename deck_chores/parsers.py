@@ -234,7 +234,7 @@ def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dic
 
     result = {}
     for name, definition in name_grouped_definitions.items():
-        if definition.get('enabled', 'true').lower() != 'false':
+        if definition.get('enabled', 'true').lower() == 'false':
             log.debug(f'Skipping disabled job: {name}')
             continue
 
