@@ -30,6 +30,7 @@ def test_default_config(monkeypatch):
         'debug': False,
         'default_max': 1,
         'default_flags': ('image', 'service'),
+        'exit_on_unexpected_container_states': False,
         'job_executor_pool_size': 10,
         'job_name_regex': '[a-z0-9-]+',
         'label_ns': 'deck-chores.',

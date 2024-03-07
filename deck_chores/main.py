@@ -2,7 +2,7 @@ import json
 import os
 import sys
 from datetime import datetime, timedelta, timezone
-from signal import signal, SIGINT, SIGTERM, SIGUSR1
+from signal import signal, SIGINT, SIGTERM, SIGUSR1, SIGUSR2
 from typing import Optional
 
 from apscheduler.schedulers import SchedulerNotRunningError
@@ -65,9 +65,15 @@ def sigusr1_handler(signum, frame):
         log.info(job.kwargs)
 
 
+def sigusr2_handler(signum, frame):
+    log.info("SIGUSR2 received, exiting with error.")
+    raise SystemExit(1)
+
+
 signal(SIGINT, sigint_handler)
 signal(SIGTERM, sigterm_handler)
 signal(SIGUSR1, sigusr1_handler)
+signal(SIGUSR2, sigusr2_handler)
 
 
 ####
