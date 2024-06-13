@@ -222,8 +222,11 @@ def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dic
                 variable
             ] = value
         else:
-            name, attribute = key.split('.', 1)
-            name_grouped_definitions[name][attribute] = value
+            if '.' in key:
+                name, attribute = key.split('.', 1)
+                name_grouped_definitions[name][attribute] = value
+            else:
+                log.error(f'Misconfigured label definition: {key}')
 
     log.debug(f'Job definitions: {dict(name_grouped_definitions)}')
 
