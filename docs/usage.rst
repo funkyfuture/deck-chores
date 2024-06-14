@@ -380,6 +380,14 @@ deck-chore's behaviour is defined by these environment variables:
 
     The URL of the Docker daemon to connect to.
 
+.. envvar:: EXIT_ON_UNEXPECTED_CONTAINER_STATES
+
+    default: ``no``
+
+    Exit *deck-chores* when it finds itself confused with unexpected states of containers.
+    If you expect a restart, configure your process manager like *systemd* or the *Docker daemon*
+    accordingly.
+
 .. envvar:: STDERR_LEVEL
 
     default: ``NOTSET``

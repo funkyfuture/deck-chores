@@ -1,5 +1,8 @@
 import logging
+import os
 from collections.abc import Iterator, Mapping
+from signal import SIGUSR2
+
 
 from apscheduler import events
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -83,21 +86,27 @@ def on_missed(event: events.JobExecutionEvent) -> None:
 ####
 
 
+def handle_exec_error(message: str):
+    log.error(message)
+    if cfg.exit_on_unexpected_container_states:
+        os.kill(os.getpid(), SIGUSR2)
+
+
 def exec_job(**definition) -> tuple[int, bytes]:
     job_id = definition['job_id']
     container_id = definition['container_id']
     log.info(f"{container_name(container_id)}: Executing '{definition['job_name']}'.")
 
-    # some sanity checks, to be removed eventually
+    # some sanity checks
     assert scheduler.get_job(job_id) is not None
     if cfg.client.containers.list(filters={'id': container_id, 'status': 'paused'}):
-        raise AssertionError('Container is paused.')
+        handle_exec_error('Container is paused.')
 
     if not cfg.client.containers.list(
         filters={'id': container_id, 'status': 'running'}
     ):
         assert scheduler.get_job(job_id) is None
-        raise AssertionError('Container is not running.')
+        handle_exec_error('Container is not running.')
     # end of sanity checks
 
     return cfg.client.containers.get(container_id).exec_run(
