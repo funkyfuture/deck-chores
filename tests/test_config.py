@@ -24,7 +24,6 @@ def test_default_config(monkeypatch):
     result = cfg.__dict__.copy()
     assert isinstance(result.pop('client'), docker.client.DockerClient)
     assert result == {
-        'assert_hostname': False,
         'client_timeout': DEFAULT_TIMEOUT_SECONDS,
         'docker_host': 'unix://var/run/docker.sock',
         'debug': False,

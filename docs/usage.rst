@@ -445,20 +445,15 @@ default: ``UTC``
 
     The job scheduler's timezone and the default for a job's ``timezone`` attribute.
 
-TLS options
-~~~~~~~~~~~
+Cryptographically secured connection to the Docker daemon
+---------------------------------------------------------
 
-.. envvar:: ASSERT_HOSTNAME
-
-    default: ``no``
-
-    Enabled by ``on``, ``true`` or ``yes``.
-
-Authentication related files are expected to be available at ``/config/ca.pem``,
-``/config/cert.pem`` respectively ``/config/key.pem``.
+The Docker client considers the environment variables ``DOCKER_CERT_PATH`` and ``DOCKER_TLS_VERIFY``
+for TLS-secured_ connections. A SSH client is available as well.
 
 
 .. _docker-issue-15211: https://github.com/moby/moby/issues/15211
 .. _docker-compose: https://docs.docker.com/compose/
 .. _log record attributes: https://docs.python.org/3/library/logging.html#logrecord-attributes
 .. _logging module's names: https://docs.python.org/library/logging.html#logging-levels
+.. _TLS-secured: https://docs.docker.com/engine/security/protect-access/#use-tls-https-to-protect-the-docker-daemon-socket

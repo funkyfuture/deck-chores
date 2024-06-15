@@ -59,7 +59,6 @@ def _test_daemon_socket(url: str) -> str:  # pragma: nocover
 
 def generate_config() -> None:
     cfg.__dict__.clear()
-    cfg.assert_hostname = trueish(getenv('ASSERT_HOSTNAME', 'no'))
     cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
     cfg.default_flags = split_string(
         getenv('DEFAULT_FLAGS', 'image,service'), sort=True
@@ -84,7 +83,6 @@ def generate_config() -> None:
         docker.from_env(
             version='auto',
             timeout=cfg.client_timeout,
-            assert_hostname=cfg.assert_hostname,
             environment=local_environment,
         )
     )
