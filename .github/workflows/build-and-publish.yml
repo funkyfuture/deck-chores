@@ -24,7 +24,7 @@ jobs:
           ref: ${{ inputs.ref || github.ref }}
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - uses: abatilo/actions-poetry@v3.0.0
 
       - id: echo-version
@@ -47,7 +47,7 @@ jobs:
           ref: ${{ inputs.ref || github.ref }}
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - uses: abatilo/actions-poetry@v3.0.0
 
       - run: poetry build
