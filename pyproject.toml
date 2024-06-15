@@ -3,7 +3,6 @@ requires = ["poetry==1.1.12"]
 build-backend = "poetry.masonry.api"
 
 [tool.black]
-safe = true
 skip-string-normalization = true
 
 [tool.poetry]
