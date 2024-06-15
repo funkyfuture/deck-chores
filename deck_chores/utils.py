@@ -3,18 +3,24 @@ import os
 import sys
 from functools import lru_cache
 from types import SimpleNamespace
-from typing import Optional
+from typing import Final, Optional
 from uuid import NAMESPACE_DNS, uuid5
 
 
-TIME_UNIT_MULTIPLIERS = {
+####
+
+
+TIME_UNIT_MULTIPLIERS: Final = {
     's': 1,
     'm': 1 * 60,
     'h': 1 * 60 * 60,
     'd': 1 * 60 * 60 * 24,
     'w': 1 * 60 * 60 * 24 * 7,
 }
-UUID_NAMESPACE = uuid5(NAMESPACE_DNS, "deck-chores.readthedocs.io")
+UUID_NAMESPACE: Final = uuid5(NAMESPACE_DNS, "deck-chores.readthedocs.io")
+
+
+####
 
 
 class ExcludeErrorsFilter(logging.Filter):
@@ -100,20 +106,24 @@ def trueish(value: str) -> bool:
     return value.strip().lower() in ('1', 'on', 'true', 'yes')
 
 
-DEBUG = trueish(os.getenv('DEBUG', 'no'))
+####
 
-log = logging.getLogger('deck_chores')
+
+DEBUG: Final = trueish(os.getenv('DEBUG', 'no'))
+
+log: Final = logging.getLogger('deck_chores')
 stdout_log_handler = logging.StreamHandler(sys.stdout)
 log.addHandler(stdout_log_handler)
 log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 
 
-# TODO remove ignore when this issue is solved:
-#      https://github.com/python/mypy/issues/1317
+####
+
+
 __all__ = (
-    'log',
-    parse_time_from_string_with_units.__name__,  # type: ignore
-    seconds_as_interval_tuple.__name__,  # type: ignore
-    split_string.__name__,  # type: ignore
+    "log",
+    "parse_time_from_string_with_units",
+    "seconds_as_interval_tuple",
+    split_string.__name__,
     trueish.__name__,
 )

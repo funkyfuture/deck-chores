@@ -3,7 +3,7 @@ import os
 import sys
 from datetime import datetime, timedelta, timezone
 from signal import signal, SIGINT, SIGTERM, SIGUSR1
-from typing import Optional
+from typing import Final, Optional
 
 from apscheduler.schedulers import SchedulerNotRunningError
 from dateutil.parser import isoparse as parse_iso_timestamp
@@ -31,7 +31,7 @@ from deck_chores.utils import (
 ####
 
 
-lock = InterProcessLock('/tmp/deck-chores.lock')
+lock: Final = InterProcessLock('/tmp/deck-chores.lock')
 
 
 def there_is_another_deck_chores_container() -> bool:

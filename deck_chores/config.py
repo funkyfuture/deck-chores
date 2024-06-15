@@ -3,6 +3,7 @@ import ssl
 from os import environ
 from os.path import exists
 from types import SimpleNamespace
+from typing import Final
 
 import docker
 from docker.constants import DEFAULT_TIMEOUT_SECONDS
@@ -13,16 +14,16 @@ from deck_chores.utils import split_string, trueish
 ####
 
 
-cfg = SimpleNamespace()
-local_environment = environ.copy()
-log = logging.getLogger('deck_chores')
-getenv = local_environment.get
+cfg: Final = SimpleNamespace()
+local_environment: Final[dict[str, str]] = environ.copy()
+log: Final = logging.getLogger('deck_chores')
+getenv: Final = local_environment.get
 
 
 ####
 
 
-CONTAINER_CACHE_SIZE = int(getenv("CONTAINER_CACHE_SIZE", "128"))
+CONTAINER_CACHE_SIZE: Final = int(getenv("CONTAINER_CACHE_SIZE", "128"))
 
 
 class ConfigurationError(Exception):

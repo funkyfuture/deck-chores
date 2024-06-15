@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Iterator, Mapping
+from typing import Final
 
 from apscheduler import events
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -15,7 +16,7 @@ from deck_chores.utils import generate_id, log
 ####
 
 
-scheduler = BackgroundScheduler()
+scheduler: Final = BackgroundScheduler()
 
 
 def start_scheduler():

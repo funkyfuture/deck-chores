@@ -1,7 +1,7 @@
 from collections import defaultdict
 from collections.abc import Mapping
 from functools import lru_cache
-from typing import Optional, Type
+from typing import Final, Optional, Type
 
 import cerberus
 from apscheduler.triggers.cron import CronTrigger
@@ -21,9 +21,9 @@ from deck_chores.utils import (
 ####
 
 
-CRON_TRIGGER_FIELDS_COUNT = len(CronTrigger.FIELD_NAMES)
-INTERVAL_SEPARATOR_TRANSLATION_TABLE = str.maketrans('.:/', '   ')
-NAME_INTERVAL_MAP = {
+CRON_TRIGGER_FIELDS_COUNT: Final = len(CronTrigger.FIELD_NAMES)
+INTERVAL_SEPARATOR_TRANSLATION_TABLE: Final = str.maketrans('.:/', '   ')
+NAME_INTERVAL_MAP: Final = {
     'weekly': (1, 0, 0, 0, 0),
     'daily': (0, 1, 0, 0, 0),
     'hourly': (0, 0, 1, 0, 0),
@@ -255,6 +255,4 @@ def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dic
 ####
 
 
-# TODO remove ignore when this issue is solved:
-#      https://github.com/python/mypy/issues/1317
-__all__ = (parse_labels.__name__,)  # type: ignore
+__all__ = ("parse_labels",)
