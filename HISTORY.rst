@@ -4,6 +4,12 @@ History
 Maintenance releases are not mentioned here, they update all dependencies and
 trigger complete rebuilds of the container images.
 
+1.4 (2024-06-15)
+~~~~~~~~~~~~~~~~
+
+* *removed*: the environment variable ``ASSERT_HOSTNAME`` is ignored to reflect changes in Docker's
+  TLS handling
+
 1.3 (2022-08-23)
 ~~~~~~~~~~~~~~~~
 
