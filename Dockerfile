@@ -1,6 +1,6 @@
 FROM docker.io/python:3.12-alpine
 
-MAINTAINER Frank Sachsenheim <funkyfuture@riseup.net>
+LABEL org.opencontainers.image.authors="funkyfuture@riseup.net"
 
 CMD ["deck-chores"]
 ENV PYTHONOPTIMIZE=1
