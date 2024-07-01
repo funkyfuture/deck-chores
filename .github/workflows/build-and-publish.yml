@@ -10,48 +10,49 @@ on:
     secrets:
       DOCKER_AUTH_TOKEN:
         required: true
-      PYPI_AUTH_TOKEN:
-        required: true
 
 jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+      - uses: hynek/build-and-inspect-python-package@v2
+
+  cheeseshop:
+    name: Publish to the cheeseshop
+    needs: [build-package]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/deck-chores
+    permissions:
+        id-token: write
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v4
+        with:
+          name: Packages
+          path: dist
+      - name: Upload package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
   version:
+    needs: [build-package]
     outputs:
       version: ${{ steps.echo-version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
-          ref: ${{ inputs.ref || github.ref }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - uses: abatilo/actions-poetry@v3.0.0
-
+          name: Package Metadata
       - id: echo-version
-        run: echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
-
+        run: 'grep "^Version: " PKG-INFO | cut -d " " -f 2 >> $GITHUB_OUTPUT'
       - if: ${{ github.event_name == 'push' }}
         run: >
              [ ${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]
              || [ refs/tags/${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]
-    
-
-  cheeseshop:
-    name: Build & publish to the cheeseshop
-    needs: [version]
-    runs-on: ubuntu-latest
-    steps:
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref || github.ref }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - uses: abatilo/actions-poetry@v3.0.0
-
-      - run: poetry build
-      - run: poetry publish --username __token__ --password ${{ secrets.PYPI_AUTH_TOKEN }}
 
   container-image:
     name: Build & push multi-architecture image
