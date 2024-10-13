@@ -142,10 +142,8 @@ with a running *deck-chores* from a ``docker compose`` project, one needs to cal
 
     docker kill --signal USR1 deck-chores_officer_1
 
-In this case, output appears in ``deck-chores_officer_1`` log target, which are the container's logs
-accessible via ``docker logs deck-chores_officer_1``. The beginning of the output is marked by 
-``|SIGUSR1 received, echoing all jobs.``, followed by detailed information regarding every registered,
-active job.
+The output appears in ``deck-chores``' log target, that are the container's logs when it runs within
+one.
 
 
 Job definitions
