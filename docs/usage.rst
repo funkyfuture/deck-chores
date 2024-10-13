@@ -138,7 +138,7 @@ Listing all registered jobs
 
 Information, including the next scheduled execution, about the registered jobs of a deck-chores
 instance can be logged by sending ``SIGUSR1`` signal to the *deck-chores*-process. For example,
-with a running *deck-chores* container named ``deck-chores_officer_1``, one needs to call::
+with a running *deck-chores* from a ``docker compose`` project, one needs to call::
 
     docker kill --signal USR1 deck-chores_officer_1
 
