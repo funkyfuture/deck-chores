@@ -14,7 +14,7 @@ Usually you would run ``deck-chores`` in a container::
 .. warning::
 
     The ``armv7l`` images are currently not available at the registries. They can be built on the
-    target platform with ``make build`` from the repository's root folder.
+    target platform with ``just build`` from the repository's root folder.
 
 .. note::
 
