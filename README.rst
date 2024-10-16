@@ -4,9 +4,6 @@ deck-chores
 .. image:: https://img.shields.io/docker/pulls/funkyfuture/deck-chores.svg
         :target: https://hub.docker.com/r/funkyfuture/deck-chores/
 
-.. image:: https://images.microbadger.com/badges/image/funkyfuture/deck-chores.svg
-        :target: https://microbadger.com/images/funkyfuture/deck-chores
-
 .. image:: https://img.shields.io/pypi/v/deck-chores.svg
         :target: https://pypi.org/project/deck-chores/
 
