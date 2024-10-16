@@ -65,7 +65,7 @@ else:
     html_theme = 'default'
 
 extlinks = {'issue': ('https://github.com/funkyfuture/deck-chores/issues/%s',
-                      '#')}
+                      '#%s')}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
