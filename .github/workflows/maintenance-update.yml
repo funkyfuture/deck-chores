@@ -9,18 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-            python-version: "3.12"
-      - uses: abatilo/actions-poetry@v3.0.0
-
-      - run: poetry update --lock
-
+      - run: pipx run poetry update --lock
       - id: commit-and-push
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Updates dependencies
-
       - if: ${{ steps.commit-and-push.outputs.changes_detected == false }}
         run: gh run cancel ${{ github.run_id }} && tail -f /dev/null
         env:
@@ -39,16 +32,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - uses: abatilo/actions-poetry@v3.0.0
-
       - id: bump
         run: | 
-          poetry version patch
+          pipx run poetry version patch
           echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
-
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: >
