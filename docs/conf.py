@@ -11,19 +11,18 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import os
-import sys
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('./..'))
-import deck_chores
+from datetime import datetime
+from importlib import metadata
+
 
 # -- Project information -----------------------------------------------------
 
-project = 'deck-chores'
-copyright = '2016-2020, Frank Sachsenheim'
-author = 'Frank Sachsenheim'
+project = "deck-chores"
+copyright = f"2016-{datetime.now().year}, Frank Sachsenheim"
+author = "Frank Sachsenheim"
 
 # The full version, including alpha/beta/rc tags.
-release = deck_chores.__version__
+release = metadata.version('deck_chores')
 # The short X.Y version.
 version = '.'.join(release.split('.', 2)[:2])
 
@@ -40,10 +39,6 @@ templates_path = ['_templates']
 
 # The master toctree document.
 master_doc = 'index'
-
-# Settings for `sphinxcontrib.issuetracker`
-issuetracker = 'github'
-issuetracker_project = 'funkyfuture/deck-chores'
 
 
 # List of patterns, relative to source directory, that match files and
