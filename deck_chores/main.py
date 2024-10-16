@@ -73,7 +73,7 @@ signal(SIGUSR1, sigusr1_handler)
 ####
 
 
-def process_started_container_labels(container_id: str, paused: bool = False) -> None:
+def process_started_container_labels(container_id: str, paused: bool = False):
     service_id, flags, definitions = parse_labels(container_id)
 
     if not definitions:
@@ -183,7 +183,7 @@ def find_other_container_for_service(
 ####
 
 
-def listen(since: datetime) -> None:
+def listen(since: datetime):
     log.info("Listening to events.")
     for event_json in cfg.client.events(since=since):
         if b'container' not in event_json:
@@ -267,7 +267,7 @@ def handle_unpause(event: dict):
         log.info(f"{container_name(container_id)}: Resumed {counter} jobs.")
 
 
-def shutdown() -> None:  # pragma: nocover
+def shutdown():  # pragma: nocover
     try:
         jobs.scheduler.shutdown()
     except SchedulerNotRunningError:
@@ -280,7 +280,7 @@ def shutdown() -> None:  # pragma: nocover
 ####
 
 
-def main() -> None:  # pragma: nocover
+def main():  # pragma: nocover
 
     if DEBUG and not __debug__:
         log.info("Replacing process with Python's optimizations off.")

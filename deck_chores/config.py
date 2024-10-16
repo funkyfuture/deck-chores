@@ -58,7 +58,7 @@ def _test_daemon_socket(url: str) -> str:  # pragma: nocover
 ####
 
 
-def generate_config() -> None:
+def generate_config():
     cfg.__dict__.clear()
     cfg.client_timeout = int(getenv('CLIENT_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
     cfg.default_flags = split_string(

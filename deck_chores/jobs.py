@@ -33,7 +33,7 @@ def start_scheduler():
 ####
 
 
-def on_max_instances(event: events.JobSubmissionEvent) -> None:
+def on_max_instances(event: events.JobSubmissionEvent):
     job = scheduler.get_job(event.job_id)
     definition = job.kwargs
     log.info(
@@ -43,7 +43,7 @@ def on_max_instances(event: events.JobSubmissionEvent) -> None:
     )
 
 
-def on_executed(event: events.JobExecutionEvent) -> None:
+def on_executed(event: events.JobExecutionEvent):
     job = scheduler.get_job(event.job_id)
     if job is None or job.id == 'container_inspection':
         return
@@ -64,7 +64,7 @@ def on_executed(event: events.JobExecutionEvent) -> None:
         log.info("== END of captured stdout & stderr ====")
 
 
-def on_error(event: events.JobExecutionEvent) -> None:
+def on_error(event: events.JobExecutionEvent):
     definition = scheduler.get_job(event.job_id).kwargs
     log.critical(
         f'An exception in deck-chores occurred while executing'
@@ -73,7 +73,7 @@ def on_error(event: events.JobExecutionEvent) -> None:
     log.error(str(event.exception))
 
 
-def on_missed(event: events.JobExecutionEvent) -> None:
+def on_missed(event: events.JobExecutionEvent):
     definition = scheduler.get_job(event.job_id).kwargs
     log.warning(
         f'Missed execution of {definition["job_name"]} in container '
@@ -112,9 +112,7 @@ def exec_job(**definition) -> tuple[int, bytes]:
 ####
 
 
-def add(
-    container_id: str, definitions: Mapping[str, dict], paused: bool = False
-) -> None:
+def add(container_id: str, definitions: Mapping[str, dict], paused: bool = False):
     log.debug(f'Adding jobs to container {container_id}.')
 
     for job_name, definition in definitions.items():
