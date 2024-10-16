@@ -1,4 +1,4 @@
-FROM docker.io/python:3.13-alpine
+FROM docker.io/python:3.12-alpine
 
 LABEL org.opencontainers.image.authors="funkyfuture@riseup.net"
 
