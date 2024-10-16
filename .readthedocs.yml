@@ -13,5 +13,7 @@ python:
   install:
     - path: .
       method: pip
+    - path: furo
+      method: pip
 
 ...
