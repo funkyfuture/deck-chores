@@ -38,8 +38,6 @@ fasteners = "^0.14"
 python-dateutil = "^2.8.1"
 
 [tool.poetry.dev-dependencies]
-black = "*"
-flake8 = "*"
 mypy = "*"
 pytest = "*"
 pytest-cov = "*"
