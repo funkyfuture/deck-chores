@@ -52,12 +52,7 @@ exclude_patterns = ['_build']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-if not os.environ.get('READTHEDOCS', False):
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-else:
-    html_theme = 'default'
+html_theme = "furo"
 
 extlinks = {'issue': ('https://github.com/funkyfuture/deck-chores/issues/%s',
                       '#%s')}

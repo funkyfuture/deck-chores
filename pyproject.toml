@@ -38,12 +38,11 @@ fasteners = "^0.14"
 python-dateutil = "^2.8.1"
 
 [tool.poetry.dev-dependencies]
+furo = "*"
 mypy = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
-Sphinx = "*"
-sphinx_rtd_theme = "*"
 types-python-dateutil = "^0.1.4"
 types-pytz = "^2021.1.0"
 types-setuptools = "*"
