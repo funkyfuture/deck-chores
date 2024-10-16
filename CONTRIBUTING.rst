@@ -54,6 +54,10 @@ If you are proposing a feature:
 Get Started!
 ------------
 
+.. warning::
+
+    This section is outdated.
+
 Ready to contribute? Here's how to set up `deck-chores` for local development.
 
 1. Fork_ the `deck-chores` repo on GitHub.
