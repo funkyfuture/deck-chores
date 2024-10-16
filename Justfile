@@ -52,7 +52,7 @@ docs:
 
 # checks the referenced URLs in the docs
 docslinks:
-	make -C docs linkcheck
+	poetry run make -C docs linkcheck
 
 # check style with flake8
 lint: black
