@@ -30,6 +30,7 @@ deck-chores = "deck_chores.main:main"
 # the Dockerfile{-dev} have these values too
 # .readthedocs.yml must be in parity with the Python version
 # it's also all over the Github workflows
+# TODO update to 3.12 when available, tracked in #150
 python = "^3.12"
 apscheduler = "^3.6"
 cerberus = "^1.3.4"
@@ -38,7 +39,6 @@ fasteners = "^0.14"
 python-dateutil = "^2.8.1"
 
 [tool.poetry.dev-dependencies]
-furo = "*"
 mypy = "*"
 pytest = "*"
 pytest-cov = "*"

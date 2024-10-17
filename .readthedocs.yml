@@ -5,6 +5,7 @@ version: 2
 build:
   os: ubuntu-24.04
   tools:
+    # TODO update to 3.12 when available, tracked in #150
     python: "3.12"
 
 formats: all
@@ -13,7 +14,6 @@ python:
   install:
     - path: .
       method: pip
-    - path: furo
-      method: pip
+    - requirements: docs/requirements.txt
 
 ...
