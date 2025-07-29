@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/deck-chores
+      url: https://pypi.org/p/deck-chores
     permissions:
         id-token: write
     steps:
