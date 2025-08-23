@@ -1,4 +1,4 @@
-name: Maintenance release (update dependence and create releases)
+name: Maintenance release (update dependencies and create releases)
 on:
   schedule:
     - cron: "44 4 26 * *"
@@ -34,6 +34,7 @@ jobs:
     needs: [run-tests]
     runs-on: ubuntu-latest
     steps:
+      - run: pipx install poetry
       - uses: actions/checkout@v4
         with:
           ref: main
