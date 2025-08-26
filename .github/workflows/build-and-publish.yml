@@ -48,8 +48,10 @@ jobs:
         with:
           name: Package Metadata
       - id: echo-version
+        shell: bash
         run: 'grep "^Version: " PKG-INFO | cut -d " " -f 2 >> $GITHUB_OUTPUT'
       - if: ${{ github.event_name == 'push' }}
+        shell: bash
         run: >
              [ ${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]
              || [ refs/tags/${{ steps.echo-version.outputs.version }} == ${{ github.ref }} ]
@@ -79,12 +81,14 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.ref }}
 
-      - run: >
+      - shell: bash
+        run: >
           echo "PRERELEASE=${{ (
              contains('a', env.VERSION)  || contains('b', env.VERSION)
           || contains('rc', env.VERSION) || contains('pre', env.VERSION)
           ) }}" >> $GITHUB_ENV
       - name: echo version related variables
+        shell: bash
         run: |
           echo 'VERSION: ${{ env.VERSION }}'
           echo 'PRERELEASE: ${{ env.PRERELEASE }}'
@@ -103,9 +107,11 @@ jobs:
             type=pep440,pattern={{major}}.{{minor}},value=${{ env.VERSION }},enable=${{ env.PRERELEASE == 'false' }}
       - name: prepare push tag value
         id: push-tags-value
+        shell: bash
         run: echo "tags=${{ steps.docker-metadata.outputs.tags }}" | tr "\n" " " | sed "s/${{ env.IMAGE_NAME }}://g" >> $GITHUB_OUTPUT
 
       - name: install dependency for multi-platform builds
+        shell: bash
         run: |
           sudo apt update
           sudo apt install -y qemu-user-static
@@ -121,13 +127,16 @@ jobs:
           tags: ${{ steps.docker-metadata.outputs.tags }}
 
       - name: echo build outputs
+        shell: bash
         run: |
           echo "Image: ${{ steps.build-image.outputs.image }}"
           echo "Tags: ${{ steps.build-image.outputs.tags }}"
           echo "Tagged Image: ${{ steps.build-image.outputs.image-with-tag }}"
       - name: echo created images
+        shell: bash
         run: buildah images | grep '${{ env.IMAGE_NAME }}'
       - name: echo image metadata
+        shell: bash
         run: buildah inspect ${{ steps.build-image.outputs.image-with-tag }}
 
       - name: push to ghcr.io
