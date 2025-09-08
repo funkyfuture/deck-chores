@@ -18,7 +18,7 @@ jobs:
       - shell: bash
         run: poetry update --lock
       - id: commit-and-push
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: Updates dependencies
       - if: ${{ steps.commit-and-push.outputs.changes_detected == false }}
@@ -46,7 +46,7 @@ jobs:
         run: | 
           pipx run poetry version patch
           echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: >
             Bumps version to ${{ steps.bump.outputs.version }} (maintenance release)
