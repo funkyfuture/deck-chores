@@ -31,7 +31,7 @@ jobs:
         id-token: write
     steps:
       - name: Download package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: Packages
           path: dist
@@ -44,7 +44,7 @@ jobs:
       version: ${{ steps.echo-version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: Package Metadata
       - id: echo-version
