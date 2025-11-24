@@ -17,7 +17,7 @@ jobs:
     outputs:
       version: ${{ steps.baipp.package_version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref || github.ref }}
       - id: baipp
@@ -62,7 +62,7 @@ jobs:
           username: ${{ env.DOCKER_IO_USER }}
           password: ${{ secrets.DOCKER_AUTH_TOKEN }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref || github.ref }}
 
