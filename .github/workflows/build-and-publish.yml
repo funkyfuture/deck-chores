@@ -101,7 +101,7 @@ jobs:
           sudo apt update
           sudo apt install -y qemu-user-static
       - id: build-image
-        uses: redhat-actions/buildah-build@v2
+        uses: redhat-actions/buildah-build@v3
         with:
           containerfiles: |
             ./Dockerfile
