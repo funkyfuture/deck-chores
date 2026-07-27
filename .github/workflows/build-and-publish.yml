@@ -51,12 +51,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: redhat-actions/podman-login@v1
+      - uses: redhat-actions/podman-login@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-      - uses: redhat-actions/podman-login@v1
+      - uses: redhat-actions/podman-login@v2
         with:
           registry: docker.io
           username: ${{ env.DOCKER_IO_USER }}
