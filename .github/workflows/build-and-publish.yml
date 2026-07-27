@@ -125,14 +125,14 @@ jobs:
         run: buildah inspect ${{ steps.build-image.outputs.image-with-tag }}
 
       - name: push to ghcr.io
-        uses: redhat-actions/push-to-registry@v2
+        uses: redhat-actions/push-to-registry@v3
         with:
           registry: ghcr.io/${{ github.actor }}
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.push-tags-value.outputs.tags }}
 
       - name: push to docker.io
-        uses: redhat-actions/push-to-registry@v2
+        uses: redhat-actions/push-to-registry@v3
         with:
           registry: docker.io/${{ env.DOCKER_IO_USER }}
           image: ${{ steps.build-image.outputs.image }}
