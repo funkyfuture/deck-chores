@@ -85,7 +85,8 @@ class JobConfigValidator(cerberus.Validator):
 
         trigger_class, args = value[0], value[1]
         try:
-            trigger_class(*args, timezone=self.document.get('timezone', cfg.timezone))
+            trigger_class(
+                *args, timezone=self.document.get('timezone', cfg.timezone))
         except Exception as e:
             message = (
                 f"Error while instantiating a {trigger_class.__name__} with '{args}'."
@@ -146,7 +147,8 @@ def parse_labels(container_id: str) -> tuple[tuple[str, ...], str, dict[str, dic
 
     service_id = parse_service_id(labels)
 
-    filtered_labels = {k: v for k, v in labels.items() if k.startswith(cfg.label_ns)}
+    filtered_labels = {k: v for k,
+                       v in labels.items() if k.startswith(cfg.label_ns)}
     flags, user = parse_options(filtered_labels)
 
     if 'image' in flags:
@@ -155,7 +157,8 @@ def parse_labels(container_id: str) -> tuple[tuple[str, ...], str, dict[str, dic
     else:
         image_labels = {}
 
-    job_definitions = parse_job_definitions(image_labels | filtered_labels, user)
+    job_definitions = parse_job_definitions(
+        image_labels | filtered_labels, user)
 
     if service_id:
         log.debug(f'Assigning service id: {service_id}')
@@ -185,7 +188,8 @@ def parse_flags(options: str) -> str:
 
 
 def parse_service_id(labels: dict[str, str]) -> tuple[str, ...]:
-    filtered_labels = {k: v for k, v in labels.items() if k in cfg.service_identifiers}
+    filtered_labels = {k: v for k,
+                       v in labels.items() if k in cfg.service_identifiers}
     log.debug(f'Considering labels for service id: {filtered_labels}')
     if not filtered_labels:
         return ()
@@ -214,6 +218,9 @@ def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dic
     )
 
     for key, value in labels.items():
+        if value == "":
+            continue
+
         key = key.removeprefix(cfg.label_ns)
         if '.env.' in key:
             name, _, variable = key.split('.', 2)
@@ -222,13 +229,18 @@ def parse_job_definitions(labels: Mapping[str, str], user: str) -> dict[str, dic
                 variable
             ] = value
         else:
-            name, attribute = key.split('.', 1)
-            name_grouped_definitions[name][attribute] = value
+            if "." in key:
+                name, attribute = key.split('.', 1)
+                name_grouped_definitions[name][attribute] = value
 
     log.debug(f'Job definitions: {dict(name_grouped_definitions)}')
 
     result = {}
     for name, definition in name_grouped_definitions.items():
+        if definition.get('enabled', 'true').lower() == 'false':
+            log.debug(f'Skipping disabled job: {name}')
+            continue
+
         log.debug(f'Processing {name}')
         definition['name'] = name
         definition.setdefault("user", user)
