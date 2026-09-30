@@ -1,23 +1,30 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
 from apscheduler.job import Job
+from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from docker.models.containers import Container
-from pytest import mark
+from pytest import fixture, mark
 
-from deck_chores.indexes import lock_service
+from deck_chores.indexes import (
+    container_name,
+    lock_service,
+    service_locks_by_container_id,
+    service_locks_by_service_id,
+)
 from deck_chores.main import (
     find_other_container_for_service,
     inspect_running_containers,
     listen,
+    process_started_container_labels,
     reassign_jobs,
     there_is_another_deck_chores_container,
     handle_die,
     handle_pause,
     handle_unpause,
 )
-from deck_chores.parsers import parse_job_definitions
+from deck_chores.parsers import parse_job_definitions, parse_labels
 
 
 @mark.parametrize(
@@ -242,45 +249,142 @@ def test_inspect_running_containers(cfg, mocker):
     process_started_container_labels.assert_called_once_with("a", paused=False)
 
 
-@mark.parametrize(
-    ("container_status", "job_next_run_time", "expected_job_call"),
-    (
-        ("running", None, "resume"),
-        ("paused", None, ""),
-        ("paused", datetime(year=1, month=2, day=3), "pause"),
-    ),
-)
-def test_reassign_jobs(
-    cfg, mocker, container_status, job_next_run_time, expected_job_call
-):
-    container = mocker.MagicMock(spec_set=Container)
-    container.status = container_status
-    container.id = "b"
+@fixture
+def replacement_service(cfg, mocker):
+    scheduler = BackgroundScheduler(timezone="UTC")
+    mocker.patch("deck_chores.jobs.scheduler", scheduler)
+    containers = {}
+    for container_id in ("old", "replacement"):
+        containers[container_id] = SimpleNamespace(
+            id=container_id,
+            name=container_id,
+            status="running",
+            image=SimpleNamespace(labels={}),
+            labels={
+                "project_id": "foo",
+                "service_id": "bar",
+                "deck-chores.backup.command": "env",
+                "deck-chores.backup.interval": "every minute",
+            },
+        )
 
-    find_other_container_for_service = mocker.MagicMock(return_value=container)
-    mocker.patch(
-        "deck_chores.main.find_other_container_for_service",
-        find_other_container_for_service,
+    cfg.client.containers.get.side_effect = containers.__getitem__
+    cfg.client.containers.list.side_effect = lambda **kwargs: [
+        c for c in containers.values() if c.status == kwargs["filters"]["status"]
+    ]
+    container_name.cache_clear()
+    parse_labels.cache_clear()
+    scheduler.start(paused=True)
+    yield scheduler, containers["old"], containers["replacement"]
+    scheduler.shutdown()
+    container_name.cache_clear()
+    parse_labels.cache_clear()
+
+
+@mark.parametrize("old_paused", (False, True))
+@mark.parametrize("replacement_status", ("running", "paused"))
+def test_reassign_jobs(replacement_service, old_paused, replacement_status):
+    scheduler, old, replacement = replacement_service
+    replacement.status = replacement_status
+    process_started_container_labels(old.id, paused=old_paused)
+    job = scheduler.get_jobs()[0]
+    next_run_time = job.next_run_time
+
+    assert reassign_jobs(old.id, consider_paused=True) == replacement.id
+
+    assert scheduler.get_jobs() == [job]
+    assert job.kwargs["container_id"] == replacement.id
+    if replacement_status == "paused":
+        assert job.next_run_time is None
+    elif old_paused:
+        assert job.next_run_time is not None
+    else:
+        assert job.next_run_time == next_run_time
+    service_id = ("project_id=foo", "service_id=bar")
+    assert service_locks_by_service_id[service_id] == replacement.id
+    assert old.id not in service_locks_by_container_id
+
+    assert reassign_jobs(replacement.id, consider_paused=True) == old.id
+    assert scheduler.get_jobs() == [job]
+    assert job.kwargs["container_id"] == old.id
+
+
+@mark.parametrize("replacement_status", ("running", "paused"))
+def test_reassign_jobs_uses_replacement_labels(replacement_service, replacement_status):
+    scheduler, old, replacement = replacement_service
+    process_started_container_labels(old.id)
+    job_id = scheduler.get_jobs()[0].id
+    old.status = "exited"
+    replacement.status = replacement_status
+    replacement.labels.update(
+        {
+            "deck-chores.backup.command": "echo changed",
+            "deck-chores.backup.interval": "daily",
+            "deck-chores.backup.user": "worker",
+            "deck-chores.backup.workdir": "/backups",
+            "deck-chores.backup.env.MODE": "daily",
+            "deck-chores.backup.max": "2",
+        }
     )
 
-    job = mocker.MagicMock(spec_set=Job)
+    handle_die({"Actor": {"ID": old.id}})
+    if replacement_status == "running":
+        process_started_container_labels(replacement.id)
 
-    # that is to detect dict unions on the mock's kwargs attribute:
-    job_kwargs_union = job.kwargs.__or__
-    job_kwargs_union.return_value = mocker.MagicMock()
+    job = scheduler.get_job(job_id)
+    assert job.kwargs["container_id"] == replacement.id
+    assert job.kwargs["command"] == "echo changed"
+    assert job.kwargs["user"] == "worker"
+    assert job.kwargs["workdir"] == "/backups"
+    assert job.kwargs["environment"] == {"MODE": "daily"}
+    assert job.max_instances == 2
+    assert job.trigger.interval == timedelta(days=1)
+    assert (job.next_run_time is None) == (replacement_status == "paused")
+    assert len(scheduler.get_jobs()) == 1
 
-    job.next_run_time = job_next_run_time
-    get_jobs_for_container = mocker.Mock(return_value=(job,))
-    mocker.patch("deck_chores.jobs.get_jobs_for_container", get_jobs_for_container)
 
-    lock_service(("project_id=foo", "service_id=bar"), "a")
+@mark.parametrize("add_replacement_job", (False, True))
+def test_reassign_jobs_removes_old_definitions(
+    replacement_service, add_replacement_job
+):
+    scheduler, old, replacement = replacement_service
+    process_started_container_labels(old.id)
+    job_id = scheduler.get_jobs()[0].id
+    replacement.labels.pop("deck-chores.backup.command")
+    replacement.labels.pop("deck-chores.backup.interval")
+    if add_replacement_job:
+        replacement.image.labels = {
+            "deck-chores.cleanup.command": "echo cleanup",
+            "deck-chores.cleanup.interval": "daily",
+        }
 
-    assert reassign_jobs("a", consider_paused=True) == "b"
-    find_other_container_for_service.assert_called_once_with("a", True)
+    assert reassign_jobs(old.id, consider_paused=True) == replacement.id
 
-    get_jobs_for_container.assert_called_once_with("a")
-    if expected_job_call:
-        getattr(job, expected_job_call).assert_called_once()
+    assert scheduler.get_job(job_id) is None
+    assert len(scheduler.get_jobs()) == int(add_replacement_job)
+    if add_replacement_job:
+        job = scheduler.get_jobs()[0]
+        assert job.name == "cleanup"
+        assert job.kwargs["container_id"] == replacement.id
+        assert job.kwargs["command"] == "echo cleanup"
 
-    job_kwargs_union.assert_called_once_with({"container_id": "b"})
-    job.modify.assert_called_once_with(kwargs=job_kwargs_union.return_value)
+
+def test_reassign_jobs_keeps_unchanged_schedule(replacement_service):
+    scheduler, old, replacement = replacement_service
+    process_started_container_labels(old.id)
+    original_job = scheduler.get_jobs()[0]
+    next_run_time = datetime(2030, 1, 2, tzinfo=timezone.utc)
+    original_job.modify(next_run_time=next_run_time)
+    replacement.labels.update(
+        {
+            "deck-chores.cleanup.command": "echo cleanup",
+            "deck-chores.cleanup.interval": "daily",
+        }
+    )
+
+    assert reassign_jobs(old.id, consider_paused=True) == replacement.id
+
+    assert scheduler.get_job(original_job.id) is original_job
+    assert original_job.next_run_time == next_run_time
+    assert original_job.kwargs["container_id"] == replacement.id
+    assert {job.name for job in scheduler.get_jobs()} == {"backup", "cleanup"}
