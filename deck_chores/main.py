@@ -27,7 +27,6 @@ from deck_chores.utils import (
     configure_logging,
 )
 
-
 ####
 
 
@@ -129,10 +128,28 @@ def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
 
     new_id = other_service_container.id
     container_is_paused = other_service_container.status == "paused"
+    _, _, definitions = parse_labels(new_id)
+    runtime_fields = ('container_id', 'job_id', 'job_name')
+    definitions = {
+        name: {
+            key: value for key, value in definition.items() if key not in runtime_fields
+        }
+        for name, definition in definitions.items()
+    }
     log.info(f"{container_name(container_id)}: Reassigning jobs to {new_id}.")
 
     for job in jobs.get_jobs_for_container(container_id):
         log.debug(f"Handling job: {job.kwargs}")
+        job_name = job.kwargs['job_name']
+        previous_definition = {
+            key: value for key, value in job.kwargs.items() if key not in runtime_fields
+        }
+        if definitions.get(job_name) != previous_definition:
+            job.remove()
+            continue
+
+        # Keep unchanged jobs so a service handover preserves their next run time.
+        definitions.pop(job_name)
         job_is_paused = not bool(job.next_run_time)
 
         if container_is_paused and not job_is_paused:
@@ -146,6 +163,7 @@ def reassign_jobs(container_id: str, consider_paused: bool) -> Optional[str]:
         job.modify(kwargs=(job.kwargs | {"container_id": new_id}))
 
     reassign_service_lock(container_id, new_id)
+    jobs.add(new_id, definitions, paused=container_is_paused)
 
     return new_id
 
